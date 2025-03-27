@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Match, Guess } from "../types";
 import { calculatePoints, getPointsBadgeClass, getScoringDescription } from "../utils/scoring";
@@ -9,6 +8,7 @@ interface MatchCardProps {
   onGuessChange?: (homeScore: number, awayScore: number) => void;
   editable?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const MatchCard = ({
@@ -17,6 +17,7 @@ const MatchCard = ({
   onGuessChange,
   editable = false,
   className = "",
+  style,
 }: MatchCardProps) => {
   const [homeGuess, setHomeGuess] = useState<number>(userGuess?.homeScore || 0);
   const [awayGuess, setAwayGuess] = useState<number>(userGuess?.awayScore || 0);
@@ -57,7 +58,7 @@ const MatchCard = ({
   });
 
   return (
-    <div className={`gradient-border card-transition ${className}`}>
+    <div className={`gradient-border card-transition ${className}`} style={style}>
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>Rodada {match.round}</span>
