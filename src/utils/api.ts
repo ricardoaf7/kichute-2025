@@ -50,6 +50,35 @@ interface ApiFootballFixture {
   };
 }
 
+// Função para testar a função Edge Function do Supabase
+export async function testApiFootballFunction(): Promise<boolean> {
+  try {
+    console.log("Testando conexão com API-Football...");
+    
+    // Faz uma requisição simples para verificar se a função está respondendo
+    const response = await fetch(`/api/rest/api-football?endpoint=rounds&league=71&season=2024`);
+    
+    if (!response.ok) {
+      throw new Error(`Erro HTTP: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("Resposta da API:", data);
+    
+    // Verifica se a resposta possui o formato esperado
+    if (data && 'response' in data) {
+      console.log("Conexão com API-Football estabelecida com sucesso!");
+      return true;
+    } else {
+      console.error("Formato de resposta inválido:", data);
+      return false;
+    }
+  } catch (error) {
+    console.error("Erro ao testar API-Football:", error);
+    return false;
+  }
+}
+
 // Função para buscar rodadas do campeonato
 export async function fetchRounds(season: string = "2024", league: string = "71"): Promise<string[]> {
   try {
