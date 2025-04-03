@@ -2,6 +2,8 @@
 import React from "react";
 import ApiFootballTester from "../components/ApiFootballTester";
 import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 const Index = () => {
   return (
@@ -11,6 +13,15 @@ const Index = () => {
         <p className="text-xl text-center mb-8">
           Bem-vindo ao Kichute Bolão, o bolão do Brasileirão!
         </p>
+        
+        <Alert className="mb-8">
+          <Info className="h-4 w-4" />
+          <AlertTitle>Teste da API Football</AlertTitle>
+          <AlertDescription>
+            Use o painel abaixo para testar a conexão com a API Football e verificar rodadas e partidas.
+            Certifique-se de que a Supabase Edge Function esteja implantada corretamente.
+          </AlertDescription>
+        </Alert>
         
         <ApiFootballTester />
         

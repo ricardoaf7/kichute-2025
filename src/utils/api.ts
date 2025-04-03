@@ -1,4 +1,3 @@
-
 import { Match, Round, Team } from "../types";
 
 interface ApiFootballResponse {
@@ -55,8 +54,8 @@ export async function testApiFootballFunction(): Promise<boolean> {
   try {
     console.log("Testando conexão com API-Football...");
     
-    // Faz uma requisição simples para verificar se a função está respondendo
-    const response = await fetch(`/api/rest/api-football?endpoint=rounds&league=71&season=2024`);
+    // Usando a URL correta para a função Edge do Supabase
+    const response = await fetch(`${window.location.origin}/functions/v1/api-football?endpoint=rounds&league=71&season=2024`);
     
     if (!response.ok) {
       throw new Error(`Erro HTTP: ${response.status}`);
@@ -83,7 +82,7 @@ export async function testApiFootballFunction(): Promise<boolean> {
 export async function fetchRounds(season: string = "2024", league: string = "71"): Promise<string[]> {
   try {
     const response = await fetch(
-      `/api/rest/api-football?endpoint=rounds&league=${league}&season=${season}`
+      `${window.location.origin}/functions/v1/api-football?endpoint=rounds&league=${league}&season=${season}`
     );
     
     if (!response.ok) {
@@ -109,7 +108,7 @@ export async function fetchFixtures(
     const formattedRound = `Regular Season - ${round}`;
     
     const response = await fetch(
-      `/api/rest/api-football?endpoint=fixtures&league=${league}&season=${season}&round=${encodeURIComponent(formattedRound)}`
+      `${window.location.origin}/functions/v1/api-football?endpoint=fixtures&league=${league}&season=${season}&round=${encodeURIComponent(formattedRound)}`
     );
     
     if (!response.ok) {
@@ -156,7 +155,6 @@ export async function fetchFixtures(
 
 // Função para obter o nome curto do time
 function getTeamShortName(fullName: string): string {
-  // Mapeamento de nomes de times para abreviações
   const shortNames: Record<string, string> = {
     "Atlético Mineiro": "CAM",
     "Athletico Paranaense": "CAP",
