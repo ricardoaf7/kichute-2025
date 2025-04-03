@@ -25,11 +25,29 @@ serve(async (req) => {
       throw new Error("API_FOOTBALL_KEY não está configurada");
     }
 
-    const url = new URL(req.url);
-    const endpoint = url.searchParams.get("endpoint") || "fixtures";
-    const league = url.searchParams.get("league") || "71"; // ID da liga brasileira
-    const season = url.searchParams.get("season") || "2024";
-    const round = url.searchParams.get("round") || "Regular Season - 1";
+    let endpoint, league, season, round;
+    
+    // Verificar se é uma requisição GET ou POST
+    if (req.method === "GET") {
+      // Extrair parâmetros da URL
+      const url = new URL(req.url);
+      endpoint = url.searchParams.get("endpoint") || "fixtures";
+      league = url.searchParams.get("league") || "71"; // ID da liga brasileira
+      season = url.searchParams.get("season") || "2024";
+      round = url.searchParams.get("round");
+    } else if (req.method === "POST") {
+      // Extrair parâmetros do corpo da requisição
+      const body = await req.json().catch(() => ({}));
+      endpoint = body.endpoint || "fixtures";
+      league = body.league || "71";
+      season = body.season || "2024";
+      round = body.round;
+      
+      console.log("Corpo da requisição POST:", body);
+    }
+
+    // Registrar parâmetros para depuração
+    console.log(`Parâmetros: endpoint=${endpoint}, league=${league}, season=${season}, round=${round}`);
 
     // Construir a URL da API
     let apiUrl = `https://api-football-v1.p.rapidapi.com/v3/${endpoint}`;
@@ -56,10 +74,14 @@ serve(async (req) => {
     });
 
     if (!apiResponse.ok) {
-      throw new Error(`Erro na API: ${apiResponse.statusText}`);
+      const errorText = await apiResponse.text();
+      console.error(`Erro na API: ${apiResponse.status} ${apiResponse.statusText}`);
+      console.error(`Resposta de erro: ${errorText}`);
+      throw new Error(`Erro na API: ${apiResponse.status} ${apiResponse.statusText}`);
     }
 
     const data = await apiResponse.json();
+    console.log("Resposta da API recebida com sucesso");
 
     // Retornar dados da API
     return new Response(JSON.stringify(data), {
@@ -67,7 +89,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Erro:", error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error.message, stack: error.stack }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
