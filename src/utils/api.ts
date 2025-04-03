@@ -50,15 +50,35 @@ interface ApiFootballFixture {
 }
 
 // Função para testar a função Edge Function do Supabase
-export async function testApiFootballFunction(): Promise<boolean> {
+export async function testApiFootballFunction(): Promise<{success: boolean; message: string}> {
   try {
     console.log("Testando conexão com API-Football...");
     
     // Usando a URL correta para a função Edge do Supabase
-    const response = await fetch(`${window.location.origin}/functions/v1/api-football?endpoint=rounds&league=71&season=2024`);
+    const url = `${window.location.origin}/functions/v1/api-football?endpoint=rounds&league=71&season=2024`;
+    console.log("URL da requisição:", url);
+    
+    const response = await fetch(url);
+    
+    // Verificar o tipo de conteúdo da resposta
+    const contentType = response.headers.get("content-type");
+    console.log("Tipo de conteúdo da resposta:", contentType);
     
     if (!response.ok) {
-      throw new Error(`Erro HTTP: ${response.status}`);
+      return {
+        success: false, 
+        message: `Erro HTTP: ${response.status} ${response.statusText}`
+      };
+    }
+    
+    // Se a resposta não for JSON, mostrar um erro mais informativo
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Resposta não-JSON recebida:", text.substring(0, 100) + "...");
+      return {
+        success: false,
+        message: "A resposta não é um JSON válido. A Edge Function pode não estar implantada corretamente."
+      };
     }
     
     const data = await response.json();
@@ -67,14 +87,20 @@ export async function testApiFootballFunction(): Promise<boolean> {
     // Verifica se a resposta possui o formato esperado
     if (data && 'response' in data) {
       console.log("Conexão com API-Football estabelecida com sucesso!");
-      return true;
+      return {success: true, message: "Conexão estabelecida com sucesso!"};
     } else {
       console.error("Formato de resposta inválido:", data);
-      return false;
+      return {
+        success: false,
+        message: "Formato de resposta inválido. Verifique se a Edge Function está corretamente implementada."
+      };
     }
   } catch (error) {
     console.error("Erro ao testar API-Football:", error);
-    return false;
+    return {
+      success: false,
+      message: `Erro: ${error.message}`
+    };
   }
 }
 

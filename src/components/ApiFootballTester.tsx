@@ -6,10 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { testApiFootballFunction, fetchRounds, fetchFixtures } from "../utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const ApiFootballTester: React.FC = () => {
   const [isTestingConnection, setIsTestingConnection] = useState(false);
-  const [connectionResult, setConnectionResult] = useState<{success?: boolean; error?: string} | null>(null);
+  const [connectionResult, setConnectionResult] = useState<{success?: boolean; message?: string} | null>(null);
   
   const [isLoadingRounds, setIsLoadingRounds] = useState(false);
   const [rounds, setRounds] = useState<string[]>([]);
@@ -23,15 +24,16 @@ const ApiFootballTester: React.FC = () => {
     setConnectionResult(null);
     
     try {
-      const success = await testApiFootballFunction();
-      setConnectionResult({ success });
-      if (success) {
+      const result = await testApiFootballFunction();
+      setConnectionResult(result);
+      
+      if (result.success) {
         toast.success("Conexão com API-Football estabelecida!");
       } else {
-        toast.error("Falha na conexão com API-Football");
+        toast.error(`Falha na conexão: ${result.message}`);
       }
     } catch (error) {
-      setConnectionResult({ error: error.message });
+      setConnectionResult({ success: false, message: error.message });
       toast.error(`Erro: ${error.message}`);
     } finally {
       setIsTestingConnection(false);
@@ -109,6 +111,16 @@ const ApiFootballTester: React.FC = () => {
           </TabsList>
           
           <TabsContent value="connection" className="space-y-4">
+            <Alert className="mb-4 bg-amber-50">
+              <Zap className="h-4 w-4" />
+              <AlertTitle>Importante</AlertTitle>
+              <AlertDescription>
+                Antes de testar, certifique-se de que a Edge Function do Supabase foi implantada corretamente
+                em <code>/functions/v1/api-football</code>. Se estiver desenvolvendo localmente, execute o servidor
+                Supabase e configure as variáveis de ambiente necessárias.
+              </AlertDescription>
+            </Alert>
+            
             <div className="flex flex-col space-y-4 my-4">
               <Button onClick={handleTestConnection} disabled={isTestingConnection}>
                 {isTestingConnection ? (
@@ -128,7 +140,12 @@ const ApiFootballTester: React.FC = () => {
                   ) : (
                     <div>
                       <p className="text-red-700">❌ Falha na conexão</p>
-                      {connectionResult.error && <p className="text-sm text-red-600">{connectionResult.error}</p>}
+                      {connectionResult.message && (
+                        <div className="mt-2">
+                          <p className="text-sm text-red-600 font-medium">Detalhes do erro:</p>
+                          <p className="text-sm text-red-600 mt-1">{connectionResult.message}</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
