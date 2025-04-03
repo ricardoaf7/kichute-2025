@@ -14,6 +14,8 @@ export interface Match {
   awayScore?: number | null;
   date: string;
   played: boolean;
+  stadium?: string;
+  city?: string;
 }
 
 export interface Player {

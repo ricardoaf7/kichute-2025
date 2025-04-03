@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Match, Guess } from "../types";
 import { calculatePoints, getPointsBadgeClass, getScoringDescription } from "../utils/scoring";
+import { MapPin } from "lucide-react";
 
 interface MatchCardProps {
   match: Match;
@@ -65,6 +66,13 @@ const MatchCard = ({
           <span>Rodada {match.round}</span>
           <span>{formattedDate}</span>
         </div>
+
+        {(match.stadium || match.city) && (
+          <div className="flex items-center text-xs text-muted-foreground mb-1">
+            <MapPin className="h-3 w-3 mr-1" />
+            <span>{match.stadium}{match.city ? `, ${match.city}` : ''}</span>
+          </div>
+        )}
 
         <div className="flex items-center justify-between">
           <div className="flex flex-1 items-center">
