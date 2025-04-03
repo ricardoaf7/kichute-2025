@@ -1,10 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PLAYERS, ROUNDS } from "../utils/mockData";
 import StandingsTable from "../components/StandingsTable";
 import RoundSelector from "../components/RoundSelector";
-import { ArrowRight, Calendar, Award, Boot } from "lucide-react";
+import { ArrowRight, Calendar, Award, DollarSign } from "lucide-react";
+import Boot from "../components/icons/Boot";
 
 const Index = () => {
   const [currentRound, setCurrentRound] = useState(1);

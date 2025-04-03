@@ -1,16 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   Award, 
   Calendar, 
   Home, 
-  Boot, 
   DollarSign, 
   Users, 
   Menu, 
   X 
 } from "lucide-react";
+import Boot from "./icons/Boot";
 
 const Navbar = () => {
   const location = useLocation();
