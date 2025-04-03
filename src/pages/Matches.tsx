@@ -36,7 +36,7 @@ const Matches = () => {
 
   return (
     <div className="page-container">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12 animate-slide-down">
           <h1 className="text-3xl font-bold">Partidas</h1>
           <p className="text-muted-foreground mt-2">
@@ -52,20 +52,20 @@ const Matches = () => {
           />
         </div>
 
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${
+        <div className={`flex flex-col space-y-4 max-w-3xl mx-auto transition-opacity duration-300 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}>
           {matches.map((match, index) => (
             <MatchCard 
               key={match.id} 
               match={match} 
-              className="animate-slide-up"
+              className="animate-slide-up w-full"
               style={{ animationDelay: `${0.1 + index * 0.05}s` }}
             />
           ))}
 
           {matches.length === 0 && (
-            <div className="col-span-full text-center py-12 text-muted-foreground animate-fadeIn">
+            <div className="text-center py-12 text-muted-foreground animate-fadeIn">
               Nenhuma partida encontrada para esta rodada.
             </div>
           )}

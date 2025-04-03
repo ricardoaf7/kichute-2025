@@ -7,6 +7,8 @@ import PlayerCard from "../components/PlayerCard";
 const Standings = () => {
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [selectedRound, setSelectedRound] = useState<number | undefined>(undefined);
+  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+  const [selectedYear, setSelectedYear] = useState<string>("2025");
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -26,7 +28,40 @@ const Standings = () => {
   const handleRoundChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedRound(value === "total" ? undefined : parseInt(value));
+    // Reset month when selecting a specific round
+    if (value !== "total") {
+      setSelectedMonth("all");
+    }
   };
+
+  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMonth(e.target.value);
+    // Reset round when selecting a specific month
+    if (e.target.value !== "all") {
+      setSelectedRound(undefined);
+    }
+  };
+
+  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(e.target.value);
+  };
+
+  const months = [
+    { value: "all", label: "Todos" },
+    { value: "mar-apr", label: "Março/Abril" },
+    { value: "may", label: "Maio" },
+    { value: "jun", label: "Junho" },
+    { value: "jul", label: "Julho" },
+    { value: "aug", label: "Agosto" },
+    { value: "sep", label: "Setembro" },
+    { value: "oct", label: "Outubro" },
+    { value: "nov", label: "Novembro" },
+    { value: "dec", label: "Dezembro" },
+  ];
+
+  const years = [
+    { value: "2025", label: "2025" },
+  ];
 
   return (
     <div className="page-container">
@@ -47,7 +82,7 @@ const Standings = () => {
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center space-x-3">
                 <label htmlFor="round-select" className="text-sm font-medium">
-                  Exibir pontos:
+                  Rodada:
                 </label>
                 <select
                   id="round-select"
@@ -55,10 +90,47 @@ const Standings = () => {
                   onChange={handleRoundChange}
                   className="form-input"
                 >
-                  <option value="total">Total</option>
+                  <option value="total">Todas</option>
                   {allRounds.map(round => (
                     <option key={round} value={round.toString()}>
                       Rodada {round}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <label htmlFor="month-select" className="text-sm font-medium">
+                  Mês:
+                </label>
+                <select
+                  id="month-select"
+                  value={selectedMonth}
+                  onChange={handleMonthChange}
+                  className="form-input"
+                  disabled={selectedRound !== undefined}
+                >
+                  {months.map(month => (
+                    <option key={month.value} value={month.value}>
+                      {month.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <label htmlFor="year-select" className="text-sm font-medium">
+                  Ano:
+                </label>
+                <select
+                  id="year-select"
+                  value={selectedYear}
+                  onChange={handleYearChange}
+                  className="form-input"
+                >
+                  {years.map(year => (
+                    <option key={year.value} value={year.value}>
+                      {year.label}
                     </option>
                   ))}
                 </select>

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { PLAYERS, ROUNDS } from "../utils/mockData";
 import StandingsTable from "../components/StandingsTable";
 import RoundSelector from "../components/RoundSelector";
-import { ArrowRight, Trophy, Calendar, Award } from "lucide-react";
+import { ArrowRight, Calendar, Award, Boot } from "lucide-react";
 
 const Index = () => {
   const [currentRound, setCurrentRound] = useState(1);
@@ -32,10 +32,10 @@ const Index = () => {
             Bolão do Brasileirão
           </div>
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-            Faça seus palpites e ganhe prêmios
+            Kichute 2025
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Acompanhe as rodadas, registre seus palpites e veja quem está liderando a competição.
+            Kichute nas rodadas e corra o risco de ganhar uma grana dos seus patos.
           </p>
         </div>
         
@@ -64,14 +64,14 @@ const Index = () => {
             style={{ animationDelay: '0.2s' }}
           >
             <div className="p-3 rounded-md bg-goal/10 text-goal w-fit">
-              <Award className="h-6 w-6" />
+              <Boot className="h-6 w-6" />
             </div>
-            <h3 className="mt-4 text-xl font-semibold">Palpites</h3>
+            <h3 className="mt-4 text-xl font-semibold">Kichutes</h3>
             <p className="mt-2 text-muted-foreground flex-grow">
-              Registre seus palpites para a próxima rodada.
+              Registre seus kichutes para a próxima rodada.
             </p>
             <div className="flex items-center mt-4 text-goal font-medium">
-              <span>Fazer palpites</span>
+              <span>Fazer kichutes</span>
               <ArrowRight className="ml-2 h-4 w-4" />
             </div>
           </Link>
@@ -82,7 +82,7 @@ const Index = () => {
             style={{ animationDelay: '0.3s' }}
           >
             <div className="p-3 rounded-md bg-amber-500/10 text-amber-500 w-fit">
-              <Trophy className="h-6 w-6" />
+              <Award className="h-6 w-6" />
             </div>
             <h3 className="mt-4 text-xl font-semibold">Classificação</h3>
             <p className="mt-2 text-muted-foreground flex-grow">
@@ -111,7 +111,7 @@ const Index = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <h2 className="text-2xl font-bold">Próxima Rodada</h2>
             <Link to={`/guesses?round=${nextOpenRound}`} className="flex items-center text-goal hover:text-goal-dark mt-2 md:mt-0">
-              <span>Fazer palpites</span>
+              <span>Fazer kichutes</span>
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </div>

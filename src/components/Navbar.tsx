@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
-  Trophy, 
+  Award, 
   Calendar, 
   Home, 
-  Award, 
+  Boot, 
   DollarSign, 
   Users, 
   Menu, 
@@ -34,10 +34,10 @@ const Navbar = () => {
   const navLinks = [
     { to: "/", label: "Início", icon: <Home className="w-4 h-4" /> },
     { to: "/matches", label: "Partidas", icon: <Calendar className="w-4 h-4" /> },
-    { to: "/guesses", label: "Palpites", icon: <Award className="w-4 h-4" /> },
-    { to: "/standings", label: "Classificação", icon: <Trophy className="w-4 h-4" /> },
-    { to: "/payments", label: "Pagamentos", icon: <DollarSign className="w-4 h-4" /> },
+    { to: "/guesses", label: "Kichutes", icon: <Boot className="w-4 h-4" /> },
+    { to: "/standings", label: "Classificação", icon: <Award className="w-4 h-4" /> },
     { to: "/prizes", label: "Premiações", icon: <Users className="w-4 h-4" /> },
+    { to: "/payments", label: "Financeiro", icon: <DollarSign className="w-4 h-4" /> },
   ];
 
   const toggleMobileMenu = () => {
@@ -60,9 +60,9 @@ const Navbar = () => {
               className="flex items-center space-x-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <Trophy className="h-8 w-8 text-goal" />
+              <Boot className="h-8 w-8 text-goal" />
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-goal to-field">
-                BolãoBR
+                Kichute 2025
               </span>
             </Link>
           </div>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Match, Guess } from "../types";
 import { calculatePoints, getPointsBadgeClass, getScoringDescription } from "../utils/scoring";
@@ -98,7 +99,7 @@ const MatchCard = ({
         {(userGuess || editable) && (
           <div className="border-t pt-3 mt-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Seu palpite:</span>
+              <span className="text-sm font-medium">Seu kichute:</span>
               {points !== null && (
                 <span className={getPointsBadgeClass(points)}>
                   {points} pts

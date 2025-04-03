@@ -14,6 +14,7 @@ const Guesses = () => {
   const [currentPlayerId, setCurrentPlayerId] = useState(PLAYERS[0].id); // Default to first player
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showAllGuesses, setShowAllGuesses] = useState(false);
 
   useEffect(() => {
     // Update URL when round changes
@@ -46,8 +47,8 @@ const Guesses = () => {
       console.log("Submitted guesses:", guesses);
       
       toast({
-        title: "Palpites salvos com sucesso!",
-        description: `Seus palpites para a rodada ${currentRound} foram registrados.`,
+        title: "Kichutes salvos com sucesso!",
+        description: `Seus kichutes para a rodada ${currentRound} foram registrados.`,
         variant: "default",
       });
       
@@ -58,14 +59,25 @@ const Guesses = () => {
   const currentRoundData = ROUNDS.find(r => r.number === currentRound);
   const matches = currentRoundData?.matches || [];
   const isRoundClosed = currentRoundData?.closed || false;
+  
+  // Check if the round deadline has passed
+  const isDeadlinePassed = () => {
+    if (!currentRoundData) return false;
+    
+    const now = new Date();
+    const deadline = new Date(currentRoundData.deadline);
+    return now > deadline;
+  };
+  
+  const isRoundStarted = isRoundClosed || isDeadlinePassed();
 
   return (
     <div className="page-container">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12 animate-slide-down">
-          <h1 className="text-3xl font-bold">Palpites</h1>
+          <h1 className="text-3xl font-bold">Kichutes</h1>
           <p className="text-muted-foreground mt-2">
-            Registre seus palpites para cada rodada do campeonato
+            Registre seus kichutes para cada rodada do campeonato
           </p>
         </div>
 
@@ -97,6 +109,25 @@ const Guesses = () => {
           </div>
         </div>
 
+        {isRoundStarted && !isRoundClosed && (
+          <div className="mb-6 p-4 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 rounded-lg">
+            <p className="text-center font-medium">
+              Prazo para kichutes encerrado! Os kichutes para esta rodada não podem mais ser editados.
+            </p>
+          </div>
+        )}
+
+        {isRoundStarted && (
+          <div className="mb-6">
+            <button
+              onClick={() => setShowAllGuesses(!showAllGuesses)}
+              className="w-full py-3 px-4 bg-goal/10 hover:bg-goal/20 text-goal font-medium rounded-lg transition-colors"
+            >
+              {showAllGuesses ? "Esconder kichutes dos outros" : "Ver kichutes de todos os jogadores"}
+            </button>
+          </div>
+        )}
+
         <div className={`transition-opacity duration-300 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}>
@@ -106,7 +137,7 @@ const Guesses = () => {
               currentPlayerId={currentPlayerId}
               existingGuesses={GUESSES}
               onSubmit={handleSubmitGuesses}
-              roundClosed={isRoundClosed}
+              roundClosed={isRoundClosed || isDeadlinePassed()}
             />
           ) : (
             <div className="text-center py-12 text-muted-foreground animate-fadeIn">
