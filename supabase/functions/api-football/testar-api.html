@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Testar API-Football</title>
+</head>
+<body>
+  <h1>Clique para buscar jogos:</h1>
+  <button onclick="buscarJogos()">Buscar jogos</button>
+  <pre id="resultado"></pre>
+
+  <script>
+    async function buscarJogos() {
+      const resultado = document.getElementById("resultado");
+      resultado.textContent = "Buscando...";
+
+      try {
+        const res = await fetch("https://nltdcwkpvtpvcgcsgvxt.functions.supabase.co/api-football?endpoint=fixtures&league=71&season=2023");
+        const data = await res.json();
+        resultado.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        resultado.textContent = "Erro ao buscar: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
