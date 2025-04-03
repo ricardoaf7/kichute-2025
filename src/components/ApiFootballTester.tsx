@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trophy, Calendar, Football } from "lucide-react";
+import { Loader2, Trophy, Calendar, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { testApiFootballFunction, fetchRounds, fetchFixtures } from "../utils/api";
@@ -19,7 +18,6 @@ const ApiFootballTester: React.FC = () => {
   const [isLoadingFixtures, setIsLoadingFixtures] = useState(false);
   const [fixtures, setFixtures] = useState<any[]>([]);
 
-  // Testar a conexão com a API
   const handleTestConnection = async () => {
     setIsTestingConnection(true);
     setConnectionResult(null);
@@ -40,7 +38,6 @@ const ApiFootballTester: React.FC = () => {
     }
   };
 
-  // Buscar as rodadas do campeonato
   const handleFetchRounds = async () => {
     setIsLoadingRounds(true);
     
@@ -60,7 +57,6 @@ const ApiFootballTester: React.FC = () => {
     }
   };
 
-  // Buscar partidas de uma rodada específica
   const handleFetchFixtures = async (round: string) => {
     if (!round) return;
     
@@ -68,7 +64,6 @@ const ApiFootballTester: React.FC = () => {
     setSelectedRound(round);
     
     try {
-      // Extrair o número da rodada (ex: "Regular Season - 1" -> "1")
       const roundNumber = round.split(" - ")[1];
       const fixturesData = await fetchFixtures(roundNumber);
       setFixtures(fixturesData);
@@ -85,7 +80,6 @@ const ApiFootballTester: React.FC = () => {
     }
   };
 
-  // Formatar data para exibição
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR', { 
@@ -114,7 +108,6 @@ const ApiFootballTester: React.FC = () => {
             <TabsTrigger value="fixtures">Partidas</TabsTrigger>
           </TabsList>
           
-          {/* Tab de Teste de Conexão */}
           <TabsContent value="connection" className="space-y-4">
             <div className="flex flex-col space-y-4 my-4">
               <Button onClick={handleTestConnection} disabled={isTestingConnection}>
@@ -143,7 +136,6 @@ const ApiFootballTester: React.FC = () => {
             </div>
           </TabsContent>
           
-          {/* Tab de Rodadas */}
           <TabsContent value="rounds" className="space-y-4">
             <div className="flex flex-col space-y-4 my-4">
               <Button onClick={handleFetchRounds} disabled={isLoadingRounds} className="mb-4">
@@ -191,7 +183,6 @@ const ApiFootballTester: React.FC = () => {
             </div>
           </TabsContent>
           
-          {/* Tab de Partidas */}
           <TabsContent value="fixtures" className="space-y-4">
             <div className="flex flex-col space-y-4 my-4">
               <div className="flex justify-between items-center mb-4">
