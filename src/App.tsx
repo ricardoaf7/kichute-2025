@@ -11,6 +11,7 @@ import Guesses from "./pages/Guesses";
 import Standings from "./pages/Standings";
 import Payments from "./pages/Payments";
 import Prizes from "./pages/Prizes";
+import AdminMatches from "./pages/AdminMatches";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/standings" element={<Standings />} />
           <Route path="/prizes" element={<Prizes />} />
           <Route path="/payments" element={<Payments />} />
+          <Route path="/admin/matches" element={<AdminMatches />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

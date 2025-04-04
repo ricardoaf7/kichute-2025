@@ -4,8 +4,10 @@ import MatchCard from "../components/MatchCard";
 import RoundSelector from "../components/RoundSelector";
 import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { fetchFixtures, groupMatchesByRound } from "../utils/api";
+import { fetchFixtures, groupMatchesByRound, loadRoundsFromStorage } from "../utils/api";
 import { Round, Match } from "../types";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Matches = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -28,17 +30,16 @@ const Matches = () => {
         setLoading(true);
         setError(null);
         
-        // Buscar partidas da rodada atual e de todas as rodadas
-        const matches = await fetchFixtures(currentRound.toString());
+        // Primeiro carregamos as rodadas do localStorage (ou valores padrão)
+        const storedRounds = loadRoundsFromStorage();
+        setRounds(storedRounds);
         
-        if (matches.length === 0) {
-          setError("Nenhuma partida encontrada. Verifique a conexão com a API.");
+        // Verificar se temos dados
+        if (storedRounds.length === 0) {
+          setError("Nenhuma rodada encontrada. Adicione rodadas e partidas no painel administrativo.");
+          setLoading(false);
           return;
         }
-        
-        // Agrupar partidas por rodada
-        const groupedRounds = groupMatchesByRound(matches);
-        setRounds(groupedRounds);
         
         // Simular carregamento para melhorar UX
         setTimeout(() => {
@@ -71,11 +72,19 @@ const Matches = () => {
   return (
     <div className="page-container">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12 animate-slide-down">
+        <div className="text-center mb-6 animate-slide-down">
           <h1 className="text-3xl font-bold">Partidas</h1>
           <p className="text-muted-foreground mt-2">
             Acompanhe os jogos e resultados de cada rodada
           </p>
+        </div>
+
+        <div className="flex justify-end mb-4">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/admin/matches">
+              Gerenciar Partidas
+            </Link>
+          </Button>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-subtle border border-border/40 p-6 mb-8 animate-slide-up">
@@ -93,6 +102,11 @@ const Matches = () => {
         ) : error ? (
           <div className="text-center py-12 text-destructive animate-fadeIn">
             <p>{error}</p>
+            <Button asChild className="mt-4" variant="outline">
+              <Link to="/admin/matches">
+                Ir para o Gerenciador de Partidas
+              </Link>
+            </Button>
           </div>
         ) : (
           <div className={`flex flex-col space-y-4 max-w-3xl mx-auto transition-opacity duration-300 ${
@@ -110,6 +124,13 @@ const Matches = () => {
             {matches.length === 0 && (
               <div className="text-center py-12 text-muted-foreground animate-fadeIn">
                 Nenhuma partida encontrada para esta rodada.
+                <div className="mt-4">
+                  <Button asChild variant="outline">
+                    <Link to="/admin/matches">
+                      Adicionar Partidas
+                    </Link>
+                  </Button>
+                </div>
               </div>
             )}
           </div>
