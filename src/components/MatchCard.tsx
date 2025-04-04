@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { Match, Guess } from "../types";
 import { calculatePoints, getPointsBadgeClass, getScoringDescription } from "../utils/scoring";
-import { MapPin, Shield } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 interface MatchCardProps {
   match: Match;
@@ -59,9 +58,7 @@ const MatchCard = ({
     minute: '2-digit'
   });
 
-  // Função para obter a cor da bandeira com base no time (para fallback)
   const getTeamFlagColor = (teamId: string) => {
-    // Cores das equipes
     const teamColors: {[key: string]: string} = {
       "1": "#231F20", // Atlético-MG - Preto
       "2": "#e30613", // Athletico-PR - Vermelho
@@ -87,38 +84,6 @@ const MatchCard = ({
     return teamColors[teamId] || "#333333"; // Cor padrão caso não encontre
   };
 
-  // Função para obter a URL do escudo do time (quando tivermos os escudos)
-  const getTeamShieldUrl = (teamId: string) => {
-    // No futuro, retornar URLs reais para os escudos
-    // Por enquanto, retorna null para usar o ícone de escudo como fallback
-    return null;
-  };
-
-  // Renderiza o escudo do time (imagem ou ícone fallback)
-  const renderTeamShield = (teamId: string, shortName: string) => {
-    const shieldUrl = getTeamShieldUrl(teamId);
-    
-    if (shieldUrl) {
-      return (
-        <img 
-          src={shieldUrl} 
-          alt="Escudo" 
-          className="w-8 h-8 object-contain"
-        />
-      );
-    } else {
-      // Fallback: círculo colorido com a letra inicial
-      return (
-        <div 
-          className="w-7 h-7 rounded-full flex items-center justify-center border border-gray-200 shadow-sm"
-          style={{ backgroundColor: getTeamFlagColor(teamId) }}
-        >
-          <span className="text-white text-xs font-bold">{shortName.substring(0, 1)}</span>
-        </div>
-      );
-    }
-  };
-
   return (
     <div className={`gradient-border card-transition ${className}`} style={style}>
       <div className="p-4 space-y-4">
@@ -137,7 +102,12 @@ const MatchCard = ({
         <div className="flex items-center justify-between">
           <div className="flex flex-1 items-center">
             <div className="mr-2 flex items-center justify-center">
-              {renderTeamShield(match.homeTeam.id, match.homeTeam.shortName)}
+              <div 
+                className="w-6 h-6 rounded-full flex items-center justify-center border border-gray-200"
+                style={{ backgroundColor: getTeamFlagColor(match.homeTeam.id) }}
+              >
+                <span className="text-white text-xs font-bold">{match.homeTeam.shortName.substring(0, 1)}</span>
+              </div>
             </div>
             <div className="text-right">
               <p className="font-semibold">{match.homeTeam.name}</p>
@@ -165,7 +135,12 @@ const MatchCard = ({
               <p className="text-sm text-muted-foreground">{match.awayTeam.shortName}</p>
             </div>
             <div className="ml-2 flex items-center justify-center">
-              {renderTeamShield(match.awayTeam.id, match.awayTeam.shortName)}
+              <div 
+                className="w-6 h-6 rounded-full flex items-center justify-center border border-gray-200"
+                style={{ backgroundColor: getTeamFlagColor(match.awayTeam.id) }}
+              >
+                <span className="text-white text-xs font-bold">{match.awayTeam.shortName.substring(0, 1)}</span>
+              </div>
             </div>
           </div>
         </div>
