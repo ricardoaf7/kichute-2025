@@ -1,9 +1,8 @@
 
 import React from "react";
-import ApiFootballTester from "../components/ApiFootballTester";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 const Index = () => {
   return (
@@ -14,20 +13,13 @@ const Index = () => {
           Bem-vindo ao Kichute Bolão, o bolão do Brasileirão!
         </p>
         
-        <Alert variant="destructive" className="mb-8">
+        <Alert variant="default" className="mb-8">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Configuração necessária</AlertTitle>
+          <AlertTitle>Informação Importante</AlertTitle>
           <AlertDescription>
-            <p className="mb-2">Para que o sistema funcione corretamente, você precisa:</p>
-            <ol className="list-decimal pl-5 space-y-1">
-              <li>Implantar a Edge Function do Supabase em <code>/functions/v1/api-football</code></li>
-              <li>Configurar a variável de ambiente <code>API_FOOTBALL_KEY</code> no Supabase</li>
-              <li>Verificar se a função está acessível publicamente</li>
-            </ol>
+            O sistema agora está configurado para lançamento manual de rodadas e jogos.
           </AlertDescription>
         </Alert>
-        
-        <ApiFootballTester />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card>
