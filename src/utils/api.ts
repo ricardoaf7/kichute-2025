@@ -2,6 +2,34 @@
 import { Match, Round } from "../types";
 import { ROUNDS } from "./mockData";
 
+// Função para testar a conexão com API-Football
+export const testApiFootballFunction = async (): Promise<{success: boolean; message?: string}> => {
+  try {
+    // Como não estamos mais usando a API real, retornamos uma simulação
+    return {
+      success: false,
+      message: "A conexão com API-Football não está disponível. Estamos usando dados locais."
+    };
+  } catch (error) {
+    console.error("Erro ao testar conexão:", error);
+    return {
+      success: false,
+      message: "Erro ao testar conexão com API-Football"
+    };
+  }
+};
+
+// Função para buscar as rodadas disponíveis
+export const fetchRounds = async (): Promise<string[]> => {
+  try {
+    // Retornar rodadas simuladas baseadas nos dados mockados
+    return ROUNDS.map(round => `Regular Season - ${round.number}`);
+  } catch (error) {
+    console.error("Erro ao buscar rodadas:", error);
+    throw new Error("Não foi possível carregar as rodadas.");
+  }
+};
+
 // Função para buscar partidas por rodada
 export const fetchFixtures = async (round?: string): Promise<Match[]> => {
   try {
