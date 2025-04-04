@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Match, Guess } from "../types";
 import { calculatePoints, getPointsBadgeClass, getScoringDescription } from "../utils/scoring";
-import { MapPin } from "lucide-react";
+import { MapPin, Flag } from "lucide-react";
 
 interface MatchCardProps {
   match: Match;
@@ -59,6 +59,34 @@ const MatchCard = ({
     minute: '2-digit'
   });
 
+  // Função para obter a cor da bandeira com base no time
+  const getTeamFlagColor = (teamId: string) => {
+    // Cores das equipes (você pode personalizar conforme necessário)
+    const teamColors: {[key: string]: string} = {
+      "1": "#231F20", // Atlético-MG - Preto
+      "2": "#e30613", // Athletico-PR - Vermelho
+      "3": "#0077c8", // Bahia - Azul
+      "4": "#000000", // Botafogo - Preto
+      "5": "#000000", // Corinthians - Preto
+      "6": "#1e4c8f", // Cruzeiro - Azul
+      "7": "#10643f", // Cuiabá - Verde
+      "8": "#e30613", // Flamengo - Vermelho
+      "9": "#8A1538", // Fluminense - Grená
+      "10": "#0c2340", // Fortaleza - Azul escuro
+      "11": "#0d87bf", // Grêmio - Azul claro
+      "12": "#e30613", // Internacional - Vermelho
+      "13": "#10643f", // Juventude - Verde
+      "14": "#10643f", // Palmeiras - Verde
+      "15": "#e30613", // RB Bragantino - Vermelho
+      "16": "#e30613", // São Paulo - Vermelho
+      "17": "#000000", // Vasco - Preto
+      "18": "#e30613", // Vitória - Vermelho
+      "19": "#ffcc00", // Criciúma - Amarelo
+      "20": "#e30613", // Atlético-GO - Vermelho
+    };
+    return teamColors[teamId] || "#333333"; // Cor padrão caso não encontre
+  };
+
   return (
     <div className={`gradient-border card-transition ${className}`} style={style}>
       <div className="p-4 space-y-4">
@@ -76,6 +104,14 @@ const MatchCard = ({
 
         <div className="flex items-center justify-between">
           <div className="flex flex-1 items-center">
+            <div className="mr-2 flex items-center justify-center">
+              <div 
+                className="w-6 h-6 rounded-full flex items-center justify-center border border-gray-200"
+                style={{ backgroundColor: getTeamFlagColor(match.homeTeam.id) }}
+              >
+                <span className="text-white text-xs font-bold">{match.homeTeam.shortName.substring(0, 1)}</span>
+              </div>
+            </div>
             <div className="text-right">
               <p className="font-semibold">{match.homeTeam.name}</p>
               <p className="text-sm text-muted-foreground">{match.homeTeam.shortName}</p>
@@ -100,6 +136,14 @@ const MatchCard = ({
             <div className="text-left">
               <p className="font-semibold">{match.awayTeam.name}</p>
               <p className="text-sm text-muted-foreground">{match.awayTeam.shortName}</p>
+            </div>
+            <div className="ml-2 flex items-center justify-center">
+              <div 
+                className="w-6 h-6 rounded-full flex items-center justify-center border border-gray-200"
+                style={{ backgroundColor: getTeamFlagColor(match.awayTeam.id) }}
+              >
+                <span className="text-white text-xs font-bold">{match.awayTeam.shortName.substring(0, 1)}</span>
+              </div>
             </div>
           </div>
         </div>
