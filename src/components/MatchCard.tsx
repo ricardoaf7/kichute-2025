@@ -26,22 +26,17 @@ const MatchCard = ({
   const handleHomeScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.max(0, parseInt(e.target.value) || 0);
     setHomeGuess(value);
-    if (onGuessChange) {
-      onGuessChange(value, awayGuess);
-    }
+    if (onGuessChange) onGuessChange(value, awayGuess);
   };
 
   const handleAwayScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.max(0, parseInt(e.target.value) || 0);
     setAwayGuess(value);
-    if (onGuessChange) {
-      onGuessChange(homeGuess, value);
-    }
+    if (onGuessChange) onGuessChange(homeGuess, value);
   };
 
   const getPoints = () => {
     if (!match.played || !userGuess) return null;
-
     return calculatePoints(
       { homeScore: userGuess.homeScore, awayScore: userGuess.awayScore },
       { homeScore: match.homeScore, awayScore: match.awayScore }
@@ -51,38 +46,15 @@ const MatchCard = ({
   const points = getPoints();
   const isMatchPlayed = match.played && match.homeScore !== null && match.awayScore !== null;
   const matchDate = new Date(match.date);
-  const formattedDate = matchDate.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
+  const formattedDate = matchDate.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 
-  const getTeamFlagColor = (teamId: string) => {
-    const teamColors: {[key: string]: string} = {
-      "1": "#231F20", // Atlético-MG - Preto
-      "2": "#e30613", // Athletico-PR - Vermelho
-      "3": "#0077c8", // Bahia - Azul
-      "4": "#000000", // Botafogo - Preto
-      "5": "#000000", // Corinthians - Preto
-      "6": "#1e4c8f", // Cruzeiro - Azul
-      "7": "#10643f", // Cuiabá - Verde
-      "8": "#e30613", // Flamengo - Vermelho
-      "9": "#8A1538", // Fluminense - Grená
-      "10": "#0c2340", // Fortaleza - Azul escuro
-      "11": "#0d87bf", // Grêmio - Azul claro
-      "12": "#e30613", // Internacional - Vermelho
-      "13": "#10643f", // Juventude - Verde
-      "14": "#10643f", // Palmeiras - Verde
-      "15": "#e30613", // RB Bragantino - Vermelho
-      "16": "#e30613", // São Paulo - Vermelho
-      "17": "#000000", // Vasco - Preto
-      "18": "#e30613", // Vitória - Vermelho
-      "19": "#ffcc00", // Criciúma - Amarelo
-      "20": "#e30613", // Atlético-GO - Vermelho
-    };
-    return teamColors[teamId] || "#333333"; // Cor padrão caso não encontre
-  };
+  const formatTeamNameForImage = (name: string) =>
+    `/escudos/${name.toLowerCase().replace(/ /g, "_")}.png`;
 
   return (
     <div className={`gradient-border card-transition ${className}`} style={style}>
@@ -95,19 +67,21 @@ const MatchCard = ({
         {(match.stadium || match.city) && (
           <div className="flex items-center text-xs text-muted-foreground mb-1">
             <MapPin className="h-3 w-3 mr-1" />
-            <span>{match.stadium}{match.city ? `, ${match.city}` : ''}</span>
+            <span>
+              {match.stadium}
+              {match.city ? `, ${match.city}` : ""}
+            </span>
           </div>
         )}
 
         <div className="flex items-center justify-between">
           <div className="flex flex-1 items-center">
             <div className="mr-2 flex items-center justify-center">
-              <div 
-                className="w-6 h-6 rounded-full flex items-center justify-center border border-gray-200"
-                style={{ backgroundColor: getTeamFlagColor(match.homeTeam.id) }}
-              >
-                <span className="text-white text-xs font-bold">{match.homeTeam.shortName.substring(0, 1)}</span>
-              </div>
+              <img
+                src={formatTeamNameForImage(match.homeTeam.name)}
+                alt={match.homeTeam.name}
+                className="w-8 h-8 object-contain rounded-full border border-gray-300"
+              />
             </div>
             <div className="text-right">
               <p className="font-semibold">{match.homeTeam.name}</p>
@@ -129,18 +103,17 @@ const MatchCard = ({
             )}
           </div>
 
-          <div className="flex flex-1 items-center">
-            <div className="text-left">
+          <div className="flex flex-1 items-center justify-end">
+            <div className="text-left mr-2">
               <p className="font-semibold">{match.awayTeam.name}</p>
               <p className="text-sm text-muted-foreground">{match.awayTeam.shortName}</p>
             </div>
             <div className="ml-2 flex items-center justify-center">
-              <div 
-                className="w-6 h-6 rounded-full flex items-center justify-center border border-gray-200"
-                style={{ backgroundColor: getTeamFlagColor(match.awayTeam.id) }}
-              >
-                <span className="text-white text-xs font-bold">{match.awayTeam.shortName.substring(0, 1)}</span>
-              </div>
+              <img
+                src={formatTeamNameForImage(match.awayTeam.name)}
+                alt={match.awayTeam.name}
+                className="w-8 h-8 object-contain rounded-full border border-gray-300"
+              />
             </div>
           </div>
         </div>
@@ -150,9 +123,7 @@ const MatchCard = ({
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Seu kichute:</span>
               {points !== null && (
-                <span className={getPointsBadgeClass(points)}>
-                  {points} pts
-                </span>
+                <span className={getPointsBadgeClass(points)}>{points} pts</span>
               )}
             </div>
 
@@ -180,7 +151,6 @@ const MatchCard = ({
                   <span className="text-lg font-bold">{userGuess.homeScore}</span>
                   <span className="text-muted-foreground">x</span>
                   <span className="text-lg font-bold">{userGuess.awayScore}</span>
-                  
                   {points !== null && (
                     <span className="text-sm ml-2 text-muted-foreground">
                       ({getScoringDescription(points)})
