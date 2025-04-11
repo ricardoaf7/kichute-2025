@@ -7,7 +7,8 @@ import {
   DollarSign, 
   Users, 
   Menu, 
-  X 
+  X,
+  Settings 
 } from "lucide-react";
 import Boot from "./icons/Boot";
 
@@ -40,9 +41,9 @@ const Navbar = () => {
   ];
 
   const adminLinks = [
-    { href: "/admin/matches", label: "Partidas" },
-    { href: "/admin/teams", label: "Times" },
-    { href: "/admin/scoring", label: "Pontuação" },
+    { to: "/admin/matches", label: "Partidas", icon: <Calendar className="w-4 h-4" /> },
+    { to: "/admin/teams", label: "Times", icon: <Users className="w-4 h-4" /> },
+    { to: "/admin/scoring", label: "Pontuação", icon: <Settings className="w-4 h-4" /> },
   ];
 
   const toggleMobileMenu = () => {
@@ -72,7 +73,6 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => (
               <Link
@@ -88,9 +88,31 @@ const Navbar = () => {
                 <span>{link.label}</span>
               </Link>
             ))}
+            
+            <div className="relative group">
+              <button className="flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
+                <Settings className="w-4 h-4" />
+                <span>Admin</span>
+              </button>
+              <div className="absolute hidden group-hover:block z-10 bg-white dark:bg-gray-950 shadow-lg rounded-md py-2 mt-1 min-w-[150px]">
+                {adminLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`flex items-center space-x-2 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                      location.pathname === link.to 
+                        ? "bg-primary/10 text-primary" 
+                        : "text-gray-700 dark:text-gray-200"
+                    }`}
+                  >
+                    {link.icon}
+                    <span>{link.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </nav>
 
-          {/* Mobile Menu Button */}
           <div className="flex md:hidden">
             <button
               type="button"
@@ -109,7 +131,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div
         className={`md:hidden transition-all duration-300 ease-in-out transform ${
           isMobileMenuOpen
@@ -133,6 +154,25 @@ const Navbar = () => {
               <span>{link.label}</span>
             </Link>
           ))}
+          
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+            <span className="block px-3 py-2 text-xs text-gray-500 dark:text-gray-400">Admin</span>
+            {adminLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`flex items-center space-x-3 px-3 py-4 text-base font-medium rounded-md transition-colors ${
+                  location.pathname === link.to
+                    ? "bg-primary/10 text-primary"
+                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {link.icon}
+                <span>{link.label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </header>
