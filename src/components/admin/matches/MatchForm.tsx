@@ -1,34 +1,18 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
-import { CalendarIcon, Save } from "lucide-react";
-import { pt } from "date-fns/locale";
 import { Match } from "@/types";
 import { TEAMS } from "@/utils/mockData";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel,
-  FormMessage 
-} from "@/components/ui/form";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Form, FormField } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MatchFormValues } from "@/contexts/MatchesContext";
+import { RoundSelector } from "./form/RoundSelector";
+import { TeamSelector } from "./form/TeamSelector";
+import { DateTimeSelector } from "./form/DateTimeSelector";
+import { LocationFields } from "./form/LocationFields";
+import { FormActions } from "./form/FormActions";
 
 const formSchema = z.object({
   round: z.string(),
@@ -104,28 +88,10 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
               control={form.control}
               name="round"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Rodada</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a rodada" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Array.from({ length: 38 }, (_, i) => i + 1).map((num) => (
-                        <SelectItem key={num} value={num.toString()}>
-                          Rodada {num}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                <RoundSelector 
+                  value={field.value} 
+                  onChange={field.onChange} 
+                />
               )}
             />
 
@@ -133,30 +99,16 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
               control={form.control}
               name="homeTeam"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time da Casa</FormLabel>
-                  <Select 
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      handleHomeTeamChange(value);
-                    }}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o time da casa" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {TEAMS.map((team) => (
-                        <SelectItem key={team.id} value={team.id}>
-                          {team.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                <TeamSelector 
+                  teams={TEAMS}
+                  label="Time da Casa"
+                  value={field.value}
+                  placeholder="Selecione o time da casa"
+                  onChange={(value) => {
+                    field.onChange(value);
+                    handleHomeTeamChange(value);
+                  }}
+                />
               )}
             />
 
@@ -164,27 +116,13 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
               control={form.control}
               name="awayTeam"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time Visitante</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o time visitante" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {TEAMS.map((team) => (
-                        <SelectItem key={team.id} value={team.id}>
-                          {team.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                <TeamSelector 
+                  teams={TEAMS}
+                  label="Time Visitante"
+                  value={field.value}
+                  placeholder="Selecione o time visitante" 
+                  onChange={field.onChange}
+                />
               )}
             />
 
@@ -192,93 +130,20 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
               control={form.control}
               name="matchDate"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Data e Hora da Partida</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={`w-full pl-3 text-left font-normal ${
-                            !field.value ? "text-muted-foreground" : ""
-                          }`}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP 'às' HH:mm", { locale: pt })
-                          ) : (
-                            <span>Selecione a data e hora</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => date < new Date("2025-01-01")}
-                        initialFocus
-                      />
-                      <div className="p-3 border-t border-border">
-                        <Input
-                          type="time"
-                          onChange={(e) => {
-                            const date = field.value || new Date();
-                            const [hours, minutes] = e.target.value.split(':');
-                            date.setHours(parseInt(hours, 10));
-                            date.setMinutes(parseInt(minutes, 10));
-                            field.onChange(date);
-                          }}
-                          defaultValue={field.value ? format(field.value, "HH:mm") : "16:00"}
-                        />
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
+                <DateTimeSelector 
+                  date={field.value}
+                  onChange={field.onChange}
+                  label="Data e Hora da Partida"
+                />
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="stadium"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Estádio</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Nome do estádio" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <LocationFields form={form} />
 
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cidade</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Nome da cidade" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <FormActions 
+              editingMatch={editingMatch} 
+              onCancel={onCancel} 
             />
-
-            <div className="flex gap-2 pt-2">
-              <Button type="submit" className="flex-1">
-                <Save className="mr-2 h-4 w-4" />
-                {editingMatch ? "Atualizar" : "Adicionar"}
-              </Button>
-              {editingMatch && (
-                <Button type="button" variant="outline" onClick={onCancel}>
-                  Cancelar
-                </Button>
-              )}
-            </div>
           </form>
         </Form>
       </CardContent>
