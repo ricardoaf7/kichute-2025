@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Match, Guess } from "../types";
 import { calculatePoints, getPointsBadgeClass, getScoringDescription } from "../utils/scoring";
@@ -53,8 +54,40 @@ const MatchCard = ({
     minute: "2-digit",
   });
 
-  const formatTeamNameForImage = (name: string) =>
-    `/escudos/${name.toLowerCase().replace(/ /g, "_")}.png`;
+  const getTeamImagePath = (name: string) => {
+    // Mapeamento de nomes de times para os arquivos de escudo
+    const teamMap: { [key: string]: string } = {
+      "Atlético-MG": "atletico_mineiro",
+      "Athletico-PR": "athletico_paranaense",
+      "Bahia": "bahia",
+      "Botafogo": "botafogo",
+      "Corinthians": "corinthians",
+      "Cruzeiro": "cruzeiro",
+      "Cuiabá": "cuiaba",
+      "Flamengo": "flamengo",
+      "Fluminense": "fluminense",
+      "Fortaleza": "fortaleza",
+      "Grêmio": "gremio",
+      "Internacional": "internacional",
+      "Juventude": "juventude",
+      "Palmeiras": "palmeiras",
+      "Red Bull Bragantino": "bragantino",
+      "São Paulo": "sao_paulo",
+      "Vasco": "vasco",
+      "Vitória": "vitoria",
+      "Criciúma": "criciuma",
+      "Atlético-GO": "atletico_goianiense",
+      // Outros times que possam estar nos dados de exemplo
+      "Santos": "santos",
+      "Sport": "sport",
+      "Ceará": "ceara",
+      "Mirassol": "mirassol"
+    };
+
+    // Buscar a chave correta no mapa ou retornar nome convertido (fallback)
+    const teamKey = teamMap[name] || name.toLowerCase().replace(/ /g, "_");
+    return `/escudos/${teamKey}.png`;
+  };
 
   return (
     <div className={`gradient-border card-transition ${className}`} style={style}>
@@ -78,9 +111,13 @@ const MatchCard = ({
           <div className="flex flex-1 items-center">
             <div className="mr-2 flex items-center justify-center">
               <img
-                src={formatTeamNameForImage(match.homeTeam.name)}
+                src={getTeamImagePath(match.homeTeam.name)}
                 alt={match.homeTeam.name}
                 className="w-8 h-8 object-contain rounded-full border border-gray-300"
+                onError={(e) => {
+                  // Fallback em caso de erro ao carregar a imagem
+                  e.currentTarget.src = "/placeholder.svg";
+                }}
               />
             </div>
             <div className="text-right">
@@ -110,9 +147,13 @@ const MatchCard = ({
             </div>
             <div className="ml-2 flex items-center justify-center">
               <img
-                src={formatTeamNameForImage(match.awayTeam.name)}
+                src={getTeamImagePath(match.awayTeam.name)}
                 alt={match.awayTeam.name}
                 className="w-8 h-8 object-contain rounded-full border border-gray-300"
+                onError={(e) => {
+                  // Fallback em caso de erro ao carregar a imagem
+                  e.currentTarget.src = "/placeholder.svg";
+                }}
               />
             </div>
           </div>
