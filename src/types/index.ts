@@ -1,4 +1,5 @@
 
+
 export interface Match {
   id: string;
   round: number;
@@ -58,3 +59,4 @@ export interface ScoringSystem {
   correctDifferenceOrDraw: number;
   correctWinner: number;
 }
+
