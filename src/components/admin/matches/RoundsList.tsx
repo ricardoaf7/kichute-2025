@@ -2,21 +2,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import { Round } from "@/types";
+import { useMatches } from "@/contexts/MatchesContext";
 
-interface RoundsListProps {
-  rounds: Round[];
-  onAddRound: () => void;
-  onDeleteRound: (roundNumber: number) => void;
-}
+export const RoundsList = () => {
+  const { rounds, handleAddRound, handleDeleteRound } = useMatches();
 
-export const RoundsList = ({ rounds, onAddRound, onDeleteRound }: RoundsListProps) => {
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Rodadas</CardTitle>
-          <Button onClick={onAddRound}>Nova Rodada</Button>
+          <Button onClick={handleAddRound}>Nova Rodada</Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -29,7 +25,7 @@ export const RoundsList = ({ rounds, onAddRound, onDeleteRound }: RoundsListProp
                   <Button 
                     variant="ghost" 
                     size="icon"
-                    onClick={() => onDeleteRound(round.number)}
+                    onClick={() => handleDeleteRound(round.number)}
                   >
                     <Trash className="h-4 w-4 text-destructive" />
                   </Button>

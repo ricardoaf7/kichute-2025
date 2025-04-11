@@ -1,12 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Save } from "lucide-react";
 import { pt } from "date-fns/locale";
-import { Match, Team } from "@/types";
+import { Match } from "@/types";
 import { TEAMS } from "@/utils/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MatchFormValues } from "@/contexts/MatchesContext";
 
 const formSchema = z.object({
   round: z.string(),
@@ -37,8 +38,6 @@ const formSchema = z.object({
   stadium: z.string().optional(),
   city: z.string().optional(),
 });
-
-export type MatchFormValues = z.infer<typeof formSchema>;
 
 interface MatchFormProps {
   selectedRound: number;
@@ -52,13 +51,36 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
     resolver: zodResolver(formSchema),
     defaultValues: {
       round: selectedRound.toString(),
-      homeTeam: editingMatch?.homeTeam.id || "",
-      awayTeam: editingMatch?.awayTeam.id || "",
-      matchDate: editingMatch ? new Date(editingMatch.date) : new Date(),
-      stadium: editingMatch?.stadium || "",
-      city: editingMatch?.city || "",
+      homeTeam: "",
+      awayTeam: "",
+      matchDate: new Date(),
+      stadium: "",
+      city: "",
     },
   });
+
+  // Update form when editing match changes
+  useEffect(() => {
+    if (editingMatch) {
+      form.reset({
+        round: editingMatch.round.toString(),
+        homeTeam: editingMatch.homeTeam.id,
+        awayTeam: editingMatch.awayTeam.id,
+        matchDate: new Date(editingMatch.date),
+        stadium: editingMatch.stadium || "",
+        city: editingMatch.city || "",
+      });
+    } else {
+      form.reset({
+        round: selectedRound.toString(),
+        homeTeam: "",
+        awayTeam: "",
+        matchDate: new Date(),
+        stadium: "",
+        city: "",
+      });
+    }
+  }, [editingMatch, selectedRound, form]);
 
   const handleHomeTeamChange = (teamId: string) => {
     const selectedTeam = TEAMS.find(team => team.id === teamId);
@@ -87,6 +109,7 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -117,7 +140,7 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
                       field.onChange(value);
                       handleHomeTeamChange(value);
                     }}
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -145,7 +168,7 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
                   <FormLabel>Time Visitante</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>

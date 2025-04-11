@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash } from "lucide-react";
-import { Match, Round } from "@/types";
+import { useMatches } from "@/contexts/MatchesContext";
 import { 
   Select,
   SelectContent,
@@ -15,22 +15,17 @@ import {
 } from "@/components/ui/select";
 
 interface MatchesListProps {
-  rounds: Round[];
   selectedRound: number;
   onSelectRound: (roundNumber: number) => void;
-  onEditMatch: (match: Match) => void;
-  onDeleteMatch: (matchId: string, roundNumber: number) => void;
-  onUpdateResults: (match: Match, homeScore: number, awayScore: number) => void;
 }
 
-export const MatchesList = ({ 
-  rounds, 
-  selectedRound, 
-  onSelectRound, 
-  onEditMatch, 
-  onDeleteMatch,
-  onUpdateResults
-}: MatchesListProps) => {
+export const MatchesList = ({ selectedRound, onSelectRound }: MatchesListProps) => {
+  const { 
+    rounds, 
+    handleEditMatch, 
+    handleDeleteMatch,
+    handleUpdateResults
+  } = useMatches();
   
   const currentRound = rounds.find(r => r.number === selectedRound);
 
@@ -122,7 +117,7 @@ export const MatchesList = ({
                                 const awayScore = parseInt(awayInput.value);
                                 
                                 if (!isNaN(homeScore) && !isNaN(awayScore)) {
-                                  onUpdateResults(match, homeScore, awayScore);
+                                  handleUpdateResults(match, homeScore, awayScore);
                                 }
                               }
                             }}
@@ -134,7 +129,7 @@ export const MatchesList = ({
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => onEditMatch(match)}
+                        onClick={() => handleEditMatch(match)}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -144,7 +139,7 @@ export const MatchesList = ({
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => onDeleteMatch(match.id, match.round)}
+                        onClick={() => handleDeleteMatch(match.id, match.round)}
                       >
                         <Trash className="h-4 w-4 text-destructive" />
                       </Button>
