@@ -3,6 +3,8 @@ export interface Team {
   id: string;
   name: string;
   shortName: string;
+  homeStadium?: string;
+  city?: string;
 }
 
 export interface Match {

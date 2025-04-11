@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { TEAMS, ROUNDS } from "../utils/mockData";
@@ -70,6 +69,16 @@ const AdminMatches = () => {
     setEditingMatch(null);
   };
 
+  const handleHomeTeamChange = (teamId: string) => {
+    const selectedTeam = TEAMS.find(team => team.id === teamId);
+    if (selectedTeam && selectedTeam.homeStadium) {
+      form.setValue("stadium", selectedTeam.homeStadium);
+      if (selectedTeam.city) {
+        form.setValue("city", selectedTeam.city);
+      }
+    }
+  };
+
   const handleAddRound = () => {
     const newRoundNumber = rounds.length > 0 
       ? Math.max(...rounds.map(r => r.number)) + 1 
@@ -108,8 +117,8 @@ const AdminMatches = () => {
       homeTeam: match.homeTeam.id,
       awayTeam: match.awayTeam.id,
       matchDate: matchDate,
-      stadium: match.stadium || "",
-      city: match.city || "",
+      stadium: match.stadium || match.homeTeam.homeStadium || "",
+      city: match.city || match.homeTeam.city || "",
     });
   };
 
@@ -157,10 +166,8 @@ const AdminMatches = () => {
       return;
     }
 
-    // Verificar se a rodada existe
     let round = rounds.find(r => r.number === roundNumber);
     if (!round) {
-      // Criar a rodada se não existir
       round = {
         number: roundNumber,
         matches: [],
@@ -171,7 +178,6 @@ const AdminMatches = () => {
     }
 
     if (editingMatch) {
-      // Editar partida existente
       setRounds(prev => 
         prev.map(r => {
           if (r.number === roundNumber) {
@@ -201,7 +207,6 @@ const AdminMatches = () => {
         description: "A partida foi atualizada com sucesso."
       });
     } else {
-      // Adicionar nova partida
       const newMatch: Match = {
         id: `match-${Date.now()}`,
         round: roundNumber,
@@ -362,7 +367,10 @@ const AdminMatches = () => {
                             <FormItem>
                               <FormLabel>Time da Casa</FormLabel>
                               <Select 
-                                onValueChange={field.onChange} 
+                                onValueChange={(value) => {
+                                  field.onChange(value);
+                                  handleHomeTeamChange(value);
+                                }}
                                 defaultValue={field.value}
                               >
                                 <FormControl>
@@ -468,7 +476,7 @@ const AdminMatches = () => {
                           name="stadium"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Estádio (opcional)</FormLabel>
+                              <FormLabel>Estádio</FormLabel>
                               <FormControl>
                                 <Input {...field} placeholder="Nome do estádio" />
                               </FormControl>
@@ -482,7 +490,7 @@ const AdminMatches = () => {
                           name="city"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Cidade (opcional)</FormLabel>
+                              <FormLabel>Cidade</FormLabel>
                               <FormControl>
                                 <Input {...field} placeholder="Nome da cidade" />
                               </FormControl>

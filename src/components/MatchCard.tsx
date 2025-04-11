@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Match, Guess } from "../types";
 import { calculatePoints, getPointsBadgeClass, getScoringDescription } from "../utils/scoring";
@@ -54,6 +53,26 @@ const MatchCard = ({
     minute: "2-digit",
   });
 
+  // Função para obter o estádio e cidade da partida
+  // Se o estádio e cidade estiverem especificados na partida, use-os
+  // Caso contrário, use o estádio e cidade do time mandante
+  const getStadiumInfo = () => {
+    if (match.stadium) {
+      return {
+        stadium: match.stadium,
+        city: match.city
+      };
+    } else if (match.homeTeam.homeStadium) {
+      return {
+        stadium: match.homeTeam.homeStadium,
+        city: match.homeTeam.city
+      };
+    }
+    return null;
+  };
+
+  const stadiumInfo = getStadiumInfo();
+
   const getTeamImagePath = (name: string) => {
     // Mapeamento de nomes de times para os arquivos de escudo
     const teamMap: { [key: string]: string } = {
@@ -97,12 +116,12 @@ const MatchCard = ({
           <span>{formattedDate}</span>
         </div>
 
-        {(match.stadium || match.city) && (
+        {stadiumInfo && (
           <div className="flex items-center text-xs text-muted-foreground mb-1">
             <MapPin className="h-3 w-3 mr-1" />
             <span>
-              {match.stadium}
-              {match.city ? `, ${match.city}` : ""}
+              {stadiumInfo.stadium}
+              {stadiumInfo.city ? `, ${stadiumInfo.city}` : ""}
             </span>
           </div>
         )}
