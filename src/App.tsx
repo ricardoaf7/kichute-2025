@@ -13,6 +13,7 @@ import Payments from "./pages/Payments";
 import Prizes from "./pages/Prizes";
 import AdminMatches from "./pages/AdminMatches";
 import AdminTeams from "./pages/AdminTeams";
+import AdminScoring from "./pages/AdminScoring";
 import NotFound from "./pages/NotFound";
 import TesteEscudos from "./pages/TesteEscudos";
 
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/payments" element={<Payments />} />
           <Route path="/admin/matches" element={<AdminMatches />} />
           <Route path="/admin/teams" element={<AdminTeams />} />
+          <Route path="/admin/scoring" element={<AdminScoring />} />
           <Route path="/teste" element={<TesteEscudos />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

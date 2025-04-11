@@ -1,23 +1,20 @@
-
-export interface Team {
-  id: string;
-  name: string;
-  shortName: string;
-  homeStadium?: string;
-  city?: string;
-}
-
 export interface Match {
   id: string;
   round: number;
   homeTeam: Team;
   awayTeam: Team;
-  homeScore?: number | null;
-  awayScore?: number | null;
+  homeScore: number | null;
+  awayScore: number | null;
   date: string;
   played: boolean;
-  stadium?: string;
-  city?: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  shortName: string;
+  homeStadium: string;
+  city: string;
 }
 
 export interface Player {
@@ -26,7 +23,7 @@ export interface Player {
   paid: boolean;
   paidAmount: number;
   totalPoints: number;
-  roundPoints: {[key: number]: number};
+  roundPoints: { [round: number]: number };
 }
 
 export interface Guess {
@@ -35,14 +32,14 @@ export interface Guess {
   playerId: string;
   homeScore: number;
   awayScore: number;
-  points: number | null;
+  points?: number;
 }
 
 export interface Round {
   number: number;
-  matches: Match[];
   closed: boolean;
   deadline: string;
+  matches: Match[];
 }
 
 export interface Prize {
@@ -53,8 +50,8 @@ export interface Prize {
   paid: boolean;
 }
 
-export type ScoringSystem = {
+export interface ScoringSystem {
   exactScore: number;
   correctDifferenceOrDraw: number;
   correctWinner: number;
-};
+}

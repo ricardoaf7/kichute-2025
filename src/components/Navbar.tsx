@@ -39,6 +39,12 @@ const Navbar = () => {
     { to: "/payments", label: "Financeiro", icon: <DollarSign className="w-4 h-4" /> },
   ];
 
+  const adminLinks = [
+    { href: "/admin/matches", label: "Partidas" },
+    { href: "/admin/teams", label: "Times" },
+    { href: "/admin/scoring", label: "Pontuação" },
+  ];
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
