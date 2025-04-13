@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
@@ -6,6 +5,7 @@ import { Button } from "./ui/button";
 import { Menu, X, Calendar, Trophy, BarChart2, Settings, Users, Layers } from "lucide-react";
 import Boot from "./icons/Boot";
 import { useIsMobile } from "../hooks/use-mobile";
+import AppLogo from "./AppLogo";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -73,12 +73,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <Boot className="h-8 w-8 text-green-600" />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            Kichute FC
-          </span>
-        </Link>
+        <AppLogo />
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <Link to="/payments">
             <Button variant="outline" className="flex md:me-3 items-center px-4">
@@ -128,7 +123,6 @@ const Navbar = () => {
               </li>
             ))}
             
-            {/* Admin dropdown */}
             <li className="relative group">
               <button
                 className={cn(
