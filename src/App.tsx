@@ -15,6 +15,7 @@ import RoundReport from "./pages/RoundReport";
 import AdminMatches from "./pages/AdminMatches";
 import AdminTeams from "./pages/AdminTeams";
 import AdminScoring from "./pages/AdminScoring";
+import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 import TesteEscudos from "./pages/TesteEscudos";
 
@@ -38,7 +39,7 @@ const App = () => (
           <Route path="/admin/matches" element={<AdminMatches />} />
           <Route path="/admin/teams" element={<AdminTeams />} />
           <Route path="/admin/scoring" element={<AdminScoring />} />
-          <Route path="/admin/users" element={<NotFound />} /> {/* Created a route for user management but temporarily points to NotFound */}
+          <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/teste" element={<TesteEscudos />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -32,7 +32,7 @@ const AdminScoring = () => {
         <div className="text-center mb-8 animate-slide-down">
           <h1 className="text-3xl font-bold">Gerenciamento de Pontuação</h1>
           <p className="text-muted-foreground mt-2">
-            Configure o sistema de pontuação para os palpites do Brasileirão 2025
+            Configure o sistema de pontuação para os kichutes do Brasileirão 2025
           </p>
         </div>
 
@@ -40,7 +40,7 @@ const AdminScoring = () => {
           <CardHeader>
             <CardTitle>Sistema de Pontuação</CardTitle>
             <CardDescription>
-              Define quantos pontos são concedidos para cada tipo de acerto nos palpites
+              Define quantos pontos são concedidos para cada tipo de acerto nos kichutes
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -141,7 +141,7 @@ const Navbar = () => {
                 <Settings className="h-5 w-5 mr-2" />
                 Admin
               </button>
-              <div className="hidden group-hover:block md:absolute md:left-0 md:mt-1 md:min-w-40 md:z-30 md:bg-white md:shadow-lg md:rounded-lg md:border md:border-gray-200 dark:md:bg-gray-800 dark:md:border-gray-700">
+              <div className="md:hidden group-hover:block md:absolute md:left-0 md:mt-1 md:min-w-40 md:z-30 md:bg-white md:shadow-lg md:rounded-lg md:border md:border-gray-200 dark:md:bg-gray-800 dark:md:border-gray-700">
                 {adminItems.map((item) => (
                   <Link
                     key={item.path}
