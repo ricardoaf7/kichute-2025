@@ -5,7 +5,7 @@ import StandingsHeader from "../components/standings/StandingsHeader";
 import StandingsContent from "../components/standings/StandingsContent";
 
 const Standings = () => {
-  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic" | "kichutes" | "matches" | "payments" | "rules">("dynamic");
+  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic" | "kichutes" | "matches" | "payments" | "rules" | "teams">("dynamic");
   const [selectedRound, setSelectedRound] = useState<number | undefined>(undefined);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("2025");
