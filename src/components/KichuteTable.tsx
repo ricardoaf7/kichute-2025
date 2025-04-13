@@ -111,8 +111,8 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
             partida:partida_id(
               id,
               rodada,
-              time_casa:time_casa_id(nome, sigla),
-              time_visitante:time_visitante_id(nome, sigla)
+              time_casa_id(nome, sigla),
+              time_visitante_id(nome, sigla)
             )
           `);
         
@@ -130,23 +130,33 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
         
         if (error) throw error;
         
+        console.log("Dados brutos dos kichutes:", data);
+        
         // Formatar os dados para o formato necessário para a tabela
-        const formattedData = data?.map(item => ({
+        const formattedData = (data || []).map(item => ({
           id: item.id,
           rodada: item.partida?.rodada,
           partida: {
             id: item.partida_id,
-            time_casa: item.partida?.time_casa || { nome: 'N/A', sigla: 'N/A' },
-            time_visitante: item.partida?.time_visitante || { nome: 'N/A', sigla: 'N/A' }
+            time_casa: {
+              nome: item.partida?.time_casa_id?.nome || 'N/A',
+              sigla: item.partida?.time_casa_id?.sigla || 'N/A'
+            },
+            time_visitante: {
+              nome: item.partida?.time_visitante_id?.nome || 'N/A',
+              sigla: item.partida?.time_visitante_id?.sigla || 'N/A'
+            }
           },
           jogador: {
             id: item.jogador_id,
             nome: item.jogador?.nome || 'N/A'
           },
-          palpite_casa: item.palpite_casa,
-          palpite_visitante: item.palpite_visitante,
+          palpite_casa: item.palpite_casa || 0,
+          palpite_visitante: item.palpite_visitante || 0,
           pontos: item.pontos || 0
-        })) || [];
+        }));
+        
+        console.log("Dados formatados dos kichutes:", formattedData);
         
         // Ordenar por rodada e então por pontos (decrescente)
         formattedData.sort((a, b) => {
