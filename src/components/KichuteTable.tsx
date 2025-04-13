@@ -107,12 +107,12 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
             pontos,
             jogador_id,
             partida_id,
-            jogador:jogador_id(id, nome),
-            partida:partida_id(
+            jogador:jogadores(id, nome),
+            partida:partidas(
               id,
               rodada,
-              time_casa_id(nome, sigla),
-              time_visitante_id(nome, sigla)
+              time_casa:times!time_casa_id(nome, sigla),
+              time_visitante:times!time_visitante_id(nome, sigla)
             )
           `);
         
@@ -139,12 +139,12 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
           partida: {
             id: item.partida_id,
             time_casa: {
-              nome: item.partida?.time_casa_id?.nome || 'N/A',
-              sigla: item.partida?.time_casa_id?.sigla || 'N/A'
+              nome: item.partida?.time_casa?.nome || 'N/A',
+              sigla: item.partida?.time_casa?.sigla || 'N/A'
             },
             time_visitante: {
-              nome: item.partida?.time_visitante_id?.nome || 'N/A',
-              sigla: item.partida?.time_visitante_id?.sigla || 'N/A'
+              nome: item.partida?.time_visitante?.nome || 'N/A',
+              sigla: item.partida?.time_visitante?.sigla || 'N/A'
             }
           },
           jogador: {
