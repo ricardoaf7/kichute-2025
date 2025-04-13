@@ -31,8 +31,8 @@ const Navbar = () => {
       icon: <Calendar className="h-5 w-5 mr-2" />,
     },
     {
-      name: "Palpites",
-      path: "/guesses",
+      name: "Kichutes",
+      path: "/kichutes",
       icon: <Boot className="h-5 w-5 mr-2" />,
     },
     {

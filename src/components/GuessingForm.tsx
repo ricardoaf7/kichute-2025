@@ -97,7 +97,7 @@ const GuessingForm = ({
                 : "bg-gray-200 text-gray-500 cursor-not-allowed"
             }`}
           >
-            Salvar Palpites
+            Salvar Kichutes
           </button>
         </div>
       )}
@@ -105,7 +105,7 @@ const GuessingForm = ({
       {roundClosed && (
         <div className="text-center mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-md dark:bg-yellow-900/20 dark:border-yellow-800">
           <p className="text-yellow-700 dark:text-yellow-300">
-            Palpites encerrados para esta rodada.
+            Kichutes encerrados para esta rodada.
           </p>
         </div>
       )}
