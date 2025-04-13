@@ -5,9 +5,10 @@ import StandingsTable from "../components/StandingsTable";
 import PlayerCard from "../components/PlayerCard";
 import DynamicTable from "../components/DynamicTable";
 import KichuteTable from "../components/KichuteTable";
+import MatchesTable from "../components/MatchesTable";
 
 const Standings = () => {
-  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic" | "kichutes">("dynamic");
+  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic" | "kichutes" | "matches">("dynamic");
   const [selectedRound, setSelectedRound] = useState<number | undefined>(undefined);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("2025");
@@ -165,6 +166,16 @@ const Standings = () => {
                   Kichutes
                 </button>
                 <button
+                  onClick={() => { setViewMode("matches"); setUseDynamicTable(true); }}
+                  className={`px-3 py-1.5 text-sm ${
+                    viewMode === "matches"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background hover:bg-muted/50"
+                  }`}
+                >
+                  Partidas
+                </button>
+                <button
                   onClick={() => { setViewMode("table"); setUseDynamicTable(false); }}
                   className={`px-3 py-1.5 text-sm ${
                     viewMode === "table"
@@ -196,6 +207,8 @@ const Standings = () => {
             <DynamicTable />
           ) : viewMode === "kichutes" ? (
             <KichuteTable />
+          ) : viewMode === "matches" ? (
+            <MatchesTable />
           ) : viewMode === "table" ? (
             <StandingsTable 
               players={sortedPlayers} 
