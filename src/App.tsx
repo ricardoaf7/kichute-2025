@@ -38,6 +38,7 @@ const App = () => (
           <Route path="/admin/matches" element={<AdminMatches />} />
           <Route path="/admin/teams" element={<AdminTeams />} />
           <Route path="/admin/scoring" element={<AdminScoring />} />
+          <Route path="/admin/users" element={<NotFound />} /> {/* Created a route for user management but temporarily points to NotFound */}
           <Route path="/teste" element={<TesteEscudos />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

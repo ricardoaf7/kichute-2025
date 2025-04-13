@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { PLAYERS } from "../utils/mockData";
 import PlayerCard from "../components/PlayerCard";
 import PaymentStatus from "../components/PaymentStatus";
-import { DollarSign, Plus, Check, Calendar, CreditCard, TrendingUp, AlertTriangle } from "lucide-react";
+import { DollarSign, Check, Calendar, CreditCard, TrendingUp, AlertTriangle } from "lucide-react";
 import { toast } from "../components/ui/use-toast";
+
 const Payments = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState("");
@@ -11,6 +13,7 @@ const Payments = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"monthly" | "annual">("monthly");
   const [selectedMonth, setSelectedMonth] = useState("current");
+
   useEffect(() => {
     // Simulate loading
     const timer = setTimeout(() => {
@@ -18,14 +21,17 @@ const Payments = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, []);
+
   const handleOpenPaymentModal = (playerId: string) => {
     setSelectedPlayer(playerId);
     setPaymentAmount("");
     setIsPaymentModalOpen(true);
   };
+
   const handleClosePaymentModal = () => {
     setIsPaymentModalOpen(false);
   };
+
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -89,6 +95,7 @@ const Payments = () => {
     value: "current",
     label: "Mês Atual"
   }];
+
   return <div className="page-container">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 animate-slide-down">
@@ -119,10 +126,6 @@ const Payments = () => {
                         </option>)}
                     </select>
                   </div>
-                  <button className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-goal text-white hover:bg-goal-dark transition-colors shadow-sm">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Novo Participante
-                  </button>
                 </div>
                 
                 <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
@@ -301,4 +304,5 @@ const Payments = () => {
         </div>}
     </div>;
 };
+
 export default Payments;

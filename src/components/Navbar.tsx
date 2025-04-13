@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
-import { Menu, X, Calendar, Trophy, BarChart2 } from "lucide-react";
+import { Menu, X, Calendar, Trophy, BarChart2, Settings, Users, Layers } from "lucide-react";
 import Boot from "./icons/Boot";
 import { useIsMobile } from "../hooks/use-mobile";
 
@@ -47,6 +47,29 @@ const Navbar = () => {
     },
   ];
 
+  const adminItems = [
+    {
+      name: "Participantes",
+      path: "/admin/users",
+      icon: <Users className="h-5 w-5 mr-2" />,
+    },
+    {
+      name: "Times",
+      path: "/admin/teams",
+      icon: <Layers className="h-5 w-5 mr-2" />,
+    },
+    {
+      name: "Partidas",
+      path: "/admin/matches",
+      icon: <Calendar className="h-5 w-5 mr-2" />,
+    },
+    {
+      name: "Pontuação",
+      path: "/admin/scoring",
+      icon: <Settings className="h-5 w-5 mr-2" />,
+    },
+  ];
+
   return (
     <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -60,7 +83,7 @@ const Navbar = () => {
           <Link to="/payments">
             <Button variant="outline" className="flex md:me-3 items-center px-4">
               <span className="text-md font-bold text-primary">R$</span>
-              <span className="ml-1">Pagamentos</span>
+              <span className="ml-1">Financeiro</span>
             </Button>
           </Link>
           <button
@@ -104,6 +127,39 @@ const Navbar = () => {
                 </Link>
               </li>
             ))}
+            
+            {/* Admin dropdown */}
+            <li className="relative group">
+              <button
+                className={cn(
+                  "flex items-center py-2 px-3 md:p-0 md:px-3 md:py-2 rounded md:rounded-lg w-full text-left",
+                  location.pathname.includes("/admin")
+                    ? "text-white bg-green-700 md:bg-green-700 md:text-white"
+                    : "text-gray-900 hover:bg-gray-100 md:hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                )}
+              >
+                <Settings className="h-5 w-5 mr-2" />
+                Admin
+              </button>
+              <div className="hidden group-hover:block md:absolute md:left-0 md:mt-1 md:min-w-40 md:z-30 md:bg-white md:shadow-lg md:rounded-lg md:border md:border-gray-200 dark:md:bg-gray-800 dark:md:border-gray-700">
+                {adminItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={closeMenu}
+                    className={cn(
+                      "flex items-center py-2 px-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700",
+                      isActive(item.path)
+                        ? "bg-gray-100 dark:bg-gray-700 font-medium"
+                        : ""
+                    )}
+                  >
+                    {item.icon}
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            </li>
           </ul>
         </div>
       </div>
