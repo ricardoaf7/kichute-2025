@@ -7,9 +7,10 @@ import DynamicTable from "../DynamicTable";
 import KichuteTable from "../KichuteTable";
 import MatchesTable from "../MatchesTable";
 import PaymentsView from "../PaymentsView";
+import RulesView from "../rules/RulesView";
 
 interface StandingsContentProps {
-  viewMode: "table" | "cards" | "dynamic" | "kichutes" | "matches" | "payments";
+  viewMode: "table" | "cards" | "dynamic" | "kichutes" | "matches" | "payments" | "rules";
   sortedPlayers: Player[];
   selectedRound: number | undefined;
   isLoaded: boolean;
@@ -33,6 +34,8 @@ const StandingsContent: React.FC<StandingsContentProps> = ({
         <MatchesTable />
       ) : viewMode === "payments" ? (
         <PaymentsView />
+      ) : viewMode === "rules" ? (
+        <RulesView />
       ) : viewMode === "table" ? (
         <StandingsTable 
           players={sortedPlayers} 
