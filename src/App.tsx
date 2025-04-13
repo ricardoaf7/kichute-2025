@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Index from "./pages/Index";
 import Matches from "./pages/Matches";
-import Guesses from "./pages/Guesses";
+import Kichutes from "./pages/Guesses";
 import Standings from "./pages/Standings";
 import Payments from "./pages/Payments";
 import Prizes from "./pages/Prizes";
@@ -30,7 +30,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/matches" element={<Matches />} />
-          <Route path="/guesses" element={<Guesses />} />
+          <Route path="/guesses" element={<Kichutes />} />
           <Route path="/standings" element={<Standings />} />
           <Route path="/prizes" element={<Prizes />} />
           <Route path="/payments" element={<Payments />} />

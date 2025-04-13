@@ -6,8 +6,21 @@ import RoundSelector from "../components/RoundSelector";
 import GuessingForm from "../components/GuessingForm";
 import { toast } from "../components/ui/use-toast";
 import { Guess } from "../types";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../components/ui/table";
+import { ScoreDisplay } from "../components/match/ScoreDisplay";
+import { calculatePoints, getPointsBadgeClass } from "../utils/scoring";
+import { Trophy, Medal, Star } from "lucide-react";
 
-const Guesses = () => {
+// Mapeamento de ícones para diferentes pontuações
+const getPointsIcon = (points: number) => {
+  if (points >= 7) return <Trophy className="h-4 w-4 text-yellow-500" />;
+  if (points >= 4) return <Medal className="h-4 w-4 text-blue-500" />;
+  if (points >= 2) return <Star className="h-4 w-4 text-green-500" />;
+  return null;
+};
+
+const Kichutes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const roundParam = searchParams.get("round");
   const [currentRound, setCurrentRound] = useState(roundParam ? parseInt(roundParam) : 1);
@@ -69,7 +82,28 @@ const Guesses = () => {
     return now > deadline;
   };
   
-  const isRoundStarted = isRoundClosed || isDeadlinePassed();
+  const isRoundLocked = isRoundClosed || isDeadlinePassed();
+
+  // Obter palpites simulados para cada jogador (em uma aplicação real, viria do banco de dados)
+  const getPlayerGuesses = (matchId: string, playerId: string) => {
+    // Simular um palpite baseado no ID do jogador e da partida para demonstração
+    const hash = (matchId + playerId).split('').reduce((a, b) => (a * 31 + b.charCodeAt(0)) & 0xfffffff, 0);
+    return {
+      homeScore: (hash % 4),
+      awayScore: ((hash >> 2) % 4)
+    };
+  };
+  
+  // Calcular pontos para um palpite
+  const calculatePlayerPoints = (matchId: string, playerId: string, match: any) => {
+    if (!match.played) return null;
+    
+    const guess = getPlayerGuesses(matchId, playerId);
+    return calculatePoints(guess, { 
+      homeScore: match.homeScore, 
+      awayScore: match.awayScore 
+    });
+  };
 
   return (
     <div className="page-container">
@@ -109,7 +143,7 @@ const Guesses = () => {
           </div>
         </div>
 
-        {isRoundStarted && !isRoundClosed && (
+        {isRoundLocked && !isRoundClosed && (
           <div className="mb-6 p-4 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 rounded-lg">
             <p className="text-center font-medium">
               Prazo para kichutes encerrado! Os kichutes para esta rodada não podem mais ser editados.
@@ -117,13 +151,13 @@ const Guesses = () => {
           </div>
         )}
 
-        {isRoundStarted && (
+        {isRoundLocked && (
           <div className="mb-6">
             <button
-              onClick={() => setShowAllGuesses(!showAllGuesses)}
+              onClick={() => setShowAllGuesses(true)}
               className="w-full py-3 px-4 bg-goal/10 hover:bg-goal/20 text-goal font-medium rounded-lg transition-colors"
             >
-              {showAllGuesses ? "Esconder kichutes dos outros" : "Ver kichutes de todos os jogadores"}
+              Ver kichutes de todos os jogadores
             </button>
           </div>
         )}
@@ -137,7 +171,7 @@ const Guesses = () => {
               currentPlayerId={currentPlayerId}
               existingGuesses={GUESSES}
               onSubmit={handleSubmitGuesses}
-              roundClosed={isRoundClosed || isDeadlinePassed()}
+              roundClosed={isRoundLocked}
             />
           ) : (
             <div className="text-center py-12 text-muted-foreground animate-fadeIn">
@@ -146,8 +180,73 @@ const Guesses = () => {
           )}
         </div>
       </div>
+
+      {/* Modal para exibir os kichutes de todos os jogadores */}
+      <Dialog open={showAllGuesses} onOpenChange={setShowAllGuesses}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Kichutes de Todos os Jogadores - Rodada {currentRound}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="bg-muted/50">
+                <TableRow>
+                  <TableHead className="w-[200px]">Partida</TableHead>
+                  <TableHead className="w-[120px]">Resultado</TableHead>
+                  {PLAYERS.map(player => (
+                    <TableHead key={player.id} className="text-center">
+                      {player.name}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {matches.map(match => (
+                  <TableRow key={match.id}>
+                    <TableCell className="font-medium">
+                      {match.homeTeam.shortName} x {match.awayTeam.shortName}
+                    </TableCell>
+                    <TableCell>
+                      <ScoreDisplay 
+                        homeScore={match.homeScore} 
+                        awayScore={match.awayScore} 
+                        isMatchPlayed={match.played} 
+                      />
+                    </TableCell>
+                    
+                    {PLAYERS.map(player => {
+                      const guess = getPlayerGuesses(match.id, player.id);
+                      const points = calculatePlayerPoints(match.id, player.id, match);
+                      
+                      return (
+                        <TableCell key={player.id} className="text-center">
+                          <div className="flex flex-col items-center space-y-1">
+                            <div className="text-sm font-medium">
+                              {guess.homeScore} x {guess.awayScore}
+                            </div>
+                            
+                            {points !== null && (
+                              <div className={getPointsBadgeClass(points)}>
+                                <span className="flex items-center">
+                                  {getPointsIcon(points)}
+                                  <span className="ml-1">{points}</span>
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default Guesses;
+export default Kichutes;
