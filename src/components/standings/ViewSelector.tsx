@@ -2,8 +2,8 @@
 import React from "react";
 
 interface ViewSelectorProps {
-  viewMode: "table" | "cards" | "dynamic" | "kichutes" | "matches";
-  setViewMode: (mode: "table" | "cards" | "dynamic" | "kichutes" | "matches") => void;
+  viewMode: "table" | "cards" | "dynamic" | "kichutes" | "matches" | "payments";
+  setViewMode: (mode: "table" | "cards" | "dynamic" | "kichutes" | "matches" | "payments") => void;
   setUseDynamicTable: (value: boolean) => void;
 }
 
@@ -43,6 +43,16 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({
         }`}
       >
         Partidas
+      </button>
+      <button
+        onClick={() => { setViewMode("payments"); setUseDynamicTable(true); }}
+        className={`px-3 py-1.5 text-sm ${
+          viewMode === "payments"
+            ? "bg-primary text-primary-foreground"
+            : "bg-background hover:bg-muted/50"
+        }`}
+      >
+        Pagamentos
       </button>
       <button
         onClick={() => { setViewMode("table"); setUseDynamicTable(false); }}

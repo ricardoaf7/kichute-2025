@@ -6,9 +6,10 @@ import PlayerCard from "../PlayerCard";
 import DynamicTable from "../DynamicTable";
 import KichuteTable from "../KichuteTable";
 import MatchesTable from "../MatchesTable";
+import PaymentsView from "../PaymentsView";
 
 interface StandingsContentProps {
-  viewMode: "table" | "cards" | "dynamic" | "kichutes" | "matches";
+  viewMode: "table" | "cards" | "dynamic" | "kichutes" | "matches" | "payments";
   sortedPlayers: Player[];
   selectedRound: number | undefined;
   isLoaded: boolean;
@@ -30,6 +31,8 @@ const StandingsContent: React.FC<StandingsContentProps> = ({
         <KichuteTable />
       ) : viewMode === "matches" ? (
         <MatchesTable />
+      ) : viewMode === "payments" ? (
+        <PaymentsView />
       ) : viewMode === "table" ? (
         <StandingsTable 
           players={sortedPlayers} 
