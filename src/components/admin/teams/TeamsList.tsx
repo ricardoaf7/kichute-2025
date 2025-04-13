@@ -6,19 +6,37 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Edit, Plus, Trash } from "lucide-react";
 
 interface TeamsListProps {
-  teams: Team[];
-  onAddNew: () => void;
-  onEdit: (team: Team) => void;
-  onDelete: (teamId: string) => void;
+  teams?: Team[];
+  onAddNew?: () => void;
+  onEdit?: (team: Team) => void;
+  onDelete?: (teamId: string) => void;
+  onSelectTeam?: (teamId: string) => void;
+  onCreateNew?: () => void;
 }
 
-export const TeamsList = ({ teams, onAddNew, onEdit, onDelete }: TeamsListProps) => {
+export const TeamsList = ({ 
+  teams = [], 
+  onAddNew, 
+  onEdit, 
+  onDelete, 
+  onSelectTeam, 
+  onCreateNew 
+}: TeamsListProps) => {
+  // Use onCreateNew or onAddNew (for backward compatibility)
+  const handleAddNew = () => {
+    if (onCreateNew) {
+      onCreateNew();
+    } else if (onAddNew) {
+      onAddNew();
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Times Cadastrados</CardTitle>
-          <Button onClick={onAddNew} variant="outline" size="sm">
+          <Button onClick={handleAddNew} variant="outline" size="sm">
             <Plus className="h-4 w-4 mr-2" />
             Novo Time
           </Button>
@@ -36,8 +54,14 @@ export const TeamsList = ({ teams, onAddNew, onEdit, onDelete }: TeamsListProps)
                 <TeamCard 
                   key={team.id} 
                   team={team} 
-                  onEdit={() => onEdit(team)} 
-                  onDelete={() => onDelete(team.id)} 
+                  onEdit={() => {
+                    if (onSelectTeam) {
+                      onSelectTeam(team.id);
+                    } else if (onEdit) {
+                      onEdit(team);
+                    }
+                  }} 
+                  onDelete={() => onDelete && onDelete(team.id)} 
                 />
               ))}
             </div>

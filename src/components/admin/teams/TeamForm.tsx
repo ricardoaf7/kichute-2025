@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,12 +27,14 @@ const formSchema = z.object({
 export type TeamFormValues = z.infer<typeof formSchema>;
 
 interface TeamFormProps {
-  editingTeam: Team | null;
-  onSubmit: (values: TeamFormValues) => void;
+  editingTeam?: Team | null;
+  teamId?: string | null;
+  onSubmit?: (values: TeamFormValues) => void;
   onCancel?: () => void;
+  onSaved?: () => void;
 }
 
-export const TeamForm = ({ editingTeam, onSubmit, onCancel }: TeamFormProps) => {
+export const TeamForm = ({ editingTeam, teamId, onSubmit, onCancel, onSaved }: TeamFormProps) => {
   const form = useForm<TeamFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,14 +64,23 @@ export const TeamForm = ({ editingTeam, onSubmit, onCancel }: TeamFormProps) => 
     }
   }, [editingTeam, form]);
 
+  const handleFormSubmit = (values: TeamFormValues) => {
+    if (onSubmit) {
+      onSubmit(values);
+    }
+    if (onSaved) {
+      onSaved();
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{editingTeam ? "Editar Time" : "Novo Time"}</CardTitle>
+        <CardTitle>{editingTeam || teamId ? "Editar Time" : "Novo Time"}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -130,9 +140,9 @@ export const TeamForm = ({ editingTeam, onSubmit, onCancel }: TeamFormProps) => 
             <div className="flex gap-2 pt-2">
               <Button type="submit" className="flex-1">
                 <Save className="mr-2 h-4 w-4" />
-                {editingTeam ? "Atualizar" : "Adicionar"}
+                {editingTeam || teamId ? "Atualizar" : "Adicionar"}
               </Button>
-              {editingTeam && (
+              {(editingTeam || teamId) && (
                 <Button type="button" variant="outline" onClick={onCancel}>
                   Cancelar
                 </Button>

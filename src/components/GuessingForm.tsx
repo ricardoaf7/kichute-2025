@@ -4,19 +4,21 @@ import { Match, Guess, Player } from "../types";
 import MatchCard from "./MatchCard";
 
 interface GuessingFormProps {
-  matches: Match[];
-  currentPlayerId: string;
+  matches?: Match[];
+  currentPlayerId?: string;
   existingGuesses?: Guess[];
-  onSubmit: (guesses: Omit<Guess, "id" | "points">[]) => void;
-  roundClosed: boolean;
+  onSubmit?: (guesses: Omit<Guess, "id" | "points">[]) => void;
+  roundClosed?: boolean;
+  onSubmitSuccess?: () => void;
 }
 
 const GuessingForm = ({
-  matches,
-  currentPlayerId,
+  matches = [],
+  currentPlayerId = "",
   existingGuesses = [],
   onSubmit,
-  roundClosed,
+  roundClosed = false,
+  onSubmitSuccess,
 }: GuessingFormProps) => {
   const [guesses, setGuesses] = useState<{ [key: string]: { homeScore: number; awayScore: number } }>({});
   const [isFormValid, setIsFormValid] = useState(false);
@@ -61,7 +63,13 @@ const GuessingForm = ({
       awayScore: guesses[match.id]?.awayScore || 0,
     }));
 
-    onSubmit(submittedGuesses);
+    if (onSubmit) {
+      onSubmit(submittedGuesses);
+    }
+    
+    if (onSubmitSuccess) {
+      onSubmitSuccess();
+    }
   };
 
   const findGuessForMatch = (matchId: string): Guess | undefined => {
