@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -90,7 +89,7 @@ const Index = () => {
           <span className="inline-block px-4 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-4">Kichute do Brasileirão Séria A 2025</span>
           <h1 className="text-4xl font-bold mb-4 md:text-3xl">Faça seus kichutes e talvez ganhe uma graninha dos seus patos!!!</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Acompanhe as rodadas, registre seus palpites e veja quem está liderando a
+            Acompanhe as rodadas, registre seus kichutes e veja quem está liderando a
             competição.
           </p>
         </div>
@@ -120,10 +119,10 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
                   <Boot className="h-6 w-6 text-green-600" />
                 </div>
-                <h2 className="text-xl font-semibold">Palpites</h2>
+                <h2 className="text-xl font-semibold">Kichutes</h2>
                 <p className="text-center text-gray-600">Registre seus kichutes para a próxima rodada.</p>
-                <Link to="/guesses" className="text-green-600 flex items-center hover:underline">
-                  Fazer palpites
+                <Link to="/kichutes" className="text-green-600 flex items-center hover:underline">
+                  Fazer kichutes
                   <span className="ml-1">→</span>
                 </Link>
               </div>
