@@ -19,16 +19,24 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import { Player } from "@/types";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { NewParticipantForm } from "@/components/admin/users/NewParticipantForm";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState(PLAYERS);
   const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleAddUser = () => {
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: "A adição de novos usuários será implementada em breve."
-    });
+    setIsDialogOpen(true);
   };
 
   const handleEditUser = (userId: string) => {
@@ -42,6 +50,24 @@ const AdminUsers = () => {
     toast({
       title: "Funcionalidade em desenvolvimento",
       description: `Remoção do usuário ID ${userId} será implementada em breve.`
+    });
+  };
+
+  const handleSubmitNewUser = (newUser: Omit<Player, "id">) => {
+    // In a production app, this would be a call to an API
+    const newUserId = `user-${Date.now()}`;
+    const userWithId: Player = {
+      id: newUserId,
+      ...newUser,
+      roundPoints: {} // initialize empty round points
+    };
+    
+    setUsers((prevUsers) => [...prevUsers, userWithId]);
+    setIsDialogOpen(false);
+    
+    toast({
+      title: "Participante adicionado",
+      description: `${newUser.name} foi adicionado com sucesso.`
     });
   };
 
@@ -110,6 +136,18 @@ const AdminUsers = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Novo Participante</DialogTitle>
+            <DialogDescription>
+              Preencha os dados para adicionar um novo participante ao Kichute FC.
+            </DialogDescription>
+          </DialogHeader>
+          <NewParticipantForm onSubmit={handleSubmitNewUser} onCancel={() => setIsDialogOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
