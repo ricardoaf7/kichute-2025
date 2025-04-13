@@ -3,13 +3,15 @@ import { useState, useEffect } from "react";
 import { PLAYERS, ROUNDS } from "../utils/mockData";
 import StandingsTable from "../components/StandingsTable";
 import PlayerCard from "../components/PlayerCard";
+import DynamicTable from "../components/DynamicTable";
 
 const Standings = () => {
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic">("dynamic");
   const [selectedRound, setSelectedRound] = useState<number | undefined>(undefined);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("2025");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [useDynamicTable, setUseDynamicTable] = useState(true);
 
   useEffect(() => {
     // Simulate loading
@@ -80,65 +82,79 @@ const Standings = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center space-x-3">
-                <label htmlFor="round-select" className="text-sm font-medium">
-                  Rodada:
-                </label>
-                <select
-                  id="round-select"
-                  value={selectedRound ? selectedRound.toString() : "total"}
-                  onChange={handleRoundChange}
-                  className="form-input"
-                >
-                  <option value="total">Todas</option>
-                  {allRounds.map(round => (
-                    <option key={round} value={round.toString()}>
-                      Rodada {round}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {!useDynamicTable && (
+                <>
+                  <div className="flex items-center space-x-3">
+                    <label htmlFor="round-select" className="text-sm font-medium">
+                      Rodada:
+                    </label>
+                    <select
+                      id="round-select"
+                      value={selectedRound ? selectedRound.toString() : "total"}
+                      onChange={handleRoundChange}
+                      className="form-input"
+                    >
+                      <option value="total">Todas</option>
+                      {allRounds.map(round => (
+                        <option key={round} value={round.toString()}>
+                          Rodada {round}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="flex items-center space-x-3">
-                <label htmlFor="month-select" className="text-sm font-medium">
-                  Mês:
-                </label>
-                <select
-                  id="month-select"
-                  value={selectedMonth}
-                  onChange={handleMonthChange}
-                  className="form-input"
-                  disabled={selectedRound !== undefined}
-                >
-                  {months.map(month => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div className="flex items-center space-x-3">
+                    <label htmlFor="month-select" className="text-sm font-medium">
+                      Mês:
+                    </label>
+                    <select
+                      id="month-select"
+                      value={selectedMonth}
+                      onChange={handleMonthChange}
+                      className="form-input"
+                      disabled={selectedRound !== undefined}
+                    >
+                      {months.map(month => (
+                        <option key={month.value} value={month.value}>
+                          {month.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="flex items-center space-x-3">
-                <label htmlFor="year-select" className="text-sm font-medium">
-                  Ano:
-                </label>
-                <select
-                  id="year-select"
-                  value={selectedYear}
-                  onChange={handleYearChange}
-                  className="form-input"
-                >
-                  {years.map(year => (
-                    <option key={year.value} value={year.value}>
-                      {year.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div className="flex items-center space-x-3">
+                    <label htmlFor="year-select" className="text-sm font-medium">
+                      Ano:
+                    </label>
+                    <select
+                      id="year-select"
+                      value={selectedYear}
+                      onChange={handleYearChange}
+                      className="form-input"
+                    >
+                      {years.map(year => (
+                        <option key={year.value} value={year.value}>
+                          {year.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
 
               <div className="flex rounded-md overflow-hidden border border-border">
                 <button
-                  onClick={() => setViewMode("table")}
+                  onClick={() => { setViewMode("dynamic"); setUseDynamicTable(true); }}
+                  className={`px-3 py-1.5 text-sm ${
+                    viewMode === "dynamic"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background hover:bg-muted/50"
+                  }`}
+                >
+                  Supabase
+                </button>
+                <button
+                  onClick={() => { setViewMode("table"); setUseDynamicTable(false); }}
                   className={`px-3 py-1.5 text-sm ${
                     viewMode === "table"
                       ? "bg-primary text-primary-foreground"
@@ -148,7 +164,7 @@ const Standings = () => {
                   Tabela
                 </button>
                 <button
-                  onClick={() => setViewMode("cards")}
+                  onClick={() => { setViewMode("cards"); setUseDynamicTable(false); }}
                   className={`px-3 py-1.5 text-sm ${
                     viewMode === "cards"
                       ? "bg-primary text-primary-foreground"
@@ -165,7 +181,9 @@ const Standings = () => {
         <div className={`transition-opacity duration-300 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}>
-          {viewMode === "table" ? (
+          {viewMode === "dynamic" ? (
+            <DynamicTable />
+          ) : viewMode === "table" ? (
             <StandingsTable 
               players={sortedPlayers} 
               showRoundPoints={true}
