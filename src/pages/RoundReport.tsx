@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useMatches } from "@/contexts/MatchesContext";
+import { useMatches, MatchesProvider } from "@/contexts/MatchesContext";
 import RoundSelector from "@/components/RoundSelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
@@ -21,7 +21,9 @@ const getPointsIcon = (points: number) => {
   return null;
 };
 
-const RoundReport = () => {
+// Criando um componente interno para o conteúdo do relatório
+// que usará o hook useMatches dentro do MatchesProvider
+const RoundReportContent = () => {
   const { rounds, selectedRound, setSelectedRound } = useMatches();
   
   // Encontrar a rodada atual
@@ -162,6 +164,15 @@ const RoundReport = () => {
         )}
       </div>
     </div>
+  );
+};
+
+// Componente principal que envolve o conteúdo com o MatchesProvider
+const RoundReport = () => {
+  return (
+    <MatchesProvider>
+      <RoundReportContent />
+    </MatchesProvider>
   );
 };
 
