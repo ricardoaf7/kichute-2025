@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Calendar, Trophy, Calendar as CalendarIcon, ListOrdered } from "lucide-react";
+import { Calendar, Trophy, Calendar as CalendarIcon, ListOrdered, BarChart2 } from "lucide-react";
 import Boot from "../components/icons/Boot";
 import {
   Select,
@@ -95,7 +95,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <Card className="border hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
               <div className="flex flex-col items-center space-y-4">
@@ -142,6 +142,24 @@ const Index = () => {
                 </p>
                 <Link to="/standings" className="text-amber-600 flex items-center hover:underline">
                   Ver classificação
+                  <span className="ml-1">→</span>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border hover:shadow-md transition-shadow">
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <BarChart2 className="h-6 w-6 text-purple-600" />
+                </div>
+                <h2 className="text-xl font-semibold">Relatório</h2>
+                <p className="text-center text-gray-600">
+                  Compare os palpites e pontuações de cada rodada.
+                </p>
+                <Link to="/round-report" className="text-purple-600 flex items-center hover:underline">
+                  Ver relatório
                   <span className="ml-1">→</span>
                 </Link>
               </div>

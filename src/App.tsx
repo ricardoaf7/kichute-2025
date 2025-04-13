@@ -11,6 +11,7 @@ import Guesses from "./pages/Guesses";
 import Standings from "./pages/Standings";
 import Payments from "./pages/Payments";
 import Prizes from "./pages/Prizes";
+import RoundReport from "./pages/RoundReport";
 import AdminMatches from "./pages/AdminMatches";
 import AdminTeams from "./pages/AdminTeams";
 import AdminScoring from "./pages/AdminScoring";
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/standings" element={<Standings />} />
           <Route path="/prizes" element={<Prizes />} />
           <Route path="/payments" element={<Payments />} />
+          <Route path="/round-report" element={<RoundReport />} />
           <Route path="/admin/matches" element={<AdminMatches />} />
           <Route path="/admin/teams" element={<AdminTeams />} />
           <Route path="/admin/scoring" element={<AdminScoring />} />
