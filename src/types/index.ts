@@ -18,6 +18,7 @@ export interface Team {
   shortName: string;
   homeStadium: string;
   city: string;
+  logoUrl?: string; // Added logoUrl as an optional property
 }
 
 export interface Player {
