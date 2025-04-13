@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
-import { Menu, X, Calendar, Trophy, BarChart2, Settings, Users, Layers } from "lucide-react";
+import { Menu, X, Calendar, Trophy, BarChart2, Settings, Users, Layers, Wallet } from "lucide-react";
 import Boot from "./icons/Boot";
 import { useIsMobile } from "../hooks/use-mobile";
 import AppLogo from "./AppLogo";
@@ -45,6 +46,11 @@ const Navbar = () => {
       path: "/round-report",
       icon: <BarChart2 className="h-5 w-5 mr-2" />,
     },
+    {
+      name: "Financeiro",
+      path: "/payments",
+      icon: <Wallet className="h-5 w-5 mr-2" />,
+    },
   ];
 
   const adminItems = [
@@ -75,12 +81,6 @@ const Navbar = () => {
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <AppLogo />
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-          <Link to="/payments">
-            <Button variant="outline" className="flex md:me-3 items-center px-4">
-              <span className="text-md font-bold text-primary">R$</span>
-              <span className="ml-1">Financeiro</span>
-            </Button>
-          </Link>
           <button
             onClick={toggleMenu}
             type="button"
