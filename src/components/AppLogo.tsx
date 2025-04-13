@@ -11,7 +11,7 @@ const AppLogo = () => {
         <span className="font-poppins text-2xl font-bold text-[#00A859]">
           Kichute
         </span>
-        <span className="font-poppins text-xl font-medium text-gray-700 ml-1">
+        <span className="font-poppins text-xl font-bold text-gray-800">
           2025
         </span>
       </div>
