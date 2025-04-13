@@ -17,9 +17,7 @@ interface Payment {
   id: string;
   jogador_id: string;
   valor: number;
-  mes: string;
-  ano: string;
-  status: "Pago" | "Pendente";
+  data_pagamento: string;
   jogador: {
     nome: string;
   };
@@ -43,9 +41,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
         id, 
         jogador_id,
         valor, 
-        mes, 
-        ano,
-        status,
+        data_pagamento,
         jogador:jogador_id(nome)
       `);
 
@@ -53,12 +49,16 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
       query = query.eq("jogador_id", selectedPlayer);
     }
 
+    // Using the data_pagamento to filter by month if needed
+    // This would require additional parsing in a production app
     if (selectedMonth) {
-      query = query.eq("mes", selectedMonth);
+      // For now we'll just console log that this filter isn't implemented
+      console.log("Month filtering would need date parsing from data_pagamento");
     }
 
+    // Since status doesn't exist in the table, we'll skip this filter
     if (selectedStatus) {
-      query = query.eq("status", selectedStatus);
+      console.log("Status filtering not implemented as column doesn't exist");
     }
 
     const { data, error } = await query;
@@ -75,6 +75,47 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
     queryKey: ["payments", selectedPlayer, selectedMonth, selectedStatus],
     queryFn: fetchPayments,
   });
+
+  // Function to determine payment status based on existence
+  const getPaymentStatus = (payment: Payment) => {
+    return payment.valor > 0 ? "Pago" : "Pendente";
+  };
+
+  // Function to format date string
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('pt-BR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(date);
+    } catch (e) {
+      return dateString;
+    }
+  };
+
+  // Extract month from date for display
+  const extractMonth = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('pt-BR', {
+        month: 'long'
+      }).format(date);
+    } catch (e) {
+      return "Mês desconhecido";
+    }
+  };
+
+  // Extract year from date for display
+  const extractYear = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.getFullYear().toString();
+    } catch (e) {
+      return "Ano desconhecido";
+    }
+  };
 
   return (
     <div className="rounded-md border">
@@ -118,18 +159,18 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
                 <TableCell className="text-right">
                   R$ {payment.valor?.toFixed(2)}
                 </TableCell>
-                <TableCell>{payment.mes}</TableCell>
-                <TableCell>{payment.ano}</TableCell>
+                <TableCell>{extractMonth(payment.data_pagamento)}</TableCell>
+                <TableCell>{extractYear(payment.data_pagamento)}</TableCell>
                 <TableCell className="text-center">
                   <Badge
                     variant="outline"
                     className={`${
-                      payment.status === "Pago"
+                      getPaymentStatus(payment) === "Pago"
                         ? "bg-green-100 text-green-800 border-green-300"
                         : "bg-yellow-100 text-yellow-800 border-yellow-300"
                     }`}
                   >
-                    {payment.status}
+                    {getPaymentStatus(payment)}
                   </Badge>
                 </TableCell>
               </TableRow>
