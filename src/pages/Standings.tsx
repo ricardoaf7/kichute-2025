@@ -4,9 +4,10 @@ import { PLAYERS, ROUNDS } from "../utils/mockData";
 import StandingsTable from "../components/StandingsTable";
 import PlayerCard from "../components/PlayerCard";
 import DynamicTable from "../components/DynamicTable";
+import KichuteTable from "../components/KichuteTable";
 
 const Standings = () => {
-  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic">("dynamic");
+  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic" | "kichutes">("dynamic");
   const [selectedRound, setSelectedRound] = useState<number | undefined>(undefined);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("2025");
@@ -154,6 +155,16 @@ const Standings = () => {
                   Supabase
                 </button>
                 <button
+                  onClick={() => { setViewMode("kichutes"); setUseDynamicTable(true); }}
+                  className={`px-3 py-1.5 text-sm ${
+                    viewMode === "kichutes"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background hover:bg-muted/50"
+                  }`}
+                >
+                  Kichutes
+                </button>
+                <button
                   onClick={() => { setViewMode("table"); setUseDynamicTable(false); }}
                   className={`px-3 py-1.5 text-sm ${
                     viewMode === "table"
@@ -183,6 +194,8 @@ const Standings = () => {
         }`}>
           {viewMode === "dynamic" ? (
             <DynamicTable />
+          ) : viewMode === "kichutes" ? (
+            <KichuteTable />
           ) : viewMode === "table" ? (
             <StandingsTable 
               players={sortedPlayers} 
