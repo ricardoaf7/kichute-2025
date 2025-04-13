@@ -5,11 +5,11 @@ import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Menu, X, Calendar, Trophy, BarChart2 } from "lucide-react";
 import Boot from "./icons/Boot";
-import { useMobile } from "../hooks/use-mobile";
+import { useIsMobile } from "../hooks/use-mobile";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
   const location = useLocation();
 
   const toggleMenu = () => {
