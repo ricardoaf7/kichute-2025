@@ -14,53 +14,45 @@ import {
   DialogFooter,
   DialogDescription
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-interface TeamsListProps {
-  teams?: Team[];
-  onAddNew?: () => void;
-  onEdit?: (team: Team) => void;
-  onDelete?: (teamId: string) => void;
-  onSelectTeam?: (teamId: string) => void;
-  onCreateNew?: () => void;
-}
-
-export const TeamsList = ({ 
-  teams: propTeams = [], 
-  onAddNew, 
-  onEdit, 
-  onDelete, 
-  onSelectTeam, 
-  onCreateNew 
-}: TeamsListProps) => {
-  const [teams, setTeams] = useState<Team[]>(propTeams);
+export const TeamsList = () => {
+  const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentTeam, setCurrentTeam] = useState<Team | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     shortName: "",
-    homeStadium: "",
-    city: "",
     logoUrl: ""
   });
   const { toast } = useToast();
 
   // Fetch teams from Supabase when component mounts
   useEffect(() => {
-    if (propTeams.length === 0) {
-      fetchTeams();
-    }
-  }, [propTeams]);
+    fetchTeams();
+  }, []);
 
   const fetchTeams = async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('times')
-        .select('*');
+        .select('*')
+        .order('nome');
       
       if (error) throw error;
       
@@ -76,7 +68,7 @@ export const TeamsList = ({
       
       setTeams(transformedTeams);
     } catch (error) {
-      console.error('Error fetching teams:', error);
+      console.error('Erro ao carregar times:', error);
       toast({
         title: "Erro ao carregar times",
         description: "Não foi possível carregar a lista de times.",
@@ -87,53 +79,32 @@ export const TeamsList = ({
     }
   };
 
-  // Use onCreateNew or onAddNew (for backward compatibility)
   const handleAddNew = () => {
-    if (onCreateNew) {
-      onCreateNew();
-    } else if (onAddNew) {
-      onAddNew();
-    } else {
-      // Open the dialog for creating a new team
-      setCurrentTeam(null);
-      setFormData({
-        name: "",
-        shortName: "",
-        homeStadium: "",
-        city: "",
-        logoUrl: ""
-      });
-      setIsDialogOpen(true);
-    }
+    // Open the dialog for creating a new team
+    setCurrentTeam(null);
+    setFormData({
+      name: "",
+      shortName: "",
+      logoUrl: ""
+    });
+    setIsDialogOpen(true);
   };
 
   const handleEditTeam = (team: Team) => {
-    if (onSelectTeam) {
-      onSelectTeam(team.id);
-    } else if (onEdit) {
-      onEdit(team);
-    } else {
-      // Open the dialog for editing the team
-      setCurrentTeam(team);
-      setFormData({
-        name: team.name,
-        shortName: team.shortName,
-        homeStadium: team.homeStadium || "",
-        city: team.city || "",
-        logoUrl: team.logoUrl || ""
-      });
-      setIsDialogOpen(true);
-    }
+    // Open the dialog for editing the team
+    setCurrentTeam(team);
+    setFormData({
+      name: team.name,
+      shortName: team.shortName,
+      logoUrl: team.logoUrl || ""
+    });
+    setIsDialogOpen(true);
   };
 
   const handleDeleteTeam = (team: Team) => {
-    if (onDelete) {
-      onDelete(team.id);
-    } else {
-      // Open the confirmation dialog for deleting the team
-      setCurrentTeam(team);
-      setIsDeleteDialogOpen(true);
-    }
+    // Open the confirmation dialog for deleting the team
+    setCurrentTeam(team);
+    setIsDeleteDialogOpen(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,7 +113,16 @@ export const TeamsList = ({
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true);
+    if (!formData.name || !formData.shortName) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Nome e sigla são obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       if (currentTeam) {
         // Update existing team
@@ -205,14 +185,14 @@ export const TeamsList = ({
         }
       }
     } catch (error: any) {
-      console.error('Error saving team:', error);
+      console.error('Erro ao salvar time:', error);
       toast({
         title: "Erro ao salvar time",
         description: error.message || "Ocorreu um erro ao salvar o time.",
         variant: "destructive"
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
       setIsDialogOpen(false);
     }
   };
@@ -220,7 +200,7 @@ export const TeamsList = ({
   const handleConfirmDelete = async () => {
     if (!currentTeam) return;
     
-    setIsLoading(true);
+    setIsSubmitting(true);
     try {
       const { error } = await supabase
         .from('times')
@@ -237,14 +217,14 @@ export const TeamsList = ({
         description: `${currentTeam.name} foi removido com sucesso.`
       });
     } catch (error: any) {
-      console.error('Error deleting team:', error);
+      console.error('Erro ao remover time:', error);
       toast({
         title: "Erro ao remover time",
         description: error.message || "Ocorreu um erro ao remover o time.",
         variant: "destructive"
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
       setIsDeleteDialogOpen(false);
       setCurrentTeam(null);
     }
@@ -255,7 +235,7 @@ export const TeamsList = ({
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Times Cadastrados</CardTitle>
-          <Button onClick={handleAddNew} variant="outline" size="sm">
+          <Button onClick={handleAddNew} className="bg-primary text-white">
             <Plus className="h-4 w-4 mr-2" />
             Novo Time
           </Button>
@@ -264,16 +244,21 @@ export const TeamsList = ({
       <CardContent>
         <div className="space-y-4">
           {isLoading && teams.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8">
               <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-              <p>Carregando times...</p>
+              <p className="text-muted-foreground">Carregando times...</p>
             </div>
           ) : teams.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Nenhum time cadastrado.
+            <div className="text-center py-8 border rounded-md">
+              <Image className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">Nenhum time cadastrado.</p>
+              <Button onClick={handleAddNew} variant="outline" className="mt-4">
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Time
+              </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {teams.map((team) => (
                 <TeamCard 
                   key={team.id} 
@@ -319,6 +304,7 @@ export const TeamsList = ({
                 placeholder="Abreviação (ex: FLA, PAL)"
                 value={formData.shortName}
                 onChange={handleInputChange}
+                maxLength={3}
               />
             </div>
             <div className="grid gap-2">
@@ -348,11 +334,11 @@ export const TeamsList = ({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
               Cancelar
             </Button>
-            <Button onClick={handleSubmit} disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {currentTeam ? "Salvar Alterações" : "Cadastrar Time"}
             </Button>
           </DialogFooter>
@@ -360,26 +346,28 @@ export const TeamsList = ({
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Confirmar exclusão</DialogTitle>
-            <DialogDescription>
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
               Você tem certeza que deseja excluir o time {currentTeam?.name}?
               Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={handleConfirmDelete} disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete} 
+              disabled={isSubmitting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Excluir
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };
@@ -392,11 +380,11 @@ interface TeamCardProps {
 
 const TeamCard = ({ team, onEdit, onDelete }: TeamCardProps) => {
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-muted overflow-hidden">
+    <Card className="overflow-hidden">
+      <CardContent className="p-0">
+        <div className="p-4 flex justify-between items-start gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               {team.logoUrl ? (
                 <img 
                   src={team.logoUrl} 
@@ -410,28 +398,19 @@ const TeamCard = ({ team, onEdit, onDelete }: TeamCardProps) => {
                 <Image className="h-6 w-6 text-muted-foreground" />
               )}
             </div>
-            <div className="space-y-1">
+            <div>
               <h3 className="font-semibold text-lg">{team.name}</h3>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <span className="bg-muted px-2 py-0.5 rounded-md">{team.shortName}</span>
+              <div className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md text-sm">
+                {team.shortName}
               </div>
-              {team.homeStadium && (
-                <p className="text-sm">
-                  <span className="font-medium">Estádio:</span> {team.homeStadium}
-                </p>
-              )}
-              {team.city && (
-                <p className="text-sm">
-                  <span className="font-medium">Cidade:</span> {team.city}
-                </p>
-              )}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <Button
               variant="ghost"
               size="icon"
               onClick={onEdit}
+              className="h-8 w-8"
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -439,6 +418,7 @@ const TeamCard = ({ team, onEdit, onDelete }: TeamCardProps) => {
               variant="ghost"
               size="icon"
               onClick={onDelete}
+              className="h-8 w-8"
             >
               <Trash className="h-4 w-4 text-destructive" />
             </Button>
