@@ -1,5 +1,4 @@
 
-
 export interface Match {
   id: string;
   round: number;
@@ -28,6 +27,7 @@ export interface Player {
   paidAmount: number;
   totalPoints: number;
   roundPoints: { [round: number]: number };
+  role?: "admin" | "participant"; // Optional role field
 }
 
 export interface Guess {
@@ -60,3 +60,22 @@ export interface ScoringSystem {
   correctWinner: number;
 }
 
+export interface UserCredentials {
+  username: string;
+  password: string;
+}
+
+export interface AuthState {
+  user: Player | null;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+}
+
+export interface PaymentRecord {
+  id: string;
+  playerId: string;
+  amount: number;
+  date: string;
+  month: string;
+  confirmed: boolean;
+}
