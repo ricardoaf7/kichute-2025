@@ -2,8 +2,8 @@
 import React from "react";
 
 interface ViewSelectorProps {
-  viewMode: "table" | "cards" | "dynamic" | "kichutes" | "matches" | "payments" | "rules" | "teams";
-  setViewMode: (mode: "table" | "cards" | "dynamic" | "kichutes" | "matches" | "payments" | "rules" | "teams") => void;
+  viewMode: "table" | "cards" | "dynamic";
+  setViewMode: (mode: "table" | "cards" | "dynamic") => void;
   setUseDynamicTable: (value: boolean) => void;
 }
 
@@ -23,56 +23,6 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({
         }`}
       >
         Supabase
-      </button>
-      <button
-        onClick={() => { setViewMode("kichutes"); setUseDynamicTable(true); }}
-        className={`px-3 py-1.5 text-sm ${
-          viewMode === "kichutes"
-            ? "bg-primary text-primary-foreground"
-            : "bg-background hover:bg-muted/50"
-        }`}
-      >
-        Kichutes
-      </button>
-      <button
-        onClick={() => { setViewMode("matches"); setUseDynamicTable(true); }}
-        className={`px-3 py-1.5 text-sm ${
-          viewMode === "matches"
-            ? "bg-primary text-primary-foreground"
-            : "bg-background hover:bg-muted/50"
-        }`}
-      >
-        Partidas
-      </button>
-      <button
-        onClick={() => { setViewMode("payments"); setUseDynamicTable(true); }}
-        className={`px-3 py-1.5 text-sm ${
-          viewMode === "payments"
-            ? "bg-primary text-primary-foreground"
-            : "bg-background hover:bg-muted/50"
-        }`}
-      >
-        Pagamentos
-      </button>
-      <button
-        onClick={() => { setViewMode("rules"); setUseDynamicTable(true); }}
-        className={`px-3 py-1.5 text-sm ${
-          viewMode === "rules"
-            ? "bg-primary text-primary-foreground"
-            : "bg-background hover:bg-muted/50"
-        }`}
-      >
-        Regras
-      </button>
-      <button
-        onClick={() => { setViewMode("teams"); setUseDynamicTable(true); }}
-        className={`px-3 py-1.5 text-sm ${
-          viewMode === "teams"
-            ? "bg-primary text-primary-foreground"
-            : "bg-background hover:bg-muted/50"
-        }`}
-      >
-        Times
       </button>
       <button
         onClick={() => { setViewMode("table"); setUseDynamicTable(false); }}

@@ -11,6 +11,8 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { ScoreSettingsForm } from "@/components/admin/scoring/ScoreSettingsForm";
+import RulesView from "@/components/rules/RulesView";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminScoring = () => {
   const [scoringSystem, setScoringSystem] = useState<ScoringSystem>(SCORING_SYSTEM);
@@ -36,20 +38,33 @@ const AdminScoring = () => {
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Sistema de Pontuação</CardTitle>
-            <CardDescription>
-              Define quantos pontos são concedidos para cada tipo de acerto nos kichutes
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScoreSettingsForm 
-              initialValues={scoringSystem} 
-              onSubmit={handleSaveScoring} 
-            />
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="settings" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="settings">Configurações</TabsTrigger>
+            <TabsTrigger value="rules">Regras Atuais</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="settings">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sistema de Pontuação</CardTitle>
+                <CardDescription>
+                  Define quantos pontos são concedidos para cada tipo de acerto nos kichutes
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScoreSettingsForm 
+                  initialValues={scoringSystem} 
+                  onSubmit={handleSaveScoring} 
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="rules">
+            <RulesView />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
