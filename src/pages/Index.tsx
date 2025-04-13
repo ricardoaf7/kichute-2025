@@ -1,32 +1,89 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Calendar, Trophy, Calendar as CalendarIcon } from "lucide-react";
+import { Calendar, Trophy, Calendar as CalendarIcon, ListOrdered } from "lucide-react";
 import Boot from "../components/icons/Boot";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+
 const Index = () => {
-  // Sample data for the standings table
-  const standingsData = [{
-    position: 1,
-    player: "Cortez",
-    points: 32
-  }, {
-    position: 2,
-    player: "Álvaro",
-    points: 28
-  }, {
-    position: 3,
-    player: "Pezão",
-    points: 26
-  }, {
-    position: 4,
-    player: "Uemura",
-    points: 24
-  }, {
-    position: 5,
-    player: "Bruno",
-    points: 22
-  }];
+  // Define the different ranking types
+  const [rankingType, setRankingType] = useState<"round" | "month" | "annual">("round");
+  
+  // Sample data for each ranking type
+  const roundRankingData = [
+    { position: 1, player: "Cortez", points: 12 },
+    { position: 2, player: "Álvaro", points: 10 },
+    { position: 3, player: "Pezão", points: 9 },
+    { position: 4, player: "Uemura", points: 7 },
+    { position: 5, player: "Bruno", points: 5 }
+  ];
+  
+  const monthlyRankingData = [
+    { position: 1, player: "Pezão", points: 42 },
+    { position: 2, player: "Bruno", points: 38 },
+    { position: 3, player: "Cortez", points: 36 },
+    { position: 4, player: "Álvaro", points: 28 },
+    { position: 5, player: "Uemura", points: 24 }
+  ];
+  
+  const annualRankingData = [
+    { position: 1, player: "Cortez", points: 132 },
+    { position: 2, player: "Álvaro", points: 128 },
+    { position: 3, player: "Pezão", points: 126 },
+    { position: 4, player: "Uemura", points: 124 },
+    { position: 5, player: "Bruno", points: 122 }
+  ];
+  
+  // Get the correct data based on the selected ranking type
+  const getRankingData = () => {
+    switch (rankingType) {
+      case "round":
+        return roundRankingData;
+      case "month":
+        return monthlyRankingData;
+      case "annual":
+        return annualRankingData;
+      default:
+        return roundRankingData;
+    }
+  };
+  
+  // Get the appropriate title for the ranking section
+  const getRankingTitle = () => {
+    switch (rankingType) {
+      case "round":
+        return "Classificação da Rodada";
+      case "month":
+        return "Classificação Mensal";
+      case "annual":
+        return "Classificação Anual";
+      default:
+        return "Classificação";
+    }
+  };
+  
+  // Get the icon for the ranking type
+  const getRankingIcon = () => {
+    switch (rankingType) {
+      case "round":
+        return <ListOrdered className="h-4 w-4 mr-2" />;
+      case "month":
+        return <Calendar className="h-4 w-4 mr-2" />;
+      case "annual":
+        return <Trophy className="h-4 w-4 mr-2" />;
+      default:
+        return <ListOrdered className="h-4 w-4 mr-2" />;
+    }
+  };
+
   return <div className="container mx-auto px-4 py-8 pt-20">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
@@ -93,11 +150,29 @@ const Index = () => {
         </div>
 
         <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Classificação</h2>
-          <Link to="/standings" className="text-green-600 flex items-center hover:underline">
-            Ver classificação completa
-            <span className="ml-1">→</span>
-          </Link>
+          <h2 className="text-2xl font-bold flex items-center">
+            {getRankingIcon()}
+            {getRankingTitle()}
+          </h2>
+          <div className="flex items-center gap-4">
+            <Select
+              value={rankingType}
+              onValueChange={(value: "round" | "month" | "annual") => setRankingType(value)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Tipo de Classificação" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="round">Classificação da Rodada</SelectItem>
+                <SelectItem value="month">Classificação Mensal</SelectItem>
+                <SelectItem value="annual">Classificação Anual</SelectItem>
+              </SelectContent>
+            </Select>
+            <Link to="/standings" className="text-green-600 flex items-center hover:underline whitespace-nowrap">
+              Ver classificação completa
+              <span className="ml-1">→</span>
+            </Link>
+          </div>
         </div>
 
         <Card className="border mb-8">
@@ -106,15 +181,17 @@ const Index = () => {
               <TableRow>
                 <TableHead className="w-[80px]">#</TableHead>
                 <TableHead>Jogador</TableHead>
-                <TableHead className="text-right">Total</TableHead>
+                <TableHead className="text-right">Pontos</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {standingsData.map(row => <TableRow key={row.position}>
+              {getRankingData().map(row => (
+                <TableRow key={row.position}>
                   <TableCell className="font-medium">{row.position}</TableCell>
                   <TableCell>{row.player}</TableCell>
                   <TableCell className="text-right">{row.points}</TableCell>
-                </TableRow>)}
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </Card>
