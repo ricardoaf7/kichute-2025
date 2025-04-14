@@ -27,6 +27,15 @@ export const useParticipantEdit = (users: Player[], setUsers: React.Dispatch<Rea
       };
 
       if (data.password) {
+        // Update password in Supabase Auth
+        const email = `${selectedParticipant.name}@kichute.app`;
+        const { error: authError } = await supabase.auth.admin.updateUserById(
+          selectedParticipant.id,
+          { password: data.password }
+        );
+
+        if (authError) throw authError;
+        
         updateData.senha = data.password;
       }
 
@@ -49,8 +58,12 @@ export const useParticipantEdit = (users: Player[], setUsers: React.Dispatch<Rea
       setSelectedParticipant(null);
 
       toast({
-        title: "Participante atualizado",
-        description: `${data.name} foi atualizado com sucesso.`
+        title: data.password 
+          ? "Participante e senha atualizados"
+          : "Participante atualizado",
+        description: data.password 
+          ? `${data.name} foi atualizado e sua senha foi redefinida com sucesso.`
+          : `${data.name} foi atualizado com sucesso.`
       });
     } catch (error: any) {
       console.error("Erro ao atualizar participante:", error);
