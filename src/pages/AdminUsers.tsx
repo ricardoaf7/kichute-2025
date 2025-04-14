@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, AlertTriangle } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { UserPlus } from "lucide-react";
 import { ParticipantList } from "@/components/admin/users/ParticipantList";
 import { AdminModeToggle } from "@/components/admin/users/AdminModeToggle";
+import { AdminModeWarning } from "@/components/admin/users/AdminModeWarning";
 import { PaymentDialog } from "@/components/admin/users/PaymentDialog";
 import { EditParticipantDialog } from "@/components/admin/users/EditParticipantDialog";
 import { NewParticipantDialog } from "@/components/admin/users/NewParticipantDialog";
@@ -122,19 +122,7 @@ const AdminUsers = () => {
           </p>
         </div>
 
-        {!isAdminMode && (
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-4 mb-6">
-            <div className="flex items-start space-x-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
-              <div>
-                <h3 className="font-medium text-amber-800 dark:text-amber-300">Modo Participante</h3>
-                <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                  Você está no modo participante. Algumas ações estão restritas apenas para administradores.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        {!isAdminMode && <AdminModeWarning />}
 
         <div className="flex justify-between items-center mb-6">
           <AdminModeToggle isAdminMode={isAdminMode} onToggle={setIsAdminMode} />
