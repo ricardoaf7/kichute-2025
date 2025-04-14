@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, ShieldCheck, Lock } from "lucide-react";
+import { UserPlus, ShieldCheck, Lock, AlertTriangle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -37,6 +38,12 @@ export default function AdminUsers() {
   const [selectedParticipant, setSelectedParticipant] = useState<Player | null>(null);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(true);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
+    isOpen: false,
+    userId: null,
+    userName: ""
+  });
 
   const calculateMonthsPaid = (amount: number) => {
     return Math.min(Math.floor(amount / MONTHLY_FEE), 9);
@@ -76,7 +83,7 @@ export default function AdminUsers() {
     if (!selectedParticipant) return;
 
     try {
-      const updateData: { nome: string; tipo: string; senha?: string } = {
+      const updateData: { nome: string; tipo: "Participante" | "Administrador"; senha?: string } = {
         nome: data.name,
         tipo: data.tipo
       };
@@ -254,7 +261,7 @@ export default function AdminUsers() {
         role: newUser.tipo
       }]);
       
-      setIsDialogOpen(false);
+      setIsNewDialogOpen(false);
       
       toast({
         title: "Participante adicionado",
