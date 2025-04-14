@@ -1,31 +1,14 @@
+
 import { useState, useEffect } from "react";
 import { Team } from "@/types";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Edit, Plus, Trash, Image, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter,
-  DialogDescription
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Plus, Image, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { ShieldSelector } from "./ShieldSelector";
+import TeamCard from "./components/TeamCard";
+import TeamFormDialog from "./components/TeamFormDialog";
+import DeleteTeamDialog from "./components/DeleteTeamDialog";
 
 const TeamsList = () => {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -41,7 +24,6 @@ const TeamsList = () => {
   });
   const { toast } = useToast();
 
-  // Fetch teams from Supabase when component mounts
   useEffect(() => {
     fetchTeams();
   }, []);
@@ -56,7 +38,6 @@ const TeamsList = () => {
       
       if (error) throw error;
       
-      // Transform the data to match the Team interface
       const transformedTeams: Team[] = data.map(team => ({
         id: team.id,
         name: team.nome,
@@ -80,7 +61,6 @@ const TeamsList = () => {
   };
 
   const handleAddNew = () => {
-    // Open the dialog for creating a new team
     setCurrentTeam(null);
     setFormData({
       name: "",
@@ -91,7 +71,6 @@ const TeamsList = () => {
   };
 
   const handleEditTeam = (team: Team) => {
-    // Open the dialog for editing the team
     setCurrentTeam(team);
     setFormData({
       name: team.name,
@@ -102,7 +81,6 @@ const TeamsList = () => {
   };
 
   const handleDeleteTeam = (team: Team) => {
-    // Open the confirmation dialog for deleting the team
     setCurrentTeam(team);
     setIsDeleteDialogOpen(true);
   };
@@ -125,7 +103,6 @@ const TeamsList = () => {
     setIsSubmitting(true);
     try {
       if (currentTeam) {
-        // Update existing team
         const { error } = await supabase
           .from('times')
           .update({
@@ -137,7 +114,6 @@ const TeamsList = () => {
           
         if (error) throw error;
         
-        // Update local state
         setTeams(prev => prev.map(team => 
           team.id === currentTeam.id ? 
           { 
@@ -153,7 +129,6 @@ const TeamsList = () => {
           description: `${formData.name} foi atualizado com sucesso.`
         });
       } else {
-        // Create new team
         const { data, error } = await supabase
           .from('times')
           .insert({
@@ -165,7 +140,6 @@ const TeamsList = () => {
           
         if (error) throw error;
         
-        // Add to local state
         if (data && data[0]) {
           const newTeam: Team = {
             id: data[0].id,
@@ -209,7 +183,6 @@ const TeamsList = () => {
         
       if (error) throw error;
       
-      // Remove from local state
       setTeams(prev => prev.filter(team => team.id !== currentTeam.id));
       
       toast({
@@ -272,141 +245,24 @@ const TeamsList = () => {
         </div>
       </CardContent>
 
-      {/* Team Form Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>
-              {currentTeam ? "Editar Time" : "Novo Time"}
-            </DialogTitle>
-            <DialogDescription>
-              {currentTeam 
-                ? "Edite as informações do time abaixo." 
-                : "Preencha as informações do novo time abaixo."}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Nome do Time</Label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="Nome completo do time"
-                value={formData.name}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="shortName">Sigla</Label>
-              <Input
-                id="shortName"
-                name="shortName"
-                placeholder="Abreviação (ex: FLA, PAL)"
-                value={formData.shortName}
-                onChange={handleInputChange}
-                maxLength={3}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label>Escudo do Time</Label>
-              <ShieldSelector
-                value={formData.logoUrl || ""}
-                onChange={(url) => setFormData(prev => ({ ...prev, logoUrl: url }))}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
-              Cancelar
-            </Button>
-            <Button onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {currentTeam ? "Salvar Alterações" : "Cadastrar Time"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <TeamFormDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSubmit={handleSubmit}
+        formData={formData}
+        onInputChange={handleInputChange}
+        onLogoChange={(url) => setFormData(prev => ({ ...prev, logoUrl: url }))}
+        isSubmitting={isSubmitting}
+        currentTeam={currentTeam}
+      />
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Você tem certeza que deseja excluir o time {currentTeam?.name}?
-              Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmDelete} 
-              disabled={isSubmitting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </Card>
-  );
-};
-
-interface TeamCardProps {
-  team: Team;
-  onEdit: () => void;
-  onDelete: () => void;
-}
-
-const TeamCard = ({ team, onEdit, onDelete }: TeamCardProps) => {
-  return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-0">
-        <div className="p-4 flex justify-between items-start gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-              {team.logoUrl ? (
-                <img 
-                  src={team.logoUrl} 
-                  alt={`Escudo do ${team.name}`} 
-                  className="max-w-full max-h-full object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/placeholder.svg";
-                  }}
-                />
-              ) : (
-                <Image className="h-6 w-6 text-muted-foreground" />
-              )}
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">{team.name}</h3>
-              <div className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md text-sm">
-                {team.shortName}
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onEdit}
-              className="h-8 w-8"
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onDelete}
-              className="h-8 w-8"
-            >
-              <Trash className="h-4 w-4 text-destructive" />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
+      <DeleteTeamDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        isSubmitting={isSubmitting}
+        team={currentTeam}
+      />
     </Card>
   );
 };
