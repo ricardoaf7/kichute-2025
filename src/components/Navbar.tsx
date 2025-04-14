@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -7,9 +7,16 @@ import { Menu, X, Calendar, Trophy, BarChart2, Settings, Users, Layers, Wallet }
 import Boot from "./icons/Boot";
 import { useIsMobile } from "../hooks/use-mobile";
 import AppLogo from "./AppLogo";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
 
@@ -19,6 +26,7 @@ const Navbar = () => {
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+    setAdminDropdownOpen(false);
   };
 
   const isActive = (path: string) => {
@@ -76,6 +84,11 @@ const Navbar = () => {
     },
   ];
 
+  // Function to detect if we're in any admin route
+  const isInAdminRoute = () => {
+    return location.pathname.includes("/admin");
+  };
+
   return (
     <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -123,36 +136,79 @@ const Navbar = () => {
               </li>
             ))}
             
-            <li className="relative group">
+            {/* Desktop Admin Dropdown */}
+            <li className="hidden md:block">
+              <DropdownMenu open={adminDropdownOpen} onOpenChange={setAdminDropdownOpen}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={cn(
+                      "flex items-center py-2 px-3 rounded-lg w-full text-left",
+                      isInAdminRoute()
+                        ? "text-white bg-green-700"
+                        : "text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    )}
+                  >
+                    <Settings className="h-5 w-5 mr-2" />
+                    Admin
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-gray-800">
+                  {adminItems.map((item) => (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link
+                        to={item.path}
+                        onClick={closeMenu}
+                        className={cn(
+                          "flex w-full items-center p-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700",
+                          isActive(item.path)
+                            ? "bg-gray-100 dark:bg-gray-700 font-medium"
+                            : ""
+                        )}
+                      >
+                        {item.icon}
+                        {item.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </li>
+            
+            {/* Mobile Admin Dropdown */}
+            <li className="md:hidden">
               <button
+                onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
                 className={cn(
-                  "flex items-center py-2 px-3 md:p-0 md:px-3 md:py-2 rounded md:rounded-lg w-full text-left",
-                  location.pathname.includes("/admin")
-                    ? "text-white bg-green-700 md:bg-green-700 md:text-white"
-                    : "text-gray-900 hover:bg-gray-100 md:hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                  "flex items-center py-2 px-3 rounded w-full text-left",
+                  isInAdminRoute()
+                    ? "text-white bg-green-700"
+                    : "text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                 )}
               >
                 <Settings className="h-5 w-5 mr-2" />
                 Admin
               </button>
-              <div className="md:hidden group-hover:block md:absolute md:left-0 md:mt-1 md:min-w-40 md:z-30 md:bg-white md:shadow-lg md:rounded-lg md:border md:border-gray-200 dark:md:bg-gray-800 dark:md:border-gray-700">
-                {adminItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={closeMenu}
-                    className={cn(
-                      "flex items-center py-2 px-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700",
-                      isActive(item.path)
-                        ? "bg-gray-100 dark:bg-gray-700 font-medium"
-                        : ""
-                    )}
-                  >
-                    {item.icon}
-                    {item.name}
-                  </Link>
-                ))}
-              </div>
+              
+              {adminDropdownOpen && (
+                <div className="ml-6 mt-1 space-y-1">
+                  {adminItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={closeMenu}
+                      className={cn(
+                        "flex items-center py-2 px-3 text-sm rounded",
+                        isActive(item.path)
+                          ? "bg-gray-200 dark:bg-gray-700 font-medium"
+                          : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                      )}
+                    >
+                      {item.icon}
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </li>
           </ul>
         </div>
