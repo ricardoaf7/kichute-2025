@@ -18,6 +18,7 @@ import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 import TesteEscudos from "./pages/TesteEscudos";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -34,6 +35,7 @@ const App = () => (
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             
             {/* Protected Routes */}
             <Route path="/" element={

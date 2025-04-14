@@ -133,8 +133,16 @@ const Login = () => {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="justify-center text-sm text-muted-foreground">
-          Participe do Kichute na temporada 2025
+        <CardFooter className="flex flex-col space-y-4 items-center justify-center text-sm text-muted-foreground">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => navigate("/register")}
+          >
+            Registrar-se
+          </Button>
+          <p>Participe do Kichute na temporada 2025</p>
         </CardFooter>
       </Card>
     </div>
