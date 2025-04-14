@@ -1,49 +1,53 @@
 
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, ShieldCheck, Lock, AlertTriangle } from "lucide-react";
+import { UserPlus, AlertTriangle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NewParticipantForm } from "@/components/admin/users/NewParticipantForm";
 import { EditParticipantForm } from "@/components/admin/users/EditParticipantForm";
 import { PaymentDialog } from "@/components/admin/users/PaymentDialog";
 import { ParticipantList } from "@/components/admin/users/ParticipantList";
+import { AdminModeToggle } from "@/components/admin/users/AdminModeToggle";
 import { useParticipants } from "@/hooks/admin/useParticipants";
+import { useParticipantEdit } from "@/hooks/admin/useParticipantEdit";
+import { useParticipantDelete } from "@/hooks/admin/useParticipantDelete";
+import { usePayments } from "@/hooks/admin/usePayments";
 import { supabase } from "@/integrations/supabase/client";
-import { Player } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 const MONTHLY_FEE = 10;
 const SEASON_TOTAL = 90;
 
-interface PaymentDetails {
-  userId: string;
-  userName: string;
-  currentPayment: number;
-}
-
-interface DeleteConfirmation {
-  isOpen: boolean;
-  userId: string | null;
-  userName: string;
-}
-
 export default function AdminUsers() {
   const { users, setUsers, fetchParticipants } = useParticipants();
-  const { toast } = useToast();
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedParticipant, setSelectedParticipant] = useState<Player | null>(null);
-  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(true);
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
-  const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
-    isOpen: false,
-    userId: null,
-    userName: ""
-  });
+  const { toast } = useToast();
+
+  const {
+    isEditDialogOpen,
+    setIsEditDialogOpen,
+    selectedParticipant,
+    handleEditUser,
+    handleSubmitEdit
+  } = useParticipantEdit(users, setUsers);
+
+  const {
+    deleteConfirmation,
+    setDeleteConfirmation,
+    handleDeleteUser,
+    confirmDeleteUser
+  } = useParticipantDelete(users, setUsers);
+
+  const {
+    isPaymentDialogOpen,
+    setIsPaymentDialogOpen,
+    paymentDetails,
+    handleOpenPaymentDialog,
+    handleSubmitPayment
+  } = usePayments(users, setUsers);
 
   const calculateMonthsPaid = (amount: number) => {
     return Math.min(Math.floor(amount / MONTHLY_FEE), 9);
@@ -68,170 +72,6 @@ export default function AdminUsers() {
       return `${monthsPaid} mês(es) pago(s) - Em dia`;
     } else {
       return `${monthsPaid} mês(es) pago(s) - Em atraso`;
-    }
-  };
-
-  const handleEditUser = (userId: string) => {
-    const participant = users.find(user => user.id === userId);
-    if (participant) {
-      setSelectedParticipant(participant);
-      setIsEditDialogOpen(true);
-    }
-  };
-
-  const handleSubmitEdit = async (data: { name: string; password?: string; tipo: "Participante" | "Administrador" }) => {
-    if (!selectedParticipant) return;
-
-    try {
-      const updateData: { nome: string; tipo: "Participante" | "Administrador"; senha?: string } = {
-        nome: data.name,
-        tipo: data.tipo
-      };
-
-      if (data.password) {
-        updateData.senha = data.password;
-      }
-
-      const { error } = await supabase
-        .from('jogadores')
-        .update(updateData)
-        .eq('id', selectedParticipant.id);
-
-      if (error) throw error;
-
-      setUsers(prevUsers =>
-        prevUsers.map(user =>
-          user.id === selectedParticipant.id
-            ? { ...user, name: data.name, role: data.tipo }
-            : user
-        )
-      );
-
-      setIsEditDialogOpen(false);
-      setSelectedParticipant(null);
-
-      toast({
-        title: "Participante atualizado",
-        description: `${data.name} foi atualizado com sucesso.`
-      });
-    } catch (error: any) {
-      console.error("Erro ao atualizar participante:", error);
-      toast({
-        title: "Erro ao atualizar",
-        description: error.message || "Ocorreu um erro inesperado ao tentar atualizar o participante.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDeleteUser = (userId: string, userName: string) => {
-    if (!isAdminMode) {
-      toast({
-        title: "Acesso Negado",
-        description: "Apenas administradores podem remover participantes.",
-        variant: "destructive"
-      });
-      return;
-    }
-    setDeleteConfirmation({ isOpen: true, userId, userName });
-  };
-
-  const confirmDeleteUser = async () => {
-    if (!deleteConfirmation.userId) return;
-    
-    try {
-      const { error } = await supabase
-        .from('jogadores')
-        .delete()
-        .eq('id', deleteConfirmation.userId);
-      
-      if (error) throw error;
-      
-      setUsers(prevUsers => prevUsers.filter(user => user.id !== deleteConfirmation.userId));
-      
-      toast({
-        title: "Participante excluído",
-        description: `${deleteConfirmation.userName} foi removido com sucesso.`
-      });
-    } catch (error: any) {
-      console.error("Erro ao excluir participante:", error);
-      toast({
-        title: "Erro ao excluir",
-        description: error.message || "Ocorreu um erro inesperado ao tentar excluir o participante.",
-        variant: "destructive"
-      });
-    } finally {
-      setDeleteConfirmation({ isOpen: false, userId: null, userName: "" });
-    }
-  };
-
-  const handleOpenPaymentDialog = (userId: string, userName: string, currentPayment: number) => {
-    if (!isAdminMode) {
-      toast({
-        title: "Acesso Negado",
-        description: "Apenas administradores podem registrar pagamentos.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setPaymentDetails({ userId, userName, currentPayment });
-    setIsPaymentDialogOpen(true);
-  };
-
-  const handleSubmitPayment = async (amount: number) => {
-    if (!paymentDetails) {
-      toast({
-        title: "Erro no pagamento",
-        description: "Por favor, insira um valor válido para o pagamento.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const user = users.find(u => u.id === paymentDetails.userId);
-      if (!user) return;
-      
-      const newPaidAmount = user.paidAmount + amount;
-      const newStatus = newPaidAmount >= MONTHLY_FEE ? 'pago' : 'pendente';
-      
-      const { error } = await supabase
-        .from('jogadores')
-        .update({ 
-          pagamento_total: newPaidAmount,
-          status_pagamento: newStatus
-        })
-        .eq('id', paymentDetails.userId);
-      
-      if (error) throw error;
-      
-      setUsers(prevUsers => 
-        prevUsers.map(user => {
-          if (user.id === paymentDetails.userId) {
-            return {
-              ...user,
-              paidAmount: newPaidAmount,
-              paid: newPaidAmount >= MONTHLY_FEE
-            };
-          }
-          return user;
-        })
-      );
-      
-      setIsPaymentDialogOpen(false);
-      
-      toast({
-        title: "Pagamento registrado",
-        description: `Pagamento de R$ ${amount.toFixed(2)} registrado para ${paymentDetails.userName}.`,
-      });
-    } catch (error: any) {
-      console.error("Erro ao registrar pagamento:", error);
-      toast({
-        title: "Erro no pagamento",
-        description: error.message || "Ocorreu um erro inesperado ao tentar registrar o pagamento.",
-        variant: "destructive"
-      });
     }
   };
 
@@ -302,42 +142,7 @@ export default function AdminUsers() {
         )}
 
         <div className="flex justify-between items-center mb-6">
-          <div>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant={isAdminMode ? "default" : "outline"} 
-                    onClick={() => setIsAdminMode(true)}
-                    className="mr-2"
-                  >
-                    <ShieldCheck className="mr-2 h-4 w-4" />
-                    Admin
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Modo Administrador</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant={!isAdminMode ? "default" : "outline"} 
-                    onClick={() => setIsAdminMode(false)}
-                  >
-                    <Lock className="mr-2 h-4 w-4" />
-                    Participante
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Modo Participante</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <AdminModeToggle isAdminMode={isAdminMode} onToggle={setIsAdminMode} />
           
           <Button onClick={() => setIsNewDialogOpen(true)}>
             <UserPlus className="mr-2 h-4 w-4" />
@@ -356,8 +161,9 @@ export default function AdminUsers() {
             <ParticipantList
               users={users}
               onEdit={handleEditUser}
-              onDelete={handleDeleteUser}
-              onOpenPayment={handleOpenPaymentDialog}
+              onDelete={(userId, userName) => handleDeleteUser(userId, userName, isAdminMode)}
+              onOpenPayment={(userId, userName, currentPayment) => 
+                handleOpenPaymentDialog(userId, userName, currentPayment, isAdminMode)}
               calculateMonthsPaid={calculateMonthsPaid}
               calculateRemainingBalance={calculateRemainingBalance}
               isCurrentMonthPaid={isCurrentMonthPaid}
