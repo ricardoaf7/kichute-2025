@@ -1,15 +1,14 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, AlertTriangle } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { UserPlus } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { NewParticipantForm } from "@/components/admin/users/NewParticipantForm";
-import { EditParticipantForm } from "@/components/admin/users/EditParticipantForm";
-import { PaymentDialog } from "@/components/admin/users/PaymentDialog";
 import { ParticipantList } from "@/components/admin/users/ParticipantList";
 import { AdminModeToggle } from "@/components/admin/users/AdminModeToggle";
+import { PaymentDialog } from "@/components/admin/users/PaymentDialog";
+import { EditParticipantDialog } from "@/components/admin/users/EditParticipantDialog";
+import { NewParticipantDialog } from "@/components/admin/users/NewParticipantDialog";
+import { DeleteConfirmationDialog } from "@/components/admin/users/DeleteConfirmationDialog";
 import { useParticipants } from "@/hooks/admin/useParticipants";
 import { useParticipantEdit } from "@/hooks/admin/useParticipantEdit";
 import { useParticipantDelete } from "@/hooks/admin/useParticipantDelete";
@@ -21,7 +20,7 @@ const MONTHLY_FEE = 10;
 const SEASON_TOTAL = 90;
 
 export default function AdminUsers() {
-  const { users, setUsers, fetchParticipants } = useParticipants();
+  const { users, setUsers } = useParticipants();
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(true);
   const { toast } = useToast();
@@ -65,14 +64,10 @@ export default function AdminUsers() {
 
   const getMonthStatus = (paidAmount: number) => {
     if (paidAmount >= SEASON_TOTAL) return "Temporada Completa";
-    
     const monthsPaid = calculateMonthsPaid(paidAmount);
-    
-    if (isCurrentMonthPaid(paidAmount)) {
-      return `${monthsPaid} mês(es) pago(s) - Em dia`;
-    } else {
-      return `${monthsPaid} mês(es) pago(s) - Em atraso`;
-    }
+    return isCurrentMonthPaid(paidAmount)
+      ? `${monthsPaid} mês(es) pago(s) - Em dia`
+      : `${monthsPaid} mês(es) pago(s) - Em atraso`;
   };
 
   const handleSubmitNewUser = async (data: any) => {
@@ -82,9 +77,9 @@ export default function AdminUsers() {
         .insert({
           nome: data.name,
           senha: data.password,
+          tipo: data.tipo,
           status_pagamento: 'pendente',
-          pagamento_total: 0,
-          tipo: data.tipo
+          pagamento_total: 0
         })
         .select()
         .single();
@@ -173,42 +168,20 @@ export default function AdminUsers() {
         </Card>
       </div>
 
-      {/* New Participant Dialog */}
-      <Dialog open={isNewDialogOpen} onOpenChange={setIsNewDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Novo Participante</DialogTitle>
-            <DialogDescription>
-              Preencha os dados para adicionar um novo participante ao Kichute FC.
-            </DialogDescription>
-          </DialogHeader>
-          <NewParticipantForm 
-            onSubmit={handleSubmitNewUser} 
-            onCancel={() => setIsNewDialogOpen(false)} 
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Dialogs */}
+      <NewParticipantDialog
+        isOpen={isNewDialogOpen}
+        onClose={() => setIsNewDialogOpen(false)}
+        onSubmit={handleSubmitNewUser}
+      />
 
-      {/* Edit Participant Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Editar Participante</DialogTitle>
-            <DialogDescription>
-              Atualize os dados do participante.
-            </DialogDescription>
-          </DialogHeader>
-          {selectedParticipant && (
-            <EditParticipantForm
-              participant={selectedParticipant}
-              onSubmit={handleSubmitEdit}
-              onCancel={() => setIsEditDialogOpen(false)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <EditParticipantDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        participant={selectedParticipant}
+        onSubmit={handleSubmitEdit}
+      />
 
-      {/* Payment Dialog */}
       <PaymentDialog
         isOpen={isPaymentDialogOpen}
         onClose={() => setIsPaymentDialogOpen(false)}
@@ -217,29 +190,12 @@ export default function AdminUsers() {
         calculateRemainingBalance={calculateRemainingBalance}
       />
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog 
-        open={deleteConfirmation.isOpen} 
-        onOpenChange={(open) => 
-          setDeleteConfirmation(prev => ({ ...prev, isOpen: open }))
-        }
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Você tem certeza que deseja excluir o participante <span className="font-medium">{deleteConfirmation.userName}</span>?
-              Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteUser} className="bg-destructive text-destructive-foreground">
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmationDialog
+        isOpen={deleteConfirmation.isOpen}
+        userName={deleteConfirmation.userName}
+        onConfirm={confirmDeleteUser}
+        onOpenChange={(open) => setDeleteConfirmation(prev => ({ ...prev, isOpen: open }))}
+      />
     </div>
   );
 }
