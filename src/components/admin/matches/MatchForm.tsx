@@ -3,8 +3,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Match } from "@/types";
-import { TEAMS } from "@/utils/mockData";
+import { Match, Team } from "@/types";
 import { Form, FormField } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MatchFormValues } from "@/contexts/MatchesContext";
@@ -13,6 +12,7 @@ import { TeamSelector } from "./form/TeamSelector";
 import { DateTimeSelector } from "./form/DateTimeSelector";
 import { LocationFields } from "./form/LocationFields";
 import { FormActions } from "./form/FormActions";
+import { useTeams } from "@/hooks/teams/useTeams";
 
 const formSchema = z.object({
   round: z.string(),
@@ -31,6 +31,8 @@ interface MatchFormProps {
 }
 
 export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: MatchFormProps) => {
+  const { teams, isLoading } = useTeams();
+  
   const form = useForm<MatchFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -67,11 +69,12 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
   }, [editingMatch, selectedRound, form]);
 
   const handleHomeTeamChange = (teamId: string) => {
-    const selectedTeam = TEAMS.find(team => team.id === teamId);
-    if (selectedTeam && selectedTeam.homeStadium) {
-      form.setValue("stadium", selectedTeam.homeStadium);
+    const selectedTeam = teams.find(team => team.id === teamId);
+    if (selectedTeam) {
+      // Auto-fill stadium information from the database
+      form.setValue("stadium", selectedTeam.homeStadium || "");
       if (selectedTeam.city) {
-        form.setValue("city", selectedTeam.city);
+        form.setValue("city", selectedTeam.city || "");
       }
     }
   };
@@ -100,7 +103,7 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
               name="homeTeam"
               render={({ field }) => (
                 <TeamSelector 
-                  teams={TEAMS}
+                  teams={teams}
                   label="Time da Casa"
                   value={field.value}
                   placeholder="Selecione o time da casa"
@@ -117,7 +120,7 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
               name="awayTeam"
               render={({ field }) => (
                 <TeamSelector 
-                  teams={TEAMS}
+                  teams={teams}
                   label="Time Visitante"
                   value={field.value}
                   placeholder="Selecione o time visitante" 

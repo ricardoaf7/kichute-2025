@@ -23,8 +23,8 @@ export const useTeams = () => {
         id: team.id,
         name: team.nome,
         shortName: team.sigla,
-        homeStadium: "",
-        city: "",
+        homeStadium: team.estadio || "",
+        city: team.cidade || "",
         logoUrl: team.escudo_url
       }));
       

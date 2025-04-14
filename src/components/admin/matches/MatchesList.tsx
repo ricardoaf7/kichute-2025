@@ -3,7 +3,6 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Trash } from "lucide-react";
 import { useMatches } from "@/contexts/MatchesContext";
 import { 
@@ -23,8 +22,7 @@ export const MatchesList = ({ selectedRound, onSelectRound }: MatchesListProps) 
   const { 
     rounds, 
     handleEditMatch, 
-    handleDeleteMatch,
-    handleUpdateResults
+    handleDeleteMatch
   } = useMatches();
   
   const currentRound = rounds.find(r => r.number === selectedRound);
@@ -78,9 +76,7 @@ export const MatchesList = ({ selectedRound, onSelectRound }: MatchesListProps) 
                           <span className="font-medium">{match.homeTeam.name}</span>
                         </div>
                         <div className="mx-2 font-bold">
-                          {match.played
-                            ? `${match.homeScore} x ${match.awayScore}`
-                            : "x"}
+                          x
                         </div>
                         <div className="flex flex-1 items-center justify-end gap-2">
                           <span className="font-medium">{match.awayTeam.name}</span>
@@ -89,43 +85,6 @@ export const MatchesList = ({ selectedRound, onSelectRound }: MatchesListProps) 
                     </div>
 
                     <div className="flex gap-2 justify-end items-center border-t pt-2 md:pt-0 md:border-t-0">
-                      {!match.played && (
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            min="0"
-                            placeholder="Casa"
-                            className="w-16"
-                            id={`home-${match.id}`}
-                          />
-                          <span className="flex items-center">x</span>
-                          <Input
-                            type="number"
-                            min="0"
-                            placeholder="Fora"
-                            className="w-16"
-                            id={`away-${match.id}`}
-                          />
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              const homeInput = document.getElementById(`home-${match.id}`) as HTMLInputElement;
-                              const awayInput = document.getElementById(`away-${match.id}`) as HTMLInputElement;
-                              
-                              if (homeInput && awayInput) {
-                                const homeScore = parseInt(homeInput.value);
-                                const awayScore = parseInt(awayInput.value);
-                                
-                                if (!isNaN(homeScore) && !isNaN(awayScore)) {
-                                  handleUpdateResults(match, homeScore, awayScore);
-                                }
-                              }
-                            }}
-                          >
-                            Salvar
-                          </Button>
-                        </div>
-                      )}
                       <Button
                         variant="outline"
                         size="icon"
