@@ -179,18 +179,21 @@ export type Database = {
       times: {
         Row: {
           escudo_url: string | null
+          estadio: string
           id: string
           nome: string
           sigla: string
         }
         Insert: {
           escudo_url?: string | null
+          estadio: string
           id?: string
           nome: string
           sigla: string
         }
         Update: {
           escudo_url?: string | null
+          estadio?: string
           id?: string
           nome?: string
           sigla?: string
