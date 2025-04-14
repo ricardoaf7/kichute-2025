@@ -17,6 +17,7 @@ export type Database = {
           pagamento_total: number | null
           senha: string
           status_pagamento: string | null
+          tipo: Database["public"]["Enums"]["tipo_usuario"]
         }
         Insert: {
           created_at?: string | null
@@ -25,6 +26,7 @@ export type Database = {
           pagamento_total?: number | null
           senha: string
           status_pagamento?: string | null
+          tipo?: Database["public"]["Enums"]["tipo_usuario"]
         }
         Update: {
           created_at?: string | null
@@ -33,6 +35,7 @@ export type Database = {
           pagamento_total?: number | null
           senha?: string
           status_pagamento?: string | null
+          tipo?: Database["public"]["Enums"]["tipo_usuario"]
         }
         Relationships: []
       }
@@ -208,7 +211,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      tipo_usuario: "Participante" | "Administrador"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -323,6 +326,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      tipo_usuario: ["Participante", "Administrador"],
+    },
   },
 } as const

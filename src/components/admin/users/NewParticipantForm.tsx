@@ -13,25 +13,32 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 
-// Define the simplified form schema
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "O nome deve ter pelo menos 2 caracteres.",
   }),
   password: z.string().min(6, {
     message: "A senha deve ter pelo menos 6 caracteres.",
-  })
+  }),
+  tipo: z.enum(["Participante", "Administrador"]),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 interface NewParticipantFormProps {
-  onSubmit: (data: Omit<Player, "id" | "roundPoints" | "paid" | "paidAmount" | "totalPoints"> & { password: string }) => void;
+  onSubmit: (data: Omit<Player, "id" | "roundPoints" | "paid" | "paidAmount" | "totalPoints"> & { password: string, tipo: "Participante" | "Administrador" }) => void;
   onCancel: () => void;
 }
 
@@ -42,14 +49,16 @@ export function NewParticipantForm({ onSubmit, onCancel }: NewParticipantFormPro
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      password: ""
+      password: "",
+      tipo: "Participante"
     },
   });
 
   const handleSubmit = (data: FormData) => {
     onSubmit({
       name: data.name,
-      password: data.password
+      password: data.password,
+      tipo: data.tipo
     });
   };
 
@@ -104,6 +113,28 @@ export function NewParticipantForm({ onSubmit, onCancel }: NewParticipantFormPro
               <FormDescription>
                 Senha provisória que o participante poderá alterar posteriormente.
               </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tipo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tipo de Usuário</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo de usuário" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Participante">Participante</SelectItem>
+                  <SelectItem value="Administrador">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
