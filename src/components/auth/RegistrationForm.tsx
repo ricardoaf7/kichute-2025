@@ -89,6 +89,7 @@ export function RegistrationForm() {
       const { error: insertError } = await supabase.from("jogadores").insert({
         nome: data.username,
         tipo: "Participante",
+        senha: data.password  // Adding the required senha field
       });
 
       if (insertError) throw insertError;
