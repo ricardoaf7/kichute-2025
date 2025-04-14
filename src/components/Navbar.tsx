@@ -1,12 +1,14 @@
 
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Menu, X, Calendar, Trophy, BarChart2, Settings, Users, Layers, Wallet } from "lucide-react";
 import Boot from "./icons/Boot";
 import { useIsMobile } from "../hooks/use-mobile";
 import AppLogo from "./AppLogo";
+import AuthStatus from "./AuthStatus";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +21,8 @@ const Navbar = () => {
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -32,6 +36,27 @@ const Navbar = () => {
   const isActive = (path: string) => {
     return location.pathname === path;
   };
+
+  // If not logged in, the navbar should be minimal
+  if (!user) {
+    return (
+      <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+          <AppLogo />
+          <div className="flex items-center space-x-3">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate("/login")}
+              className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+            >
+              Entrar
+            </Button>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   const navItems = [
     {
@@ -93,7 +118,8 @@ const Navbar = () => {
     <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <AppLogo />
-        <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+        <div className="flex md:order-2 md:space-x-3 rtl:space-x-reverse items-center">
+          <AuthStatus />
           <button
             onClick={toggleMenu}
             type="button"
@@ -136,13 +162,53 @@ const Navbar = () => {
               </li>
             ))}
             
-            {/* Desktop Admin Dropdown */}
-            <li className="hidden md:block">
-              <DropdownMenu open={adminDropdownOpen} onOpenChange={setAdminDropdownOpen}>
-                <DropdownMenuTrigger asChild>
+            {/* Show Admin Menu only for admin users */}
+            {isAdmin && (
+              <>
+                {/* Desktop Admin Dropdown */}
+                <li className="hidden md:block">
+                  <DropdownMenu open={adminDropdownOpen} onOpenChange={setAdminDropdownOpen}>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={cn(
+                          "flex items-center py-2 px-3 rounded-lg w-full text-left",
+                          isInAdminRoute()
+                            ? "text-white bg-green-700"
+                            : "text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                        )}
+                      >
+                        <Settings className="h-5 w-5 mr-2" />
+                        Admin
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-gray-800">
+                      {adminItems.map((item) => (
+                        <DropdownMenuItem key={item.path} asChild>
+                          <Link
+                            to={item.path}
+                            onClick={closeMenu}
+                            className={cn(
+                              "flex w-full items-center p-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700",
+                              isActive(item.path)
+                                ? "bg-gray-100 dark:bg-gray-700 font-medium"
+                                : ""
+                            )}
+                          >
+                            {item.icon}
+                            {item.name}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </li>
+                
+                {/* Mobile Admin Dropdown */}
+                <li className="md:hidden">
                   <button
+                    onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
                     className={cn(
-                      "flex items-center py-2 px-3 rounded-lg w-full text-left",
+                      "flex items-center py-2 px-3 rounded w-full text-left",
                       isInAdminRoute()
                         ? "text-white bg-green-700"
                         : "text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
@@ -151,65 +217,30 @@ const Navbar = () => {
                     <Settings className="h-5 w-5 mr-2" />
                     Admin
                   </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-gray-800">
-                  {adminItems.map((item) => (
-                    <DropdownMenuItem key={item.path} asChild>
-                      <Link
-                        to={item.path}
-                        onClick={closeMenu}
-                        className={cn(
-                          "flex w-full items-center p-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700",
-                          isActive(item.path)
-                            ? "bg-gray-100 dark:bg-gray-700 font-medium"
-                            : ""
-                        )}
-                      >
-                        {item.icon}
-                        {item.name}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </li>
-            
-            {/* Mobile Admin Dropdown */}
-            <li className="md:hidden">
-              <button
-                onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
-                className={cn(
-                  "flex items-center py-2 px-3 rounded w-full text-left",
-                  isInAdminRoute()
-                    ? "text-white bg-green-700"
-                    : "text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                )}
-              >
-                <Settings className="h-5 w-5 mr-2" />
-                Admin
-              </button>
-              
-              {adminDropdownOpen && (
-                <div className="ml-6 mt-1 space-y-1">
-                  {adminItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={closeMenu}
-                      className={cn(
-                        "flex items-center py-2 px-3 text-sm rounded",
-                        isActive(item.path)
-                          ? "bg-gray-200 dark:bg-gray-700 font-medium"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-700"
-                      )}
-                    >
-                      {item.icon}
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </li>
+                  
+                  {adminDropdownOpen && (
+                    <div className="ml-6 mt-1 space-y-1">
+                      {adminItems.map((item) => (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={closeMenu}
+                          className={cn(
+                            "flex items-center py-2 px-3 text-sm rounded",
+                            isActive(item.path)
+                              ? "bg-gray-200 dark:bg-gray-700 font-medium"
+                              : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                          )}
+                        >
+                          {item.icon}
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

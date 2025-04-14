@@ -1,53 +1,14 @@
 
-import { useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RoundsList } from "@/components/admin/matches/RoundsList";
 import { MatchesList } from "@/components/admin/matches/MatchesList";
 import { MatchForm } from "@/components/admin/matches/MatchForm";
 import { MatchesProvider } from "@/contexts/MatchesContext";
 import { MatchesContent } from "@/components/admin/matches/MatchesContent";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AdminMatches = () => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  // Check if user has admin role
-  useEffect(() => {
-    const checkAdminAccess = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast({
-          title: "Acesso restrito",
-          description: "Você precisa estar autenticado para acessar esta página.",
-          variant: "destructive"
-        });
-        navigate("/");
-        return;
-      }
-      
-      // Fetch user role from jogadores table
-      const { data: userData, error } = await supabase
-        .from('jogadores')
-        .select('tipo')
-        .eq('id', session.user.id)
-        .single();
-      
-      if (error || !userData || userData.tipo !== 'Administrador') {
-        toast({
-          title: "Acesso restrito",
-          description: "Apenas administradores podem acessar esta página.",
-          variant: "destructive"
-        });
-        navigate("/");
-      }
-    };
-    
-    checkAdminAccess();
-  }, [navigate, toast]);
+  const { isAdmin } = useAuth();
 
   return (
     <MatchesProvider>
