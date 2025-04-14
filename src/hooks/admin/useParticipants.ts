@@ -24,7 +24,7 @@ export const useParticipants = () => {
         return;
       }
       
-      const mappedData = data.map(jogador => ({
+      const mappedData: Player[] = data.map(jogador => ({
         id: jogador.id,
         name: jogador.nome,
         paid: jogador.status_pagamento === 'pago',

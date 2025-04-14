@@ -1,4 +1,3 @@
-
 export interface Match {
   id: string;
   round: number;
@@ -18,7 +17,7 @@ export interface Team {
   shortName: string;
   homeStadium: string;
   city: string;
-  logoUrl?: string; // Added logoUrl as an optional property
+  logoUrl?: string;
 }
 
 export interface Player {
@@ -28,7 +27,7 @@ export interface Player {
   paidAmount: number;
   totalPoints: number;
   roundPoints: { [round: number]: number };
-  role?: "admin" | "participant"; // Optional role field
+  role?: "Administrador" | "Participante";
 }
 
 export interface Guess {

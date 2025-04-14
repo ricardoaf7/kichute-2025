@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,7 @@ import { PaymentDialog } from "@/components/admin/users/PaymentDialog";
 import { ParticipantList } from "@/components/admin/users/ParticipantList";
 import { useParticipants } from "@/hooks/admin/useParticipants";
 import { supabase } from "@/integrations/supabase/client";
+import { Player } from "@/types";
 
 const MONTHLY_FEE = 10;
 const SEASON_TOTAL = 90;
@@ -41,17 +41,14 @@ export default function AdminUsers() {
     userName: ""
   });
 
-  // Calculate months paid based on amount
   const calculateMonthsPaid = (amount: number) => {
     return Math.min(Math.floor(amount / MONTHLY_FEE), 9);
   };
 
-  // Calculate remaining balance
   const calculateRemainingBalance = (paidAmount: number) => {
     return Math.max(SEASON_TOTAL - paidAmount, 0);
   };
 
-  // Check if current month is paid
   const isCurrentMonthPaid = (paidAmount: number) => {
     const currentMonth = new Date().getMonth() - 2;
     const monthsPaid = calculateMonthsPaid(paidAmount);
