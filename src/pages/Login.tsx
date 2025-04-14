@@ -8,11 +8,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import AppLogo from "@/components/AppLogo";
 import { Eye, EyeOff } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Login = () => {
   const [nome, setNome] = useState("");
   const [senha, setSenha] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showRecoveryInfo, setShowRecoveryInfo] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, user } = useAuth();
   const navigate = useNavigate();
@@ -61,11 +63,11 @@ const Login = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="nome">Nome</Label>
+              <Label htmlFor="nome">Nome de usuário</Label>
               <Input
                 id="nome"
                 type="text"
-                placeholder="Seu nome"
+                placeholder="Digite seu nome de usuário"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
                 required
@@ -78,7 +80,7 @@ const Login = () => {
                 <Input
                   id="senha"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Sua senha"
+                  placeholder="Digite sua senha"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                   required
@@ -97,6 +99,23 @@ const Login = () => {
                   )}
                 </button>
               </div>
+            </div>
+            <div>
+              <button
+                type="button"
+                className="text-sm text-green-700 hover:text-green-800 hover:underline"
+                onClick={() => setShowRecoveryInfo(!showRecoveryInfo)}
+              >
+                Esqueceu sua senha?
+              </button>
+              
+              {showRecoveryInfo && (
+                <Alert className="mt-2 bg-gray-100 dark:bg-gray-800">
+                  <AlertDescription>
+                    Caso esqueça sua senha, fale com o organizador para redefinição.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
             <Button 
               type="submit" 

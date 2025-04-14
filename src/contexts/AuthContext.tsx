@@ -14,6 +14,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Função para converter nome em formato de email
+const converterNomeParaEmail = (nome: string): string => {
+  return `${nome.toLowerCase().trim()}@kichute.app`;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<any | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -102,9 +107,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error("Senha incorreta");
       }
       
-      // Sign in with supabase auth using the jogador's id
+      // Criar email a partir do nome
+      const email = converterNomeParaEmail(nome);
+      
+      // Sign in with supabase auth using the jogador's email
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: `${jogador.id}@kichute.app`, // Using a deterministic email based on ID
+        email: email,
         password: senha
       });
       
@@ -112,7 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // If user doesn't exist in auth, create an account
         if (signInError.message.includes('Invalid login credentials')) {
           const { error: signUpError } = await supabase.auth.signUp({
-            email: `${jogador.id}@kichute.app`,
+            email: email,
             password: senha,
             options: {
               data: {
@@ -125,7 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           // Try login again after signup
           const { error: retryError } = await supabase.auth.signInWithPassword({
-            email: `${jogador.id}@kichute.app`,
+            email: email,
             password: senha
           });
           

@@ -10,7 +10,8 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
+  FormDescription
 } from "@/components/ui/form";
 import {
   Select,
@@ -72,10 +73,13 @@ export function EditParticipantForm({ participant, onSubmit, onCancel }: EditPar
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome</FormLabel>
+              <FormLabel>Nome de usuário</FormLabel>
               <FormControl>
                 <Input placeholder="Digite o nome do participante" {...field} />
               </FormControl>
+              <FormDescription>
+                Este é o nome utilizado para login no sistema.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -86,7 +90,7 @@ export function EditParticipantForm({ participant, onSubmit, onCancel }: EditPar
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nova Senha (opcional)</FormLabel>
+              <FormLabel>Redefinir Senha</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input 
@@ -108,6 +112,9 @@ export function EditParticipantForm({ participant, onSubmit, onCancel }: EditPar
                   </Button>
                 </div>
               </FormControl>
+              <FormDescription>
+                Deixe em branco para manter a senha atual. Use este campo apenas para redefinir senhas esquecidas.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

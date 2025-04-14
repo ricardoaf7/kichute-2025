@@ -74,10 +74,13 @@ export function NewParticipantForm({ onSubmit, onCancel }: NewParticipantFormPro
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome</FormLabel>
+              <FormLabel>Nome de usuário</FormLabel>
               <FormControl>
                 <Input placeholder="Digite o nome do participante" {...field} />
               </FormControl>
+              <FormDescription>
+                Este será o nome utilizado para login no sistema.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
