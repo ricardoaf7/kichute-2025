@@ -2,11 +2,12 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, ShieldCheck, Lock, AlertTriangle } from "lucide-react";
+import { UserPlus, ShieldCheck, Lock } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NewParticipantForm } from "@/components/admin/users/NewParticipantForm";
+import { EditParticipantForm } from "@/components/admin/users/EditParticipantForm";
 import { PaymentDialog } from "@/components/admin/users/PaymentDialog";
 import { ParticipantList } from "@/components/admin/users/ParticipantList";
 import { useParticipants } from "@/hooks/admin/useParticipants";
@@ -29,17 +30,13 @@ interface DeleteConfirmation {
 }
 
 export default function AdminUsers() {
-  const { users, setUsers } = useParticipants();
+  const { users, setUsers, fetchParticipants } = useParticipants();
   const { toast } = useToast();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState<Player | null>(null);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
   const [isAdminMode, setIsAdminMode] = useState(true);
-  const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
-    isOpen: false,
-    userId: null,
-    userName: ""
-  });
 
   const calculateMonthsPaid = (amount: number) => {
     return Math.min(Math.floor(amount / MONTHLY_FEE), 9);
@@ -68,10 +65,56 @@ export default function AdminUsers() {
   };
 
   const handleEditUser = (userId: string) => {
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: `Edição do usuário ID ${userId} será implementada em breve.`
-    });
+    const participant = users.find(user => user.id === userId);
+    if (participant) {
+      setSelectedParticipant(participant);
+      setIsEditDialogOpen(true);
+    }
+  };
+
+  const handleSubmitEdit = async (data: { name: string; password?: string; tipo: "Participante" | "Administrador" }) => {
+    if (!selectedParticipant) return;
+
+    try {
+      const updateData: { nome: string; tipo: string; senha?: string } = {
+        nome: data.name,
+        tipo: data.tipo
+      };
+
+      if (data.password) {
+        updateData.senha = data.password;
+      }
+
+      const { error } = await supabase
+        .from('jogadores')
+        .update(updateData)
+        .eq('id', selectedParticipant.id);
+
+      if (error) throw error;
+
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id === selectedParticipant.id
+            ? { ...user, name: data.name, role: data.tipo }
+            : user
+        )
+      );
+
+      setIsEditDialogOpen(false);
+      setSelectedParticipant(null);
+
+      toast({
+        title: "Participante atualizado",
+        description: `${data.name} foi atualizado com sucesso.`
+      });
+    } catch (error: any) {
+      console.error("Erro ao atualizar participante:", error);
+      toast({
+        title: "Erro ao atualizar",
+        description: error.message || "Ocorreu um erro inesperado ao tentar atualizar o participante.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleDeleteUser = (userId: string, userName: string) => {
@@ -289,7 +332,7 @@ export default function AdminUsers() {
             </TooltipProvider>
           </div>
           
-          <Button onClick={() => setIsDialogOpen(true)}>
+          <Button onClick={() => setIsNewDialogOpen(true)}>
             <UserPlus className="mr-2 h-4 w-4" />
             Novo Participante
           </Button>
@@ -318,7 +361,7 @@ export default function AdminUsers() {
       </div>
 
       {/* New Participant Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isNewDialogOpen} onOpenChange={setIsNewDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Novo Participante</DialogTitle>
@@ -328,8 +371,27 @@ export default function AdminUsers() {
           </DialogHeader>
           <NewParticipantForm 
             onSubmit={handleSubmitNewUser} 
-            onCancel={() => setIsDialogOpen(false)} 
+            onCancel={() => setIsNewDialogOpen(false)} 
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Participant Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Editar Participante</DialogTitle>
+            <DialogDescription>
+              Atualize os dados do participante.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedParticipant && (
+            <EditParticipantForm
+              participant={selectedParticipant}
+              onSubmit={handleSubmitEdit}
+              onCancel={() => setIsEditDialogOpen(false)}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
