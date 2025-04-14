@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Team } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -26,8 +25,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ShieldSelector } from "./ShieldSelector";
 
-export const TeamsList = () => {
+const TeamsList = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -308,29 +308,11 @@ export const TeamsList = () => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="logoUrl">URL do Escudo</Label>
-              <Input
-                id="logoUrl"
-                name="logoUrl"
-                placeholder="https://exemplo.com/escudo.png"
+              <Label>Escudo do Time</Label>
+              <ShieldSelector
                 value={formData.logoUrl || ""}
-                onChange={handleInputChange}
+                onChange={(url) => setFormData(prev => ({ ...prev, logoUrl: url }))}
               />
-              {formData.logoUrl && (
-                <div className="mt-2 flex items-center">
-                  <div className="w-12 h-12 border rounded flex items-center justify-center overflow-hidden">
-                    <img 
-                      src={formData.logoUrl} 
-                      alt="Prévia do escudo" 
-                      className="max-w-full max-h-full object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder.svg";
-                      }}
-                    />
-                  </div>
-                  <span className="ml-2 text-sm text-muted-foreground">Prévia do escudo</span>
-                </div>
-              )}
             </div>
           </div>
           <DialogFooter>
@@ -428,3 +410,5 @@ const TeamCard = ({ team, onEdit, onDelete }: TeamCardProps) => {
     </Card>
   );
 };
+
+export default TeamsList;
