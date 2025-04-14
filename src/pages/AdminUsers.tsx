@@ -28,6 +28,16 @@ import {
   DialogDescription,
   DialogFooter
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { NewParticipantForm } from "@/components/admin/users/NewParticipantForm";
 import { 
   Tooltip,
@@ -38,6 +48,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
 
 const MONTHLY_FEE = 10; // R$10 per month
 const SEASON_TOTAL = 90; // R$90 for the full season (9 months)
@@ -48,6 +59,12 @@ interface PaymentDetails {
   currentPayment: number;
 }
 
+interface DeleteConfirmation {
+  isOpen: boolean;
+  userId: string | null;
+  userName: string;
+}
+
 const AdminUsers = () => {
   const [users, setUsers] = useState<Player[]>(PLAYERS);
   const { toast } = useToast();
@@ -56,6 +73,52 @@ const AdminUsers = () => {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [isAdminMode, setIsAdminMode] = useState(true); // Default to admin mode for now
+  const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
+    isOpen: false,
+    userId: null,
+    userName: ""
+  });
+
+  useEffect(() => {
+    fetchParticipants();
+  }, []);
+
+  const fetchParticipants = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('jogadores')
+        .select('*');
+      
+      if (error) {
+        console.error("Erro ao buscar participantes:", error);
+        toast({
+          title: "Erro ao carregar participantes",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Map the database fields to our Player type
+      const mappedData = data.map(jogador => ({
+        id: jogador.id,
+        name: jogador.nome,
+        paid: jogador.status_pagamento === 'pago',
+        paidAmount: jogador.pagamento_total || 0,
+        totalPoints: 0, // Default value as it's not in the database yet
+        roundPoints: {}
+      }));
+      
+      setUsers(mappedData);
+    } catch (error) {
+      console.error("Erro ao buscar participantes:", error);
+      toast({
+        title: "Erro ao carregar participantes",
+        description: "Não foi possível carregar a lista de participantes.",
+        variant: "destructive"
+      });
+    }
+  };
 
   // Calculate months paid based on amount
   const calculateMonthsPaid = (amount: number) => {
@@ -107,7 +170,7 @@ const AdminUsers = () => {
     });
   };
 
-  const handleDeleteUser = (userId: string) => {
+  const handleDeleteUser = (userId: string, userName: string) => {
     if (!isAdminMode) {
       toast({
         title: "Acesso Negado",
@@ -117,10 +180,55 @@ const AdminUsers = () => {
       return;
     }
     
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: `Remoção do usuário ID ${userId} será implementada em breve.`
+    // Open confirmation dialog
+    setDeleteConfirmation({
+      isOpen: true,
+      userId,
+      userName
     });
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!deleteConfirmation.userId) return;
+    
+    try {
+      const { error } = await supabase
+        .from('jogadores')
+        .delete()
+        .eq('id', deleteConfirmation.userId);
+      
+      if (error) {
+        console.error("Erro ao excluir participante:", error);
+        toast({
+          title: "Erro ao excluir",
+          description: `Não foi possível excluir ${deleteConfirmation.userName}. ${error.message}`,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Remove from local state
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== deleteConfirmation.userId));
+      
+      toast({
+        title: "Participante excluído",
+        description: `${deleteConfirmation.userName} foi removido com sucesso.`
+      });
+    } catch (error) {
+      console.error("Erro ao excluir participante:", error);
+      toast({
+        title: "Erro ao excluir",
+        description: "Ocorreu um erro inesperado ao tentar excluir o participante.",
+        variant: "destructive"
+      });
+    } finally {
+      // Close confirmation dialog
+      setDeleteConfirmation({
+        isOpen: false,
+        userId: null,
+        userName: ""
+      });
+    }
   };
 
   const handleOpenPaymentDialog = (userId: string, userName: string, currentPayment: number) => {
@@ -142,7 +250,7 @@ const AdminUsers = () => {
     setIsPaymentDialogOpen(true);
   };
 
-  const handleSubmitPayment = () => {
+  const handleSubmitPayment = async () => {
     if (!paymentDetails || isNaN(Number(paymentAmount)) || Number(paymentAmount) <= 0) {
       toast({
         title: "Erro no pagamento",
@@ -154,47 +262,115 @@ const AdminUsers = () => {
 
     const amount = Number(paymentAmount);
     
-    // Update the user with the new payment amount
-    setUsers(prevUsers => 
-      prevUsers.map(user => {
-        if (user.id === paymentDetails.userId) {
-          const newPaidAmount = user.paidAmount + amount;
-          return {
-            ...user,
-            paidAmount: newPaidAmount,
-            paid: newPaidAmount >= MONTHLY_FEE // Paid if at least one month is covered
-          };
-        }
-        return user;
-      })
-    );
-
-    // Close dialog and show success message
-    setIsPaymentDialogOpen(false);
-    
-    toast({
-      title: "Pagamento registrado",
-      description: `Pagamento de R$ ${amount.toFixed(2)} registrado para ${paymentDetails.userName}.`,
-    });
+    try {
+      // Find current user to get their existing payment amount
+      const user = users.find(u => u.id === paymentDetails.userId);
+      if (!user) return;
+      
+      const newPaidAmount = user.paidAmount + amount;
+      const newStatus = newPaidAmount >= MONTHLY_FEE ? 'pago' : 'pendente';
+      
+      // Update the record in Supabase
+      const { error } = await supabase
+        .from('jogadores')
+        .update({ 
+          pagamento_total: newPaidAmount,
+          status_pagamento: newStatus
+        })
+        .eq('id', paymentDetails.userId);
+      
+      if (error) {
+        console.error("Erro ao atualizar pagamento:", error);
+        toast({
+          title: "Erro no pagamento",
+          description: `Não foi possível registrar o pagamento. ${error.message}`,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Update the user with the new payment amount
+      setUsers(prevUsers => 
+        prevUsers.map(user => {
+          if (user.id === paymentDetails.userId) {
+            return {
+              ...user,
+              paidAmount: newPaidAmount,
+              paid: newPaidAmount >= MONTHLY_FEE // Paid if at least one month is covered
+            };
+          }
+          return user;
+        })
+      );
+      
+      // Close dialog and show success message
+      setIsPaymentDialogOpen(false);
+      
+      toast({
+        title: "Pagamento registrado",
+        description: `Pagamento de R$ ${amount.toFixed(2)} registrado para ${paymentDetails.userName}.`,
+      });
+    } catch (error) {
+      console.error("Erro ao registrar pagamento:", error);
+      toast({
+        title: "Erro no pagamento",
+        description: "Ocorreu um erro inesperado ao tentar registrar o pagamento.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleSubmitNewUser = (newUser: Omit<Player, "id" | "roundPoints"> & { password: string }) => {
-    // In a production app, this would be a call to an API
-    // Here we would also save the password securely
-    const newUserId = `user-${Date.now()}`;
-    const userWithId: Player = {
-      id: newUserId,
-      ...newUser,
-      roundPoints: {} // initialize empty round points
-    };
-    
-    setUsers((prevUsers) => [...prevUsers, userWithId]);
-    setIsDialogOpen(false);
-    
-    toast({
-      title: "Participante adicionado",
-      description: `${newUser.name} foi adicionado com sucesso.`
-    });
+  const handleSubmitNewUser = async (newUser: Omit<Player, "id" | "roundPoints" | "paid" | "paidAmount" | "totalPoints"> & { password: string }) => {
+    try {
+      // Insert the new user into Supabase
+      const { data, error } = await supabase
+        .from('jogadores')
+        .insert({
+          nome: newUser.name,
+          senha: newUser.password, // Store password (in a real app, this should be hashed)
+          status_pagamento: 'pendente',
+          pagamento_total: 0
+        })
+        .select();
+      
+      if (error) {
+        console.error("Erro ao adicionar participante:", error);
+        toast({
+          title: "Erro ao adicionar",
+          description: `Não foi possível adicionar ${newUser.name}. ${error.message}`,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Add the new user to the local state
+      if (data && data.length > 0) {
+        const addedUser: Player = {
+          id: data[0].id,
+          name: data[0].nome,
+          paid: false,
+          paidAmount: 0,
+          totalPoints: 0,
+          roundPoints: {}
+        };
+        
+        setUsers(prevUsers => [...prevUsers, addedUser]);
+      }
+      
+      setIsDialogOpen(false);
+      
+      toast({
+        title: "Participante adicionado",
+        description: `${newUser.name} foi adicionado com sucesso.`
+      });
+    } catch (error) {
+      console.error("Erro ao adicionar participante:", error);
+      toast({
+        title: "Erro ao adicionar",
+        description: "Ocorreu um erro inesperado ao tentar adicionar o participante.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -318,7 +494,7 @@ const AdminUsers = () => {
                           <Pencil className="h-4 w-4" />
                           <span className="sr-only">Editar</span>
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteUser(user.id)}>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteUser(user.id, user.name)}>
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">Excluir</span>
                         </Button>
@@ -421,6 +597,30 @@ const AdminUsers = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog 
+        open={deleteConfirmation.isOpen} 
+        onOpenChange={(open) => 
+          setDeleteConfirmation(prev => ({ ...prev, isOpen: open }))
+        }
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você tem certeza que deseja excluir o participante <span className="font-medium">{deleteConfirmation.userName}</span>?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteUser} className="bg-destructive text-destructive-foreground">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
