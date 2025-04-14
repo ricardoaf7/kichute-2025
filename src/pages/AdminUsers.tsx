@@ -5,6 +5,7 @@ import { UserPlus } from "lucide-react";
 import { ParticipantList } from "@/components/admin/users/ParticipantList";
 import { AdminModeToggle } from "@/components/admin/users/AdminModeToggle";
 import { AdminModeWarning } from "@/components/admin/users/AdminModeWarning";
+import { AdminUsersHeader } from "@/components/admin/users/AdminUsersHeader";
 import { PaymentDialog } from "@/components/admin/users/PaymentDialog";
 import { EditParticipantDialog } from "@/components/admin/users/EditParticipantDialog";
 import { NewParticipantDialog } from "@/components/admin/users/NewParticipantDialog";
@@ -115,12 +116,7 @@ const AdminUsers = () => {
   return (
     <div className="page-container">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8 animate-slide-down">
-          <h1 className="text-3xl font-bold">Gerenciar Participantes</h1>
-          <p className="text-muted-foreground mt-2">
-            Adicione, edite e remova participantes do Brasileirão 2025
-          </p>
-        </div>
+        <AdminUsersHeader onNewUser={() => setIsNewDialogOpen(true)} />
 
         {!isAdminMode && <AdminModeWarning />}
 
@@ -156,7 +152,6 @@ const AdminUsers = () => {
         </Card>
       </div>
 
-      {/* Dialogs */}
       <NewParticipantDialog
         isOpen={isNewDialogOpen}
         onClose={() => setIsNewDialogOpen(false)}
