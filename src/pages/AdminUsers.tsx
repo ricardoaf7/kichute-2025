@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
+import { UserPlus, AlertTriangle } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ParticipantList } from "@/components/admin/users/ParticipantList";
 import { AdminModeToggle } from "@/components/admin/users/AdminModeToggle";
@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 const MONTHLY_FEE = 10;
 const SEASON_TOTAL = 90;
 
-export default function AdminUsers() {
+const AdminUsers = () => {
   const { users, setUsers } = useParticipants();
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(true);
@@ -199,3 +199,5 @@ export default function AdminUsers() {
     </div>
   );
 }
+
+export default AdminUsers;
