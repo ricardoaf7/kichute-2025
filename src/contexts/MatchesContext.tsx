@@ -79,13 +79,16 @@ export const MatchesProvider = ({ children }: { children: ReactNode }) => {
             name: match.time_casa.nome,
             shortName: match.time_casa.sigla,
             logoUrl: match.time_casa.escudo_url,
-            homeStadium: match.time_casa.estadio
+            homeStadium: match.time_casa.estadio,
+            city: ''  // Add empty city property to fix TypeScript error
           },
           awayTeam: {
             id: match.time_visitante.id,
             name: match.time_visitante.nome,
             shortName: match.time_visitante.sigla,
-            logoUrl: match.time_visitante.escudo_url
+            logoUrl: match.time_visitante.escudo_url,
+            homeStadium: '',  // Add empty homeStadium property to fix TypeScript error
+            city: ''  // Add empty city property to fix TypeScript error
           },
           homeScore: match.placar_casa,
           awayScore: match.placar_visitante,
@@ -282,13 +285,16 @@ export const MatchesProvider = ({ children }: { children: ReactNode }) => {
           name: match.time_casa.nome,
           shortName: match.time_casa.sigla,
           logoUrl: match.time_casa.escudo_url,
-          homeStadium: match.time_casa.estadio
+          homeStadium: match.time_casa.estadio,
+          city: ''  // Add empty city property to fix TypeScript error
         },
         awayTeam: {
           id: match.time_visitante.id,
           name: match.time_visitante.nome,
           shortName: match.time_visitante.sigla,
-          logoUrl: match.time_visitante.escudo_url
+          logoUrl: match.time_visitante.escudo_url,
+          homeStadium: '',  // Add empty homeStadium property to fix TypeScript error
+          city: ''  // Add empty city property to fix TypeScript error
         },
         homeScore: match.placar_casa,
         awayScore: match.placar_visitante,
