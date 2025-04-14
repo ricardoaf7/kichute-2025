@@ -1,3 +1,4 @@
+
 import { Team } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,7 +46,8 @@ const TeamsList = () => {
     setFormData({
       name: "",
       shortName: "",
-      logoUrl: ""
+      logoUrl: "",
+      stadium: ""
     });
     setIsDialogOpen(true);
   };

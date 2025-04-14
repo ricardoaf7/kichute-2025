@@ -13,6 +13,7 @@ interface TeamFormDialogProps {
     name: string;
     shortName: string;
     logoUrl: string;
+    stadium: string;
   };
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onLogoChange: (url: string) => void;
