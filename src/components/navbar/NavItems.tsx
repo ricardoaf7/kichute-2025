@@ -1,7 +1,7 @@
-
 import { Link } from "react-router-dom";
-import { Calendar, Trophy, BarChart2, Boot, Wallet } from "lucide-react";
+import { Calendar, Trophy, BarChart2, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Boot from "@/components/icons/Boot";
 
 interface NavItemProps {
   path: string;
