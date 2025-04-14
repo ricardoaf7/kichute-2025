@@ -2,10 +2,8 @@
 import { Team } from "@/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { ShieldSelector } from "../ShieldSelector";
+import TeamFormFields from "./TeamFormFields";
 
 interface TeamFormDialogProps {
   open: boolean;
@@ -45,36 +43,13 @@ const TeamFormDialog = ({
               : "Preencha as informações do novo time abaixo."}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Nome do Time</Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder="Nome completo do time"
-              value={formData.name}
-              onChange={onInputChange}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="shortName">Sigla</Label>
-            <Input
-              id="shortName"
-              name="shortName"
-              placeholder="Abreviação (ex: FLA, PAL)"
-              value={formData.shortName}
-              onChange={onInputChange}
-              maxLength={3}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label>Escudo do Time</Label>
-            <ShieldSelector
-              value={formData.logoUrl}
-              onChange={onLogoChange}
-            />
-          </div>
-        </div>
+
+        <TeamFormFields 
+          formData={formData}
+          onInputChange={onInputChange}
+          onLogoChange={onLogoChange}
+        />
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
             Cancelar
@@ -90,4 +65,3 @@ const TeamFormDialog = ({
 };
 
 export default TeamFormDialog;
-
