@@ -1,64 +1,45 @@
 
-import { useState, useEffect } from "react";
 import { Team } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Image, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import TeamCard from "./components/TeamCard";
 import TeamFormDialog from "./components/TeamFormDialog";
 import DeleteTeamDialog from "./components/DeleteTeamDialog";
+import { useTeams } from "@/hooks/teams/useTeams";
+import { useTeamForm } from "@/hooks/teams/useTeamForm";
+import { useTeamDelete } from "@/hooks/teams/useTeamDelete";
 
 const TeamsList = () => {
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [currentTeam, setCurrentTeam] = useState<Team | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    shortName: "",
-    logoUrl: ""
-  });
-  const { toast } = useToast();
-
-  useEffect(() => {
-    fetchTeams();
-  }, []);
-
-  const fetchTeams = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('times')
-        .select('*')
-        .order('nome');
-      
-      if (error) throw error;
-      
-      const transformedTeams: Team[] = data.map(team => ({
-        id: team.id,
-        name: team.nome,
-        shortName: team.sigla,
-        homeStadium: "",
-        city: "",
-        logoUrl: team.escudo_url
-      }));
-      
-      setTeams(transformedTeams);
-    } catch (error) {
-      console.error('Erro ao carregar times:', error);
-      toast({
-        title: "Erro ao carregar times",
-        description: "Não foi possível carregar a lista de times.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+  const { teams, setTeams, isLoading } = useTeams();
+  
+  const { 
+    formData,
+    setFormData,
+    currentTeam,
+    setCurrentTeam,
+    isSubmitting,
+    isDialogOpen,
+    setIsDialogOpen,
+    handleSubmit
+  } = useTeamForm((team: Team) => {
+    if (currentTeam) {
+      setTeams(prev => prev.map(t => t.id === team.id ? team : t));
+    } else {
+      setTeams(prev => [...prev, team]);
     }
-  };
+  });
+
+  const {
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+    teamToDelete,
+    setTeamToDelete,
+    isDeleting,
+    handleDelete
+  } = useTeamDelete((teamId: string) => {
+    setTeams(prev => prev.filter(team => team.id !== teamId));
+  });
 
   const handleAddNew = () => {
     setCurrentTeam(null);
@@ -81,126 +62,13 @@ const TeamsList = () => {
   };
 
   const handleDeleteTeam = (team: Team) => {
-    setCurrentTeam(team);
+    setTeamToDelete(team);
     setIsDeleteDialogOpen(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async () => {
-    if (!formData.name || !formData.shortName) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Nome e sigla são obrigatórios.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      if (currentTeam) {
-        const { error } = await supabase
-          .from('times')
-          .update({
-            nome: formData.name,
-            sigla: formData.shortName,
-            escudo_url: formData.logoUrl
-          })
-          .eq('id', currentTeam.id);
-          
-        if (error) throw error;
-        
-        setTeams(prev => prev.map(team => 
-          team.id === currentTeam.id ? 
-          { 
-            ...team, 
-            name: formData.name, 
-            shortName: formData.shortName,
-            logoUrl: formData.logoUrl
-          } : team
-        ));
-        
-        toast({
-          title: "Time atualizado",
-          description: `${formData.name} foi atualizado com sucesso.`
-        });
-      } else {
-        const { data, error } = await supabase
-          .from('times')
-          .insert({
-            nome: formData.name,
-            sigla: formData.shortName,
-            escudo_url: formData.logoUrl
-          })
-          .select();
-          
-        if (error) throw error;
-        
-        if (data && data[0]) {
-          const newTeam: Team = {
-            id: data[0].id,
-            name: data[0].nome,
-            shortName: data[0].sigla,
-            homeStadium: "",
-            city: "",
-            logoUrl: data[0].escudo_url
-          };
-          
-          setTeams(prev => [...prev, newTeam]);
-          
-          toast({
-            title: "Time criado",
-            description: `${formData.name} foi adicionado com sucesso.`
-          });
-        }
-      }
-    } catch (error: any) {
-      console.error('Erro ao salvar time:', error);
-      toast({
-        title: "Erro ao salvar time",
-        description: error.message || "Ocorreu um erro ao salvar o time.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-      setIsDialogOpen(false);
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!currentTeam) return;
-    
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase
-        .from('times')
-        .delete()
-        .eq('id', currentTeam.id);
-        
-      if (error) throw error;
-      
-      setTeams(prev => prev.filter(team => team.id !== currentTeam.id));
-      
-      toast({
-        title: "Time removido",
-        description: `${currentTeam.name} foi removido com sucesso.`
-      });
-    } catch (error: any) {
-      console.error('Erro ao remover time:', error);
-      toast({
-        title: "Erro ao remover time",
-        description: error.message || "Ocorreu um erro ao remover o time.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-      setIsDeleteDialogOpen(false);
-      setCurrentTeam(null);
-    }
   };
 
   return (
@@ -259,9 +127,9 @@ const TeamsList = () => {
       <DeleteTeamDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={handleConfirmDelete}
-        isSubmitting={isSubmitting}
-        team={currentTeam}
+        onConfirm={handleDelete}
+        isSubmitting={isDeleting}
+        team={teamToDelete}
       />
     </Card>
   );
