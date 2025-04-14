@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { TeamsList } from "@/components/admin/teams/TeamsList";
+import TeamsList from "@/components/admin/teams/TeamsList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TeamsView from "../components/teams/TeamsView";
 
