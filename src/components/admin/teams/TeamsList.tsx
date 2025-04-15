@@ -47,7 +47,8 @@ const TeamsList = () => {
       name: "",
       shortName: "",
       logoUrl: "",
-      stadium: ""
+      stadium: "",
+      city: ""
     });
     setIsDialogOpen(true);
   };
@@ -58,7 +59,8 @@ const TeamsList = () => {
       name: team.name,
       shortName: team.shortName,
       logoUrl: team.logoUrl || "",
-      stadium: team.homeStadium || ""
+      stadium: team.homeStadium || "",
+      city: team.city || ""
     });
     setIsDialogOpen(true);
   };

@@ -24,7 +24,7 @@ export const useTeams = () => {
         name: team.nome,
         shortName: team.sigla,
         homeStadium: team.estadio || "",
-        city: "", // Changed from team.cidade to empty string as cidade doesn't exist in the schema
+        city: team.cidade || "",
         logoUrl: team.escudo_url
       }));
       
