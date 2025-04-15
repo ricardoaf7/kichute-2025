@@ -181,6 +181,7 @@ export type Database = {
       }
       times: {
         Row: {
+          cidade: string
           escudo_url: string | null
           estadio: string
           id: string
@@ -188,6 +189,7 @@ export type Database = {
           sigla: string
         }
         Insert: {
+          cidade?: string
           escudo_url?: string | null
           estadio: string
           id?: string
@@ -195,6 +197,7 @@ export type Database = {
           sigla: string
         }
         Update: {
+          cidade?: string
           escudo_url?: string | null
           estadio?: string
           id?: string

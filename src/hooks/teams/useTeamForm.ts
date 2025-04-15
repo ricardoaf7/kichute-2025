@@ -9,6 +9,7 @@ interface TeamFormData {
   shortName: string;
   logoUrl: string;
   stadium: string;
+  city: string;
 }
 
 export const useTeamForm = (onSuccess: (team: Team) => void) => {
@@ -19,7 +20,8 @@ export const useTeamForm = (onSuccess: (team: Team) => void) => {
     name: "",
     shortName: "",
     logoUrl: "",
-    stadium: ""
+    stadium: "",
+    city: ""
   });
   const { toast } = useToast();
 
@@ -28,16 +30,17 @@ export const useTeamForm = (onSuccess: (team: Team) => void) => {
       name: "",
       shortName: "",
       logoUrl: "",
-      stadium: ""
+      stadium: "",
+      city: ""
     });
     setCurrentTeam(null);
   };
 
   const handleSubmit = async () => {
-    if (!formData.name || !formData.shortName || !formData.stadium) {
+    if (!formData.name || !formData.shortName || !formData.stadium || !formData.city) {
       toast({
         title: "Campos obrigatórios",
-        description: "Nome, sigla e estádio são obrigatórios.",
+        description: "Nome, sigla, estádio e cidade são obrigatórios.",
         variant: "destructive"
       });
       return;
@@ -52,7 +55,8 @@ export const useTeamForm = (onSuccess: (team: Team) => void) => {
             nome: formData.name,
             sigla: formData.shortName,
             escudo_url: formData.logoUrl,
-            estadio: formData.stadium
+            estadio: formData.stadium,
+            cidade: formData.city
           })
           .eq('id', currentTeam.id);
           
@@ -63,7 +67,8 @@ export const useTeamForm = (onSuccess: (team: Team) => void) => {
           name: formData.name,
           shortName: formData.shortName,
           logoUrl: formData.logoUrl,
-          homeStadium: formData.stadium
+          homeStadium: formData.stadium,
+          city: formData.city
         };
         
         onSuccess(updatedTeam);
@@ -78,7 +83,8 @@ export const useTeamForm = (onSuccess: (team: Team) => void) => {
             nome: formData.name,
             sigla: formData.shortName,
             escudo_url: formData.logoUrl,
-            estadio: formData.stadium
+            estadio: formData.stadium,
+            cidade: formData.city
           })
           .select();
           
@@ -90,7 +96,7 @@ export const useTeamForm = (onSuccess: (team: Team) => void) => {
             name: data[0].nome,
             shortName: data[0].sigla,
             homeStadium: data[0].estadio,
-            city: "",
+            city: data[0].cidade,
             logoUrl: data[0].escudo_url
           };
           

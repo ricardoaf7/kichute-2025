@@ -10,6 +10,7 @@ interface TeamFormFieldsProps {
     shortName: string;
     logoUrl: string;
     stadium: string;
+    city: string;
   };
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onLogoChange: (url: string) => void;
@@ -50,6 +51,16 @@ const TeamFormFields = ({
           name="stadium"
           placeholder="Nome do estádio onde o time joga em casa"
           value={formData.stadium}
+          onChange={onInputChange}
+        />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="city">Cidade</Label>
+        <Input
+          id="city"
+          name="city"
+          placeholder="Digite o nome da cidade do time"
+          value={formData.city}
           onChange={onInputChange}
         />
       </div>
