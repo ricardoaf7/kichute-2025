@@ -1,6 +1,4 @@
 
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { 
   Table,
   TableBody,
@@ -50,13 +48,13 @@ const MatchesTableContent = ({ matches, isLoading, error }: MatchesTableContentP
     };
   };
 
-  // Função para formatar a data considerando o fuso horário de Brasília
+  // Função para formatar a data sem conversão de fuso horário
   const formatDate = (dateString: string) => {
     try {
       // Criar um objeto Date a partir da string ISO
       const date = new Date(dateString);
       
-      // Formatar a data e hora para o formato brasileiro, considerando o fuso de Brasília
+      // Usar toLocaleString com a opção timeZone para garantir que não haja conversão de fuso
       return {
         date: date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
         time: date.toLocaleTimeString('pt-BR', { 
