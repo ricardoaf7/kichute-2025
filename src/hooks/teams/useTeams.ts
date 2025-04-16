@@ -12,12 +12,16 @@ export const useTeams = () => {
   const fetchTeams = async () => {
     setIsLoading(true);
     try {
+      console.log("Iniciando busca de times...");
+      
       const { data, error } = await supabase
         .from('times')
         .select('*')
         .order('nome');
       
       if (error) throw error;
+      
+      console.log("Dados recebidos do Supabase:", data);
       
       const transformedTeams: Team[] = data.map(team => ({
         id: team.id,
@@ -27,6 +31,8 @@ export const useTeams = () => {
         city: team.cidade || "",
         logoUrl: team.escudo_url
       }));
+      
+      console.log("Times transformados:", transformedTeams);
       
       setTeams(transformedTeams);
     } catch (error) {
@@ -42,6 +48,7 @@ export const useTeams = () => {
   };
 
   useEffect(() => {
+    console.log("useEffect do useTeams executado");
     fetchTeams();
   }, []);
 
