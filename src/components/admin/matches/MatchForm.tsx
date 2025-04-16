@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -13,7 +13,8 @@ import { DateTimeSelector } from "./form/DateTimeSelector";
 import { LocationFields } from "./form/LocationFields";
 import { FormActions } from "./form/FormActions";
 import { useTeams } from "@/hooks/teams/useTeams";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   round: z.string(),
@@ -34,18 +35,30 @@ interface MatchFormProps {
 export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: MatchFormProps) => {
   const { teams, isLoading, error, fetchTeams } = useTeams();
   const { toast } = useToast();
+  const [matchesInRound, setMatchesInRound] = useState(0);
   
-  // Tentar carregar os times novamente se houver erro
-  useEffect(() => {
+  // Fetch matches in current round to check for duplicates and count
+  const fetchRoundMatches = async () => {
+    const { data, error } = await supabase
+      .from('partidas')
+      .select('*')
+      .eq('rodada', selectedRound);
+    
     if (error) {
-      console.error("Erro ao carregar times:", error);
       toast({
-        title: "Erro ao carregar times",
-        description: "Não foi possível carregar a lista de times para o formulário de partidas.",
+        title: "Erro ao carregar partidas",
+        description: "Não foi possível verificar as partidas da rodada.",
         variant: "destructive"
       });
+      return;
     }
-  }, [error, toast]);
+    
+    setMatchesInRound(data ? data.length : 0);
+  };
+
+  useEffect(() => {
+    fetchRoundMatches();
+  }, [selectedRound]);
   
   const form = useForm<MatchFormValues>({
     resolver: zodResolver(formSchema),
@@ -94,38 +107,69 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
   };
 
   // Verificar se há times duplicados selecionados
-  const validateTeamSelection = () => {
+  const validateTeamSelection = async () => {
     const homeTeam = form.getValues("homeTeam");
     const awayTeam = form.getValues("awayTeam");
     
-    if (homeTeam && awayTeam && homeTeam === awayTeam) {
+    // Check for team duplication in the same round
+    const { data: duplicateMatches, error } = await supabase
+      .from('partidas')
+      .select('*')
+      .eq('rodada', selectedRound)
+      .or(`time_casa_id.eq.${homeTeam},time_casa_id.eq.${awayTeam},time_visitante_id.eq.${homeTeam},time_visitante_id.eq.${awayTeam}`);
+    
+    if (error) {
+      toast({
+        title: "Erro de validação",
+        description: "Não foi possível verificar times duplicados.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    
+    if (homeTeam === awayTeam) {
       form.setError("awayTeam", {
         type: "manual",
         message: "O time visitante deve ser diferente do time da casa"
       });
       return false;
     }
+    
+    if (duplicateMatches && duplicateMatches.length > 0) {
+      form.setError("awayTeam", {
+        type: "manual",
+        message: "Este time já está cadastrado nesta rodada"
+      });
+      return false;
+    }
+    
+    // Check round match limit
+    if (matchesInRound >= 10 && !editingMatch) {
+      toast({
+        title: "Limite de partidas excedido",
+        description: "Só é possível cadastrar 10 partidas por rodada.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    
     return true;
   };
 
-  const handleFormSubmit = (values: MatchFormValues) => {
-    if (validateTeamSelection()) {
+  const handleFormSubmit = async (values: MatchFormValues) => {
+    const isValid = await validateTeamSelection();
+    if (isValid) {
       onSubmit(values);
     }
   };
-
-  // Tentar recarregar os times se estiverem vazios
-  useEffect(() => {
-    if (teams.length === 0 && !isLoading) {
-      console.log("Tentando recarregar times pois a lista está vazia");
-      fetchTeams();
-    }
-  }, [teams, isLoading, fetchTeams]);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>{editingMatch ? "Editar Partida" : "Nova Partida"}</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Jogos cadastrados nesta rodada: {matchesInRound} / 10
+        </p>
       </CardHeader>
       <CardContent>
         <Form {...form}>
