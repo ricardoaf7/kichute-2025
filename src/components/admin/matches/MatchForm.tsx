@@ -13,6 +13,7 @@ import { DateTimeSelector } from "./form/DateTimeSelector";
 import { LocationFields } from "./form/LocationFields";
 import { FormActions } from "./form/FormActions";
 import { MatchFormValues } from "@/contexts/matches/types";
+import { useTeams } from "@/hooks/teams/useTeams";
 
 // Definir esquema de validação do formulário
 const formSchema = z.object({
@@ -45,6 +46,20 @@ export const MatchForm = ({
   const [homeTeamId, setHomeTeamId] = useState<string>("");
   const { teams, isLoading: teamsLoading } = useTeams();
   
+  // Verificar se existe uma data/hora salva anteriormente
+  const getDefaultMatchDate = () => {
+    const savedDateTime = localStorage.getItem('lastMatchDateTime');
+    if (savedDateTime) {
+      try {
+        return new Date(savedDateTime);
+      } catch (error) {
+        console.error('Erro ao converter data salva:', error);
+        return new Date();
+      }
+    }
+    return new Date();
+  };
+  
   // Inicializar formulário com react-hook-form
   const form = useForm<MatchFormValues>({
     resolver: zodResolver(formSchema),
@@ -52,7 +67,7 @@ export const MatchForm = ({
       round: selectedRound.toString(),
       homeTeam: "",
       awayTeam: "",
-      matchDate: new Date(),
+      matchDate: getDefaultMatchDate(),
       stadium: "",
       city: "",
     },
@@ -75,7 +90,7 @@ export const MatchForm = ({
         round: selectedRound.toString(),
         homeTeam: "",
         awayTeam: "",
-        matchDate: new Date(),
+        matchDate: getDefaultMatchDate(),
         stadium: "",
         city: "",
       });
@@ -135,5 +150,3 @@ export const MatchForm = ({
     </Card>
   );
 };
-
-import { useTeams } from "@/hooks/teams/useTeams";
