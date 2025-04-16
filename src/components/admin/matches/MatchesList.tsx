@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
@@ -29,6 +28,24 @@ export const MatchesList = ({ selectedRound, onSelectRound }: MatchesListProps) 
   
   // Criar um array com todas as 38 rodadas
   const allRounds = Array.from({ length: 38 }, (_, i) => i + 1);
+
+  // Formatar data e hora para o fuso de Brasília
+  const formatDateTime = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'America/Sao_Paulo'
+      });
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return 'Data inválida';
+    }
+  };
 
   return (
     <Card>
@@ -66,7 +83,7 @@ export const MatchesList = ({ selectedRound, onSelectRound }: MatchesListProps) 
                     <div className="flex-1">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-muted-foreground">
-                          {format(new Date(match.date), "dd/MM/yyyy HH:mm")}
+                          {formatDateTime(match.date)}
                         </span>
                         {match.stadium && (
                           <span className="text-sm text-muted-foreground">
