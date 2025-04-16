@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,9 @@ export const MatchesList = ({ selectedRound, onSelectRound }: MatchesListProps) 
   } = useMatches();
   
   const currentRound = rounds.find(r => r.number === selectedRound);
+  
+  // Criar um array com todas as 38 rodadas
+  const allRounds = Array.from({ length: 38 }, (_, i) => i + 1);
 
   return (
     <Card>
@@ -40,9 +43,9 @@ export const MatchesList = ({ selectedRound, onSelectRound }: MatchesListProps) 
               <SelectValue placeholder="Selecione a rodada" />
             </SelectTrigger>
             <SelectContent>
-              {rounds.map((round) => (
-                <SelectItem key={round.number} value={round.number.toString()}>
-                  Rodada {round.number}
+              {allRounds.map((roundNumber) => (
+                <SelectItem key={roundNumber} value={roundNumber.toString()}>
+                  Rodada {roundNumber}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -52,7 +55,7 @@ export const MatchesList = ({ selectedRound, onSelectRound }: MatchesListProps) 
       <CardContent>
         {!currentRound || currentRound.matches.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            Nenhuma partida cadastrada para esta rodada.
+            Nenhuma partida cadastrada nesta rodada ainda.
           </div>
         ) : (
           <div className="space-y-4">

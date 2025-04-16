@@ -15,8 +15,9 @@ const RoundSelector = ({
   onRoundChange, 
   onSelectRound 
 }: RoundSelectorProps) => {
-  const maxRound = rounds.length > 0 ? Math.max(...rounds.map(r => r.number)) : 38;
-  const minRound = rounds.length > 0 ? Math.min(...rounds.map(r => r.number)) : 1;
+  // Definir constantes para os limites de rodadas
+  const minRound = 1;
+  const maxRound = 38;
 
   const handlePrevious = () => {
     if (currentRound > minRound) {
@@ -93,38 +94,27 @@ const RoundSelector = ({
       </div>
 
       <div className="flex justify-center space-x-1 overflow-x-auto py-2">
-        {rounds.length > 0 ? (
-          rounds.map((round) => (
-            <button
-              key={round.number}
-              onClick={() => handleRoundClick(round.number)}
-              className={`w-8 h-8 flex items-center justify-center rounded-full text-sm transition-colors ${
-                round.number === currentRound
-                  ? "bg-primary text-primary-foreground"
-                  : round.closed
-                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                  : "bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
-              }`}
-            >
-              {round.number}
-            </button>
-          ))
-        ) : (
-          // Fallback if no rounds data is provided
-          Array.from({ length: 38 }, (_, i) => i + 1).map((num) => (
+        {/* Sempre exibir todas as 38 rodadas */}
+        {Array.from({ length: 38 }, (_, i) => i + 1).map((num) => {
+          // Verificar se temos dados desta rodada nos rounds disponíveis
+          const roundData = rounds.find(r => r.number === num);
+          
+          return (
             <button
               key={num}
               onClick={() => handleRoundClick(num)}
               className={`w-8 h-8 flex items-center justify-center rounded-full text-sm transition-colors ${
                 num === currentRound
                   ? "bg-primary text-primary-foreground"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  : roundData?.closed
+                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  : "bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
               }`}
             >
               {num}
             </button>
-          ))
-        )}
+          );
+        })}
       </div>
     </div>
   );
