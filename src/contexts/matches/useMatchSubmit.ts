@@ -5,7 +5,7 @@ import { MatchFormValues } from "./types";
 import { saveMatch, fetchAllMatches } from "./utils/supabaseHelpers";
 import { groupMatchesToRounds } from "./utils/matchTransformers";
 
-export const useMatchSubmit = (setRounds: (rounds: Round[]) => void) => {
+export const useMatchSubmit = (setRounds: React.Dispatch<React.SetStateAction<Round[]>>) => {
   const { toast } = useToast();
 
   const handleSubmitMatch = async (values: MatchFormValues, editingMatch: Match | null) => {

@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Round } from "@/types";
 import { deleteMatch } from "./utils/supabaseHelpers";
 
-export const useMatchDelete = (setRounds: (rounds: Round[]) => void) => {
+export const useMatchDelete = (setRounds: React.Dispatch<React.SetStateAction<Round[]>>) => {
   const { toast } = useToast();
 
   const handleDeleteMatch = async (matchId: string, roundNumber: number) => {

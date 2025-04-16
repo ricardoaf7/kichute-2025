@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Match, Round } from "@/types";
 import { updateMatchResult } from "./utils/supabaseHelpers";
 
-export const useMatchResults = (setRounds: (rounds: Round[]) => void) => {
+export const useMatchResults = (setRounds: React.Dispatch<React.SetStateAction<Round[]>>) => {
   const { toast } = useToast();
 
   const handleUpdateResults = async (match: Match, homeScore: number, awayScore: number) => {
