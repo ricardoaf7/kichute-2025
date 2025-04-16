@@ -3,6 +3,7 @@ import { Team } from "@/types";
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getTeamImagePath } from "@/utils/teamImages";
+import { Loader2 } from "lucide-react";
 
 interface TeamSelectorProps {
   teams: Team[];
@@ -10,6 +11,7 @@ interface TeamSelectorProps {
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
+  isLoading?: boolean;
 }
 
 export const TeamSelector = ({ 
@@ -17,7 +19,8 @@ export const TeamSelector = ({
   label, 
   value,
   placeholder,
-  onChange
+  onChange,
+  isLoading = false
 }: TeamSelectorProps) => {
   return (
     <FormItem>
@@ -25,10 +28,18 @@ export const TeamSelector = ({
       <Select 
         onValueChange={onChange}
         value={value}
+        disabled={isLoading}
       >
         <FormControl>
           <SelectTrigger>
-            <SelectValue placeholder={placeholder} />
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Carregando times...</span>
+              </div>
+            ) : (
+              <SelectValue placeholder={placeholder} />
+            )}
           </SelectTrigger>
         </FormControl>
         <SelectContent>

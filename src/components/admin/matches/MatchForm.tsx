@@ -13,11 +13,12 @@ import { DateTimeSelector } from "./form/DateTimeSelector";
 import { LocationFields } from "./form/LocationFields";
 import { FormActions } from "./form/FormActions";
 import { useTeams } from "@/hooks/teams/useTeams";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   round: z.string(),
-  homeTeam: z.string(),
-  awayTeam: z.string(),
+  homeTeam: z.string().min(1, "Selecione o time da casa"),
+  awayTeam: z.string().min(1, "Selecione o time visitante"),
   matchDate: z.date(),
   stadium: z.string().optional(),
   city: z.string().optional(),
@@ -31,7 +32,20 @@ interface MatchFormProps {
 }
 
 export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: MatchFormProps) => {
-  const { teams, isLoading } = useTeams();
+  const { teams, isLoading, error, fetchTeams } = useTeams();
+  const { toast } = useToast();
+  
+  // Tentar carregar os times novamente se houver erro
+  useEffect(() => {
+    if (error) {
+      console.error("Erro ao carregar times:", error);
+      toast({
+        title: "Erro ao carregar times",
+        description: "Não foi possível carregar a lista de times para o formulário de partidas.",
+        variant: "destructive"
+      });
+    }
+  }, [error, toast]);
   
   const form = useForm<MatchFormValues>({
     resolver: zodResolver(formSchema),
@@ -79,6 +93,35 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
     }
   };
 
+  // Verificar se há times duplicados selecionados
+  const validateTeamSelection = () => {
+    const homeTeam = form.getValues("homeTeam");
+    const awayTeam = form.getValues("awayTeam");
+    
+    if (homeTeam && awayTeam && homeTeam === awayTeam) {
+      form.setError("awayTeam", {
+        type: "manual",
+        message: "O time visitante deve ser diferente do time da casa"
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleFormSubmit = (values: MatchFormValues) => {
+    if (validateTeamSelection()) {
+      onSubmit(values);
+    }
+  };
+
+  // Tentar recarregar os times se estiverem vazios
+  useEffect(() => {
+    if (teams.length === 0 && !isLoading) {
+      console.log("Tentando recarregar times pois a lista está vazia");
+      fetchTeams();
+    }
+  }, [teams, isLoading, fetchTeams]);
+
   return (
     <Card>
       <CardHeader>
@@ -86,7 +129,7 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="round"
@@ -107,6 +150,7 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
                   label="Time da Casa"
                   value={field.value}
                   placeholder="Selecione o time da casa"
+                  isLoading={isLoading}
                   onChange={(value) => {
                     field.onChange(value);
                     handleHomeTeamChange(value);
@@ -124,6 +168,7 @@ export const MatchForm = ({ selectedRound, editingMatch, onSubmit, onCancel }: M
                   label="Time Visitante"
                   value={field.value}
                   placeholder="Selecione o time visitante" 
+                  isLoading={isLoading}
                   onChange={field.onChange}
                 />
               )}
