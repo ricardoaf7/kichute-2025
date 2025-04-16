@@ -1,6 +1,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MatchesProvider } from "@/contexts/MatchesContext";
+import { MatchesProvider } from "@/contexts/matches";
 import { MatchesContent } from "@/components/admin/matches/MatchesContent";
 import { useAuth } from "@/contexts/auth";
 

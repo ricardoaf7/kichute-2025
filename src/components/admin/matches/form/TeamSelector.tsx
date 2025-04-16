@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getTeamImagePath } from "@/utils/teamImages";
 import { Loader2 } from "lucide-react";
 import { Control } from "react-hook-form";
-import { MatchFormValues } from "@/contexts/MatchesContext";
+import { MatchFormValues } from "@/contexts/matches";
 
 interface TeamSelectorProps {
   teams: Team[];

@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import { useMatches } from "@/contexts/MatchesContext";
+import { useMatches } from "@/contexts/matches";
 import { 
   Select,
   SelectContent,

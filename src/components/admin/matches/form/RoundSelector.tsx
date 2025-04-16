@@ -2,7 +2,7 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Control } from "react-hook-form";
-import { MatchFormValues } from "@/contexts/MatchesContext";
+import { MatchFormValues } from "@/contexts/matches";
 
 interface RoundSelectorProps {
   control: Control<MatchFormValues>;

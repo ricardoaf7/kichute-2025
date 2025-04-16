@@ -1,5 +1,5 @@
 
-import { useMatches } from "@/contexts/MatchesContext";
+import { useMatches } from "@/contexts/matches";
 import { MatchForm } from "./MatchForm";
 import { MatchesList } from "./MatchesList";
 
