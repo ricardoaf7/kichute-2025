@@ -1,0 +1,107 @@
+
+import { Round } from "../../types";
+import { TEAMS } from "./teams";
+
+export const ROUNDS: Round[] = [
+  {
+    number: 1,
+    closed: true,
+    deadline: "2023-04-15T16:00:00Z",
+    matches: [
+      {
+        id: "1",
+        round: 1,
+        homeTeam: TEAMS[0],
+        awayTeam: TEAMS[1],
+        homeScore: 2,
+        awayScore: 1,
+        date: "2023-04-16T16:00:00Z",
+        played: true,
+      },
+      {
+        id: "2",
+        round: 1,
+        homeTeam: TEAMS[2],
+        awayTeam: TEAMS[3],
+        homeScore: 1,
+        awayScore: 1,
+        date: "2023-04-16T18:30:00Z",
+        played: true,
+      },
+      {
+        id: "3",
+        round: 1,
+        homeTeam: TEAMS[4],
+        awayTeam: TEAMS[5],
+        homeScore: 0,
+        awayScore: 2,
+        date: "2023-04-16T16:00:00Z",
+        played: true,
+      },
+    ],
+  },
+  {
+    number: 2,
+    closed: true,
+    deadline: "2023-04-22T16:00:00Z",
+    matches: [
+      {
+        id: "4",
+        round: 2,
+        homeTeam: TEAMS[6],
+        awayTeam: TEAMS[7],
+        homeScore: 0,
+        awayScore: 3,
+        date: "2023-04-23T16:00:00Z",
+        played: true,
+      },
+      {
+        id: "5",
+        round: 2,
+        homeTeam: TEAMS[8],
+        awayTeam: TEAMS[9],
+        homeScore: 2,
+        awayScore: 0,
+        date: "2023-04-23T18:30:00Z",
+        played: true,
+      },
+    ],
+  },
+  {
+    number: 3,
+    closed: false,
+    deadline: "2023-04-29T16:00:00Z",
+    matches: [
+      {
+        id: "6",
+        round: 3,
+        homeTeam: TEAMS[10],
+        awayTeam: TEAMS[11],
+        homeScore: null,
+        awayScore: null,
+        date: "2023-04-30T16:00:00Z",
+        played: false,
+      },
+      {
+        id: "7",
+        round: 3,
+        homeTeam: TEAMS[12],
+        awayTeam: TEAMS[13],
+        homeScore: null,
+        awayScore: null,
+        date: "2023-04-30T18:30:00Z",
+        played: false,
+      },
+      {
+        id: "8",
+        round: 3,
+        homeTeam: TEAMS[14],
+        awayTeam: TEAMS[15],
+        homeScore: null,
+        awayScore: null,
+        date: "2023-04-30T16:00:00Z",
+        played: false,
+      },
+    ],
+  },
+];
