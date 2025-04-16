@@ -7,10 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 export const useTeams = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchTeams = async () => {
     setIsLoading(true);
+    setError(null);
+    
     try {
       console.log("Iniciando busca de times...");
       
@@ -19,9 +22,18 @@ export const useTeams = () => {
         .select('*')
         .order('nome');
       
-      if (error) throw error;
+      if (error) {
+        console.error("Erro do Supabase:", error);
+        throw error;
+      }
       
       console.log("Dados recebidos do Supabase:", data);
+      
+      // Verificação adicional para garantir que data é um array
+      if (!Array.isArray(data)) {
+        console.error("Dados não são um array:", data);
+        throw new Error("Formato de dados inválido");
+      }
       
       const transformedTeams: Team[] = data.map(team => ({
         id: team.id,
@@ -35,13 +47,17 @@ export const useTeams = () => {
       console.log("Times transformados:", transformedTeams);
       
       setTeams(transformedTeams);
-    } catch (error) {
-      console.error('Erro ao carregar times:', error);
+    } catch (error: any) {
+      console.error('Erro detalhado ao carregar times:', error);
+      setError(error.message || "Erro ao carregar times");
       toast({
         title: "Erro ao carregar times",
-        description: "Não foi possível carregar a lista de times.",
+        description: error.message || "Não foi possível carregar a lista de times.",
         variant: "destructive"
       });
+      
+      // Definir um array vazio para garantir que a UI possa renderizar mesmo com erro
+      setTeams([]);
     } finally {
       setIsLoading(false);
     }
@@ -56,6 +72,7 @@ export const useTeams = () => {
     teams,
     setTeams,
     isLoading,
+    error,
     fetchTeams
   };
 };

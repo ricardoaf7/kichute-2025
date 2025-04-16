@@ -2,16 +2,17 @@
 import { Team } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Image, Loader2 } from "lucide-react";
+import { Plus, Image, Loader2, AlertCircle } from "lucide-react";
 import TeamCard from "./components/TeamCard";
 import TeamFormDialog from "./components/TeamFormDialog";
 import DeleteTeamDialog from "./components/DeleteTeamDialog";
 import { useTeams } from "@/hooks/teams/useTeams";
 import { useTeamForm } from "@/hooks/teams/useTeamForm";
 import { useTeamDelete } from "@/hooks/teams/useTeamDelete";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const TeamsList = () => {
-  const { teams, setTeams, isLoading } = useTeams();
+  const { teams, setTeams, isLoading, error, fetchTeams } = useTeams();
   
   const { 
     formData,
@@ -75,6 +76,10 @@ const TeamsList = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleRetry = () => {
+    fetchTeams();
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -88,7 +93,19 @@ const TeamsList = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {isLoading && teams.length === 0 ? (
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              <AlertDescription className="flex items-center justify-between">
+                <span>Erro ao carregar times: {error}</span>
+                <Button onClick={handleRetry} variant="outline" size="sm">
+                  Tentar novamente
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {isLoading ? (
             <div className="text-center py-8">
               <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
               <p className="text-muted-foreground">Carregando times...</p>
@@ -96,10 +113,16 @@ const TeamsList = () => {
           ) : teams.length === 0 ? (
             <div className="text-center py-8 border rounded-md">
               <Image className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">Nenhum time cadastrado.</p>
-              <Button onClick={handleAddNew} variant="outline" className="mt-4">
-                <Plus className="h-4 w-4 mr-2" />
-                Adicionar Time
+              <p className="text-muted-foreground">
+                {error ? "Não foi possível carregar os times." : "Nenhum time cadastrado."}
+              </p>
+              <Button onClick={error ? handleRetry : handleAddNew} variant="outline" className="mt-4">
+                {error ? "Tentar novamente" : (
+                  <>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Adicionar Time
+                  </>
+                )}
               </Button>
             </div>
           ) : (
