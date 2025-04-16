@@ -9,7 +9,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Control } from "react-hook-form";
 import { MatchFormValues } from "@/contexts/matches/types";
-import { useEffect, useState } from "react";
 
 interface DateTimeSelectorProps {
   control: Control<MatchFormValues>;
@@ -21,8 +20,10 @@ export const DateTimeSelector = ({ control }: DateTimeSelectorProps) => {
       control={control}
       name="matchDate"
       render={({ field }) => {
-        // Formatar o tempo para exibição no input time
-        const timeString = field.value ? format(new Date(field.value), "HH:mm") : "16:00";
+        // Formatar o tempo para exibição no input time (usando a data local, sem ajustes de fuso)
+        const timeString = field.value
+          ? `${String(field.value.getHours()).padStart(2, '0')}:${String(field.value.getMinutes()).padStart(2, '0')}`
+          : "16:00";
 
         return (
           <FormItem className="flex flex-col">
@@ -37,7 +38,7 @@ export const DateTimeSelector = ({ control }: DateTimeSelectorProps) => {
                     }`}
                   >
                     {field.value ? (
-                      format(new Date(field.value), "dd/MM/yyyy 'às' HH:mm", { locale: pt })
+                      format(field.value, "dd/MM/yyyy 'às' HH:mm", { locale: pt })
                     ) : (
                       <span>Selecione a data e hora</span>
                     )}
@@ -51,12 +52,12 @@ export const DateTimeSelector = ({ control }: DateTimeSelectorProps) => {
                   selected={field.value ? new Date(field.value) : undefined}
                   onSelect={(date) => {
                     if (date) {
-                      // Manter a hora atual se já existir uma data selecionada
+                      // Preservar a hora atual se já existir uma data selecionada
                       const newDate = new Date(date);
                       if (field.value) {
-                        const currentDate = new Date(field.value);
-                        newDate.setHours(currentDate.getHours());
-                        newDate.setMinutes(currentDate.getMinutes());
+                        // Usar getHours/getMinutes para manter o horário local sem ajustes de fuso
+                        newDate.setHours(field.value.getHours());
+                        newDate.setMinutes(field.value.getMinutes());
                       } else {
                         // Hora padrão se não houver data selecionada
                         newDate.setHours(16);
@@ -76,7 +77,9 @@ export const DateTimeSelector = ({ control }: DateTimeSelectorProps) => {
                     onChange={(e) => {
                       const [hours, minutes] = e.target.value.split(':').map(Number);
                       const newDate = field.value ? new Date(field.value) : new Date();
-                      newDate.setHours(hours, minutes);
+                      // Definir horas e minutos diretamente sem ajustes de fuso
+                      newDate.setHours(hours);
+                      newDate.setMinutes(minutes);
                       field.onChange(newDate);
                     }}
                   />

@@ -26,16 +26,20 @@ export const useMatchSubmit = (setRounds: React.Dispatch<React.SetStateAction<Ro
       // Formato para o campo 'local' no banco de dados
       const location = values.stadium + (values.city ? `, ${values.city}` : '');
       
-      // Usamos a data/hora exatamente como informada pelo usuário, sem ajustes
+      // Obtém a data/hora exatamente como informada pelo usuário
       const matchDate = values.matchDate;
       
+      // Formata a data para string ISO, mas mantém o fuso horário local do usuário
+      // Isso garante que a data salva será exatamente a mesma que o usuário selecionou
+      const formattedDate = matchDate.toISOString();
+      
       // Salvar a data/hora no localStorage para reutilização
-      localStorage.setItem('lastMatchDateTime', matchDate.toISOString());
+      localStorage.setItem('lastMatchDateTime', formattedDate);
 
       // Preparar dados para inserção ou atualização
       const matchData = {
         rodada: roundNumber,
-        data: matchDate.toISOString(),
+        data: formattedDate,
         time_casa_id: homeTeamId,
         time_visitante_id: awayTeamId,
         local: location

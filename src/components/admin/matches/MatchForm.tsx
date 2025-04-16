@@ -51,13 +51,20 @@ export const MatchForm = ({
     const savedDateTime = localStorage.getItem('lastMatchDateTime');
     if (savedDateTime) {
       try {
+        // Usar o construtor de Date diretamente, que mantém o fuso local
         return new Date(savedDateTime);
       } catch (error) {
         console.error('Erro ao converter data salva:', error);
-        return new Date();
+        // Criar data com horário padrão (16:00)
+        const defaultDate = new Date();
+        defaultDate.setHours(16, 0, 0, 0);
+        return defaultDate;
       }
     }
-    return new Date();
+    // Criar data com horário padrão (16:00)
+    const defaultDate = new Date();
+    defaultDate.setHours(16, 0, 0, 0);
+    return defaultDate;
   };
   
   // Inicializar formulário com react-hook-form
