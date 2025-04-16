@@ -46,7 +46,7 @@ export const MatchForm = ({
   const [homeTeamId, setHomeTeamId] = useState<string>("");
   const { teams, isLoading: teamsLoading } = useTeams();
   
-  // Verificar se existe uma data/hora salva anteriormente
+  // Obter a última data/hora utilizada ou usar a data atual
   const getDefaultMatchDate = () => {
     const savedDateTime = localStorage.getItem('lastMatchDateTime');
     if (savedDateTime) {
@@ -76,16 +76,20 @@ export const MatchForm = ({
   // Atualizar valores do formulário quando editingMatch mudar
   useEffect(() => {
     if (editingMatch) {
+      // Para edição, usamos a data exata da partida
+      const matchDate = new Date(editingMatch.date);
+      
       form.reset({
         round: editingMatch.round.toString(),
         homeTeam: editingMatch.homeTeam.id,
         awayTeam: editingMatch.awayTeam.id,
-        matchDate: new Date(editingMatch.date),
+        matchDate: matchDate,
         stadium: editingMatch.stadium || "",
         city: editingMatch.city || "",
       });
       setHomeTeamId(editingMatch.homeTeam.id);
     } else {
+      // Para nova partida, usamos a última data salva ou a data atual
       form.reset({
         round: selectedRound.toString(),
         homeTeam: "",

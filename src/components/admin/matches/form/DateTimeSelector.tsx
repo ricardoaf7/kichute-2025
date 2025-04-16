@@ -22,7 +22,7 @@ export const DateTimeSelector = ({ control }: DateTimeSelectorProps) => {
       name="matchDate"
       render={({ field }) => {
         // Formatar o tempo para exibição no input time
-        const timeString = field.value ? format(field.value, "HH:mm") : "16:00";
+        const timeString = field.value ? format(new Date(field.value), "HH:mm") : "16:00";
 
         return (
           <FormItem className="flex flex-col">
@@ -37,7 +37,7 @@ export const DateTimeSelector = ({ control }: DateTimeSelectorProps) => {
                     }`}
                   >
                     {field.value ? (
-                      format(field.value, "PPP 'às' HH:mm", { locale: pt })
+                      format(new Date(field.value), "dd/MM/yyyy 'às' HH:mm", { locale: pt })
                     ) : (
                       <span>Selecione a data e hora</span>
                     )}
@@ -48,20 +48,24 @@ export const DateTimeSelector = ({ control }: DateTimeSelectorProps) => {
               <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
                 <Calendar
                   mode="single"
-                  selected={field.value}
+                  selected={field.value ? new Date(field.value) : undefined}
                   onSelect={(date) => {
                     if (date) {
                       // Manter a hora atual se já existir uma data selecionada
+                      const newDate = new Date(date);
                       if (field.value) {
-                        const hours = field.value.getHours();
-                        const minutes = field.value.getMinutes();
-                        date.setHours(hours);
-                        date.setMinutes(minutes);
+                        const currentDate = new Date(field.value);
+                        newDate.setHours(currentDate.getHours());
+                        newDate.setMinutes(currentDate.getMinutes());
+                      } else {
+                        // Hora padrão se não houver data selecionada
+                        newDate.setHours(16);
+                        newDate.setMinutes(0);
                       }
-                      field.onChange(date);
+                      field.onChange(newDate);
                     }
                   }}
-                  disabled={(date) => date < new Date("2025-01-01")}
+                  disabled={(date) => date < new Date("2024-01-01")}
                   initialFocus
                   className="p-3 pointer-events-auto"
                 />
@@ -70,11 +74,10 @@ export const DateTimeSelector = ({ control }: DateTimeSelectorProps) => {
                     type="time"
                     value={timeString}
                     onChange={(e) => {
-                      const [hours, minutes] = e.target.value.split(':');
-                      const newDate = field.value || new Date();
-                      newDate.setHours(parseInt(hours, 10));
-                      newDate.setMinutes(parseInt(minutes, 10));
-                      field.onChange(new Date(newDate));
+                      const [hours, minutes] = e.target.value.split(':').map(Number);
+                      const newDate = field.value ? new Date(field.value) : new Date();
+                      newDate.setHours(hours, minutes);
+                      field.onChange(newDate);
                     }}
                   />
                 </div>
