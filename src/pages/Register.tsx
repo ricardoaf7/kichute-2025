@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { RegistrationForm } from "@/components/auth/RegistrationForm";
 import AppLogo from "@/components/AppLogo";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth";
 import { useEffect } from "react";
 
 const Register = () => {

@@ -2,7 +2,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MatchesProvider } from "@/contexts/MatchesContext";
 import { MatchesContent } from "@/components/admin/matches/MatchesContent";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth";
 
 const AdminMatches = () => {
   const { isAdmin } = useAuth();
