@@ -24,6 +24,7 @@ export const MatchesProvider = ({ children }: { children: ReactNode }) => {
   const { 
     rounds, 
     setRounds, 
+    isLoading,
     handleAddRound, 
     handleDeleteRound 
   } = useRounds();
@@ -53,6 +54,7 @@ export const MatchesProvider = ({ children }: { children: ReactNode }) => {
     rounds,
     selectedRound,
     editingMatch,
+    isLoading,
     setRounds,
     setSelectedRound,
     setEditingMatch,

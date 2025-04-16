@@ -1,45 +1,55 @@
 
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Match } from "@/types";
-import { Form } from "@/components/ui/form";
+import { useMatches } from "@/contexts/matches";
 import { Card, CardContent } from "@/components/ui/card";
-import { MatchFormValues } from "@/contexts/MatchesContext";
+import { Form } from "@/components/ui/form";
+import { useTeams } from "@/hooks/teams/useTeams";
+import { Match } from "@/types";
+import { useEffect, useState } from "react";
+import { MatchFormHeader } from "./form/MatchFormHeader";
 import { RoundSelector } from "./form/RoundSelector";
 import { TeamSelector } from "./form/TeamSelector";
 import { DateTimeSelector } from "./form/DateTimeSelector";
 import { LocationFields } from "./form/LocationFields";
 import { FormActions } from "./form/FormActions";
-import { useTeams } from "@/hooks/teams/useTeams";
-import { MatchFormHeader } from "./form/MatchFormHeader";
-import { useMatchValidation } from "./form/ValidationHelpers";
+import { format } from "date-fns";
 
+// Definir esquema de validação do formulário
 const formSchema = z.object({
-  round: z.string(),
+  round: z.string().min(1, "Selecione a rodada"),
   homeTeam: z.string().min(1, "Selecione o time da casa"),
-  awayTeam: z.string().min(1, "Selecione o time visitante"),
-  matchDate: z.date(),
+  awayTeam: z.string().min(1, "Selecione o time visitante")
+    .refine(val => val !== "", {
+      message: "Selecione o time visitante",
+    }),
+  matchDate: z.date({
+    required_error: "Selecione a data da partida",
+  }),
   stadium: z.string().optional(),
   city: z.string().optional(),
 });
 
+type MatchFormValues = z.infer<typeof formSchema>;
+
 interface MatchFormProps {
   selectedRound: number;
   editingMatch: Match | null;
-  onSubmit: (values: MatchFormValues) => void;
+  onSubmit: (values: any) => void;
   onCancel: () => void;
 }
 
-export const MatchForm = ({ 
-  selectedRound, 
-  editingMatch, 
-  onSubmit, 
-  onCancel 
+export const MatchForm = ({
+  selectedRound,
+  editingMatch,
+  onSubmit,
+  onCancel
 }: MatchFormProps) => {
-  const { teams, isLoading } = useTeams();
+  const { teams, isLoading: teamsLoading } = useTeams();
+  const [homeTeamId, setHomeTeamId] = useState<string>("");
   
+  // Inicializar formulário com react-hook-form
   const form = useForm<MatchFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,13 +62,7 @@ export const MatchForm = ({
     },
   });
 
-  const { validateTeamSelection, matchesInRound } = useMatchValidation(
-    form, 
-    selectedRound,
-    editingMatch?.id || null
-  );
-
-  // Update form when editing match changes
+  // Atualizar valores do formulário quando editingMatch mudar
   useEffect(() => {
     if (editingMatch) {
       form.reset({
@@ -69,6 +73,7 @@ export const MatchForm = ({
         stadium: editingMatch.stadium || "",
         city: editingMatch.city || "",
       });
+      setHomeTeamId(editingMatch.homeTeam.id);
     } else {
       form.reset({
         round: selectedRound.toString(),
@@ -78,71 +83,55 @@ export const MatchForm = ({
         stadium: "",
         city: "",
       });
+      setHomeTeamId("");
     }
   }, [editingMatch, selectedRound, form]);
 
-  const handleHomeTeamChange = (teamId: string) => {
-    const selectedTeam = teams.find(team => team.id === teamId);
-    if (selectedTeam) {
-      // Auto-fill stadium information from the database
-      form.setValue("stadium", selectedTeam.homeStadium || "");
-      if (selectedTeam.city) {
-        form.setValue("city", selectedTeam.city || "");
-      }
-    }
-  };
+  // Atualizar homeTeamId quando o time da casa mudar
+  const watchHomeTeam = form.watch("homeTeam");
+  useEffect(() => {
+    setHomeTeamId(watchHomeTeam);
+  }, [watchHomeTeam]);
 
-  const handleFormSubmit = async (values: MatchFormValues) => {
-    const isValid = await validateTeamSelection();
-    if (isValid) {
-      onSubmit(values);
-    }
+  // Manipular envio do formulário
+  const handleSubmit = (values: MatchFormValues) => {
+    onSubmit(values);
   };
 
   return (
-    <Card>
+    <Card className="w-full">
       <MatchFormHeader 
         editingMatch={editingMatch} 
-        matchesInRound={matchesInRound} 
       />
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
-            <RoundSelector 
-              control={form.control}
-              name="round"
-            />
-
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <RoundSelector control={form.control} />
             <TeamSelector 
-              control={form.control}
-              name="homeTeam"
               label="Time da Casa"
-              placeholder="Selecione o time da casa"
-              teams={teams}
-              isLoading={isLoading}
-              onChange={handleHomeTeamChange}
+              name="homeTeam" 
+              control={form.control} 
+              teams={teams} 
+              isLoading={teamsLoading}
             />
-
             <TeamSelector 
+              label="Time Visitante" 
+              name="awayTeam" 
+              control={form.control} 
+              teams={teams} 
+              excludeTeamId={homeTeamId}
+              isLoading={teamsLoading}
+            />
+            <DateTimeSelector control={form.control} />
+            <LocationFields 
               control={form.control}
-              name="awayTeam"
-              label="Time Visitante"
-              placeholder="Selecione o time visitante"
+              homeTeamId={homeTeamId}
               teams={teams}
-              isLoading={isLoading}
             />
-
-            <DateTimeSelector 
-              control={form.control}
-              name="matchDate"
-              label="Data e Hora da Partida"
-            />
-
-            <LocationFields form={form} />
-
             <FormActions 
-              editingMatch={editingMatch} 
+              isEditing={!!editingMatch} 
               onCancel={onCancel} 
+              isSubmitting={form.formState.isSubmitting}
             />
           </form>
         </Form>

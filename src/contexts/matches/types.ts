@@ -5,6 +5,7 @@ export interface MatchesContextType {
   rounds: Round[];
   selectedRound: number;
   editingMatch: Match | null;
+  isLoading: boolean;
   setRounds: (rounds: Round[]) => void;
   setSelectedRound: (round: number) => void;
   setEditingMatch: (match: Match | null) => void;
