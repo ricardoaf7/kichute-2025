@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Control, useWatch } from "react-hook-form";
+import { Control, useWatch, useFormContext } from "react-hook-form";
 import { MatchFormValues } from "@/contexts/matches/types";
 import { Team } from "@/types";
 
@@ -18,6 +18,9 @@ export const LocationFields = ({ control, homeTeamId, teams }: LocationFieldsPro
     control,
     name: "homeTeam",
   });
+  
+  // Obter a função setValue do contexto do formulário
+  const { setValue } = useFormContext<MatchFormValues>();
 
   // Efeito para atualizar os campos de estádio e cidade quando o time da casa muda
   useEffect(() => {
@@ -27,17 +30,15 @@ export const LocationFields = ({ control, homeTeamId, teams }: LocationFieldsPro
       if (selectedHomeTeam) {
         // Atualizar os campos com os valores do time selecionado
         if (selectedHomeTeam.homeStadium) {
-          control._formValues.stadium = selectedHomeTeam.homeStadium;
-          control._fields.stadium?._f.value = selectedHomeTeam.homeStadium;
+          setValue("stadium", selectedHomeTeam.homeStadium);
         }
         
         if (selectedHomeTeam.city) {
-          control._formValues.city = selectedHomeTeam.city;
-          control._fields.city?._f.value = selectedHomeTeam.city;
+          setValue("city", selectedHomeTeam.city);
         }
       }
     }
-  }, [watchHomeTeam, teams, control]);
+  }, [watchHomeTeam, teams, setValue]);
 
   return (
     <>
