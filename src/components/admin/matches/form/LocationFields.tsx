@@ -1,18 +1,21 @@
 
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { MatchFormValues } from "@/contexts/MatchesContext";
+import { Control } from "react-hook-form";
+import { MatchFormValues } from "@/contexts/matches/types";
+import { Team } from "@/types";
 
 interface LocationFieldsProps {
-  form: UseFormReturn<MatchFormValues>;
+  control: Control<MatchFormValues>;
+  homeTeamId: string;
+  teams: Team[];
 }
 
-export const LocationFields = ({ form }: LocationFieldsProps) => {
+export const LocationFields = ({ control, homeTeamId, teams }: LocationFieldsProps) => {
   return (
     <>
       <FormField
-        control={form.control}
+        control={control}
         name="stadium"
         render={({ field }) => (
           <FormItem>
@@ -26,7 +29,7 @@ export const LocationFields = ({ form }: LocationFieldsProps) => {
       />
 
       <FormField
-        control={form.control}
+        control={control}
         name="city"
         render={({ field }) => (
           <FormItem>

@@ -5,12 +5,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getTeamImagePath } from "@/utils/teamImages";
 import { Loader2 } from "lucide-react";
 import { Control } from "react-hook-form";
-import { MatchFormValues } from "@/contexts/matches";
+import { MatchFormValues } from "@/contexts/matches/types";
 
 interface TeamSelectorProps {
   teams: Team[];
   label: string;
-  placeholder: string;
+  placeholder?: string;
+  excludeTeamId?: string;
   onChange?: (value: string) => void;
   isLoading?: boolean;
   control: Control<MatchFormValues>;
@@ -20,12 +21,18 @@ interface TeamSelectorProps {
 export const TeamSelector = ({ 
   teams, 
   label, 
-  placeholder,
+  placeholder = "Selecione um time",
+  excludeTeamId,
   onChange,
   isLoading = false,
   control,
   name
 }: TeamSelectorProps) => {
+  // Filter out the excluded team if an ID is provided
+  const filteredTeams = excludeTeamId 
+    ? teams.filter(team => team.id !== excludeTeamId)
+    : teams;
+
   return (
     <FormField
       control={control}
@@ -56,7 +63,7 @@ export const TeamSelector = ({
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {teams.map((team) => (
+              {filteredTeams.map((team) => (
                 <SelectItem key={team.id} value={team.id}>
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 relative flex-shrink-0">

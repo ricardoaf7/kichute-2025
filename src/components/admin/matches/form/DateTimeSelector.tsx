@@ -8,22 +8,20 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Control } from "react-hook-form";
-import { MatchFormValues } from "@/contexts/MatchesContext";
+import { MatchFormValues } from "@/contexts/matches/types";
 
 interface DateTimeSelectorProps {
   control: Control<MatchFormValues>;
-  name: "matchDate";
-  label: string;
 }
 
-export const DateTimeSelector = ({ control, name, label }: DateTimeSelectorProps) => {
+export const DateTimeSelector = ({ control }: DateTimeSelectorProps) => {
   return (
     <FormField
       control={control}
-      name={name}
+      name="matchDate"
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>{label}</FormLabel>
+          <FormLabel>Data e Hora</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>

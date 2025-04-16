@@ -1,21 +1,21 @@
 
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Match } from "@/types";
 
 interface FormActionsProps {
-  editingMatch: Match | null;
+  isEditing: boolean;
   onCancel: () => void;
+  isSubmitting: boolean;
 }
 
-export const FormActions = ({ editingMatch, onCancel }: FormActionsProps) => {
+export const FormActions = ({ isEditing, onCancel, isSubmitting }: FormActionsProps) => {
   return (
     <div className="flex gap-2 pt-2">
-      <Button type="submit" className="flex-1">
+      <Button type="submit" className="flex-1" disabled={isSubmitting}>
         <Save className="mr-2 h-4 w-4" />
-        {editingMatch ? "Atualizar" : "Adicionar"}
+        {isEditing ? "Atualizar" : "Adicionar"}
       </Button>
-      {editingMatch && (
+      {isEditing && (
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>

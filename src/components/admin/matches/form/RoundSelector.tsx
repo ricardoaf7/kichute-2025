@@ -2,18 +2,17 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Control } from "react-hook-form";
-import { MatchFormValues } from "@/contexts/matches";
+import { MatchFormValues } from "@/contexts/matches/types";
 
 interface RoundSelectorProps {
   control: Control<MatchFormValues>;
-  name: "round";
 }
 
-export const RoundSelector = ({ control, name }: RoundSelectorProps) => {
+export const RoundSelector = ({ control }: RoundSelectorProps) => {
   return (
     <FormField
       control={control}
-      name={name}
+      name="round"
       render={({ field }) => (
         <FormItem>
           <FormLabel>Rodada</FormLabel>

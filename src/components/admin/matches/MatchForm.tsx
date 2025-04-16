@@ -2,10 +2,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useMatches } from "@/contexts/matches";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
-import { useTeams } from "@/hooks/teams/useTeams";
 import { Match } from "@/types";
 import { useEffect, useState } from "react";
 import { MatchFormHeader } from "./form/MatchFormHeader";
@@ -14,7 +12,7 @@ import { TeamSelector } from "./form/TeamSelector";
 import { DateTimeSelector } from "./form/DateTimeSelector";
 import { LocationFields } from "./form/LocationFields";
 import { FormActions } from "./form/FormActions";
-import { format } from "date-fns";
+import { MatchFormValues } from "@/contexts/matches/types";
 
 // Definir esquema de validação do formulário
 const formSchema = z.object({
@@ -31,12 +29,10 @@ const formSchema = z.object({
   city: z.string().optional(),
 });
 
-type MatchFormValues = z.infer<typeof formSchema>;
-
 interface MatchFormProps {
   selectedRound: number;
   editingMatch: Match | null;
-  onSubmit: (values: any) => void;
+  onSubmit: (values: MatchFormValues) => void;
   onCancel: () => void;
 }
 
@@ -46,8 +42,8 @@ export const MatchForm = ({
   onSubmit,
   onCancel
 }: MatchFormProps) => {
-  const { teams, isLoading: teamsLoading } = useTeams();
   const [homeTeamId, setHomeTeamId] = useState<string>("");
+  const { teams, isLoading: teamsLoading } = useTeams();
   
   // Inicializar formulário com react-hook-form
   const form = useForm<MatchFormValues>({
@@ -118,7 +114,7 @@ export const MatchForm = ({
               label="Time Visitante" 
               name="awayTeam" 
               control={form.control} 
-              teams={teams} 
+              teams={teams}
               excludeTeamId={homeTeamId}
               isLoading={teamsLoading}
             />
@@ -139,3 +135,5 @@ export const MatchForm = ({
     </Card>
   );
 };
+
+import { useTeams } from "@/hooks/teams/useTeams";
