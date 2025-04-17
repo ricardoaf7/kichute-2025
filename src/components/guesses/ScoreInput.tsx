@@ -44,7 +44,8 @@ export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInput
     
     // Only update parent if it's a valid number
     if (value === "") {
-      onChange(0);
+      // Não atualizamos o parent aqui para evitar resetar para 0 durante a digitação
+      // O valor será atualizado no handleBlur se necessário
     } else if (/^\d+$/.test(value)) {
       const numValue = parseInt(value);
       if (numValue >= 0 && numValue <= 20) {
@@ -55,15 +56,16 @@ export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInput
 
   const handleBlur = () => {
     // When input loses focus, ensure the display value matches actual score
-    // But don't reset to 0 if the user's input was valid
     if (inputValue === "" || !/^\d+$/.test(inputValue)) {
+      // If empty or invalid, reset to current score
       setInputValue(score.toString());
     } else {
       const numValue = parseInt(inputValue);
       if (numValue < 0 || numValue > 20) {
+        // If out of range, reset to current score
         setInputValue(score.toString());
       } else {
-        // Ensure the parent component has the correct value
+        // If valid, ensure parent component has the correct value
         onChange(numValue);
       }
     }
