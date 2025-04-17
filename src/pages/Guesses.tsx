@@ -1,8 +1,6 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import GuessingForm from "@/components/GuessingForm";
 import GuessingFormNew from "@/components/guesses/GuessingFormNew";
 import KichuteTable from "@/components/KichuteTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

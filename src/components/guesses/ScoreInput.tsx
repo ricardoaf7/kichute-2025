@@ -1,121 +1,70 @@
 
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronDown } from "lucide-react";
-import { useState, useEffect } from "react";
+import { MinusIcon, PlusIcon } from "lucide-react";
 
 interface ScoreInputProps {
   teamName: string;
   score: number;
   onChange: (value: number) => void;
-  isDisabled: boolean;
+  isDisabled?: boolean;
 }
 
-export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInputProps) => {
-  // Use local state to handle text input
-  const [inputValue, setInputValue] = useState<string>(score?.toString() || "0");
+export const ScoreInput = ({
+  teamName,
+  score,
+  onChange,
+  isDisabled = false,
+}: ScoreInputProps) => {
+  // For screen readers
+  const ariaLabel = `Score for ${teamName}`;
 
-  // Update local state when prop changes (e.g. from parent)
-  useEffect(() => {
-    if (score !== undefined) {
-      setInputValue(score.toString());
-    }
-  }, [score]);
-
-  const handleIncrement = () => {
-    // Ensure we don't exceed max value of 20
-    if (score < 20) {
-      const newScore = score + 1;
-      setInputValue(newScore.toString());
-      onChange(newScore);
-    }
+  const increment = () => {
+    if (isDisabled) return;
+    onChange(Math.min(20, score + 1));
   };
 
-  const handleDecrement = () => {
-    // Ensure we don't go below 0
-    if (score > 0) {
-      const newScore = score - 1;
-      setInputValue(newScore.toString());
-      onChange(newScore);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    
-    // Always update the input field for better UX
-    setInputValue(value);
-    
-    // Only update parent if it's a valid number
-    if (value === "") {
-      // Let user type empty value temporarily without updating parent
-    } else if (/^\d+$/.test(value)) {
-      const numValue = parseInt(value);
-      if (numValue >= 0 && numValue <= 20) {
-        onChange(numValue);
-      }
-    }
-  };
-
-  const handleBlur = () => {
-    // When input loses focus, ensure the display value is valid
-    let finalValue = 0;
-    
-    if (inputValue === "" || !/^\d+$/.test(inputValue)) {
-      // If empty or invalid, reset to zero
-      finalValue = 0;
-    } else {
-      const numValue = parseInt(inputValue);
-      if (numValue < 0) {
-        finalValue = 0;
-      } else if (numValue > 20) {
-        finalValue = 20;
-      } else {
-        finalValue = numValue;
-      }
-    }
-    
-    // Update both local state and parent component
-    setInputValue(finalValue.toString());
-    onChange(finalValue);
+  const decrement = () => {
+    if (isDisabled) return;
+    onChange(Math.max(0, score - 1));
   };
 
   return (
-    <div className="flex flex-col items-center space-y-2 w-2/5">
-      <span className="font-semibold text-center">{teamName}</span>
-      <div className="flex items-center space-x-1">
-        <Button 
-          type="button" 
-          variant="outline" 
-          size="icon" 
+    <div className="flex flex-col items-center flex-1">
+      <div className="font-medium text-sm mb-2 text-center line-clamp-1" title={teamName}>
+        {teamName}
+      </div>
+      
+      <div className="flex items-center">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
           className="h-8 w-8"
-          onClick={handleDecrement}
+          onClick={decrement}
           disabled={isDisabled || score <= 0}
+          aria-label={`Decrease score for ${teamName}`}
         >
-          <ChevronDown className="h-4 w-4" />
+          <MinusIcon className="h-4 w-4" />
         </Button>
         
-        <Input
-          type="text"
-          className="w-12 text-center"
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          disabled={isDisabled}
-          min="0"
-          max="20"
-          aria-label={`Score for ${teamName}`}
-        />
+        <div 
+          className="w-12 mx-2 text-center text-xl font-bold"
+          aria-label={ariaLabel}
+        >
+          {score}
+        </div>
         
         <Button
           type="button"
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          onClick={handleIncrement}
+          onClick={increment}
           disabled={isDisabled || score >= 20}
+          aria-label={`Increase score for ${teamName}`}
         >
-          <ChevronUp className="h-4 w-4" />
+          <PlusIcon className="h-4 w-4" />
         </Button>
       </div>
     </div>

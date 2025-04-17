@@ -1,180 +1,213 @@
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/auth";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { RoundSelector } from "./RoundSelector";
+import { Button } from "@/components/ui/button";
 import { ParticipantSelector } from "./ParticipantSelector";
-import { LoadingMatches } from "./LoadingMatches";
+import { RoundSelector } from "./RoundSelector";
 import { MatchesGrid } from "./MatchesGrid";
 import { FormControls } from "./FormControls";
+import { LoadingMatches } from "./LoadingMatches";
 import { useGuesses } from "@/hooks/useGuesses";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/auth";
 
 interface GuessingFormNewProps {
   onSubmitSuccess: () => void;
 }
 
 const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
-  const [selectedRound, setSelectedRound] = useState<string>("1");
+  const [selectedRound, setSelectedRound] = useState<number>(1);
   const [selectedParticipant, setSelectedParticipant] = useState<string>("");
-  const [participantError, setParticipantError] = useState(false);
   const [matches, setMatches] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
-  const { guesses, setGuesses, isSaving, updateGuess, saveGuesses } = useGuesses(onSubmitSuccess);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRoundClosed, setIsRoundClosed] = useState<boolean>(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const {
+    guesses,
+    setGuesses,
+    isSaving,
+    updateGuess,
+    saveGuesses
+  } = useGuesses(onSubmitSuccess);
 
-  // Função para buscar partidas e palpites existentes
-  const fetchMatchesAndGuesses = async () => {
-    if (!selectedRound) return;
-    
-    setIsLoading(true);
-    try {
-      // Buscar partidas da rodada selecionada
-      const { data: matchesData, error: matchesError } = await supabase
-        .from('partidas')
-        .select(`
-          id,
-          rodada,
-          data,
-          local,
-          time_casa:times!time_casa_id(id, nome, sigla),
-          time_visitante:times!time_visitante_id(id, nome, sigla)
-        `)
-        .eq('rodada', parseInt(selectedRound))
-        .order('data');
-      
-      if (matchesError) {
-        console.error("Erro ao buscar partidas:", matchesError);
-        throw matchesError;
-      }
-      
-      console.log("Partidas encontradas:", matchesData || []);
-      setMatches(matchesData || []);
-      
-      // Inicializar array de palpites com valores zerados
-      const initialGuesses = (matchesData || []).map(match => ({
-        matchId: match.id,
-        homeScore: 0,
-        awayScore: 0
-      }));
-      
-      setGuesses(initialGuesses);
-      
-      // Determinar o ID do jogador (autenticado ou selecionado manualmente)
-      const playerId = selectedParticipant;
-      
-      if (playerId) {
-        console.log("Buscando palpites existentes para o jogador:", playerId);
-        
-        // Buscar palpites existentes para este jogador e estas partidas
-        const { data: existingGuesses, error: guessesError } = await supabase
-          .from('kichutes')
-          .select('id, partida_id, palpite_casa, palpite_visitante')
-          .eq('jogador_id', playerId)
-          .in('partida_id', (matchesData || []).map(m => m.id));
-        
-        if (guessesError) {
-          console.error("Erro ao buscar palpites existentes:", guessesError);
-          toast({
-            title: "Erro",
-            description: "Não foi possível carregar seus palpites anteriores.",
-            variant: "destructive"
-          });
-        } else {
-          console.log("Palpites existentes encontrados:", existingGuesses || []);
-          
-          if (existingGuesses && existingGuesses.length > 0) {
-            // Mesclar palpites existentes com os inicializados como zero
-            const updatedGuesses = initialGuesses.map(guess => {
-              const existing = existingGuesses.find(g => g.partida_id === guess.matchId);
-              return existing 
-                ? {
-                    ...guess,
-                    homeScore: existing.palpite_casa || 0,
-                    awayScore: existing.palpite_visitante || 0
-                  }
-                : guess;
-            });
-            console.log("Palpites atualizados com dados existentes:", updatedGuesses);
-            setGuesses(updatedGuesses);
-          } else {
-            console.log("Nenhum palpite existente. Usando valores iniciais:", initialGuesses);
-          }
-        }
-      } else {
-        console.log("Nenhum jogador selecionado. Usando valores iniciais:", initialGuesses);
-      }
-    } catch (err) {
-      console.error("Erro ao buscar partidas e palpites:", err);
-      toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao carregar as partidas desta rodada.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Carregar partidas quando a rodada ou participante mudar
+  // Fetch matches for selected round
   useEffect(() => {
-    fetchMatchesAndGuesses();
-  }, [selectedRound, selectedParticipant]);
+    const fetchMatches = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("partidas")
+          .select(`
+            id,
+            rodada,
+            data,
+            local,
+            time_casa:times!time_casa_id(id, nome, sigla),
+            time_visitante:times!time_visitante_id(id, nome, sigla)
+          `)
+          .eq("rodada", selectedRound)
+          .order("data");
+
+        if (error) throw error;
+
+        console.log("Partidas encontradas:", data);
+        setMatches(data || []);
+
+        // Initialize guesses array with default values
+        const initialGuesses = (data || []).map(match => ({
+          matchId: match.id,
+          homeScore: 0,
+          awayScore: 0
+        }));
+        
+        console.log("Nenhum jogador selecionado. Usando valores iniciais:", initialGuesses);
+        setGuesses(initialGuesses);
+      } catch (err) {
+        console.error("Erro ao carregar partidas:", err);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar as partidas para esta rodada.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMatches();
+  }, [selectedRound, toast, setGuesses]);
+
+  // Load existing guesses when participant is selected
+  useEffect(() => {
+    const fetchExistingGuesses = async () => {
+      if (!selectedParticipant) return;
+
+      setIsLoading(true);
+      try {
+        // Get partidas for the selected round
+        const { data: matchesData, error: matchesError } = await supabase
+          .from("partidas")
+          .select("id")
+          .eq("rodada", selectedRound);
+
+        if (matchesError) throw matchesError;
+
+        // Get existing kichutes
+        const { data: existingGuesses, error: guessesError } = await supabase
+          .from("kichutes")
+          .select("*")
+          .eq("jogador_id", selectedParticipant)
+          .in("partida_id", matchesData.map(m => m.id));
+
+        if (guessesError) throw guessesError;
+
+        console.log("Palpites existentes:", existingGuesses);
+
+        // Update guesses state with existing guesses
+        const updatedGuesses = [...guesses];
+        
+        existingGuesses.forEach(guess => {
+          const index = updatedGuesses.findIndex(g => g.matchId === guess.partida_id);
+          if (index !== -1) {
+            updatedGuesses[index] = {
+              ...updatedGuesses[index],
+              homeScore: guess.palpite_casa || 0,
+              awayScore: guess.palpite_visitante || 0
+            };
+          }
+        });
+
+        setGuesses(updatedGuesses);
+      } catch (err) {
+        console.error("Erro ao carregar palpites existentes:", err);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar os palpites existentes.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchExistingGuesses();
+  }, [selectedParticipant, selectedRound, guesses, setGuesses, toast]);
+
+  // Check if current user is admin
+  const isAdmin = user?.role === "Administrador";
+
+  // Set default participant to current user if not admin
+  useEffect(() => {
+    if (user && !isAdmin && user.id) {
+      setSelectedParticipant(user.id);
+    }
+  }, [user, isAdmin]);
 
   const handleParticipantChange = (participantId: string) => {
-    console.log("Participante selecionado:", participantId);
     setSelectedParticipant(participantId);
-    if (participantId) {
-      setParticipantError(false);
-    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleRoundChange = (round: number) => {
+    setSelectedRound(round);
+  };
+
+  const handleSubmit = async () => {
     if (!selectedParticipant) {
-      setParticipantError(true);
+      toast({
+        title: "Selecione um participante",
+        description: "Por favor, selecione um participante antes de salvar os palpites.",
+        variant: "destructive"
+      });
       return;
     }
 
-    console.log("Enviando palpites para o participante:", selectedParticipant);
     await saveGuesses(selectedParticipant);
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col md:flex-row justify-between gap-4">
-        <ParticipantSelector
-          selectedParticipant={selectedParticipant}
-          onParticipantChange={handleParticipantChange}
-          showError={participantError}
-        />
+    <div className="space-y-6 animate-fadeIn">
+      <div className="grid gap-4 p-6 bg-white dark:bg-gray-800 rounded-lg border border-border/40 shadow-subtle">
+        <div className="grid gap-6 md:grid-cols-2">
+          <RoundSelector selectedRound={selectedRound} onRoundChange={handleRoundChange} />
+          
+          {isAdmin && (
+            <ParticipantSelector 
+              selectedParticipant={selectedParticipant} 
+              onParticipantChange={handleParticipantChange} 
+            />
+          )}
+        </div>
 
-        <RoundSelector
-          selectedRound={selectedRound}
-          onRoundChange={setSelectedRound}
-          isDisabled={isLoading || isSaving}
-        />
+        {isLoading ? (
+          <LoadingMatches />
+        ) : (
+          <div className="space-y-6">
+            <MatchesGrid 
+              matches={matches} 
+              guesses={guesses} 
+              onGuessChange={updateGuess} 
+              isDisabled={isSaving || isRoundClosed} 
+            />
+            
+            {!isRoundClosed && (
+              <FormControls 
+                onSubmit={handleSubmit} 
+                isSaving={isSaving} 
+                isValid={guesses.length > 0 && selectedParticipant !== ""} 
+              />
+            )}
+            
+            {isRoundClosed && (
+              <div className="p-4 text-center bg-yellow-50 border border-yellow-200 rounded-md dark:bg-yellow-900/20 dark:border-yellow-800">
+                <p className="text-yellow-700 dark:text-yellow-300">
+                  Kichutes encerrados para esta rodada.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-
-      {isLoading ? (
-        <LoadingMatches />
-      ) : (
-        <MatchesGrid 
-          matches={matches}
-          guesses={guesses}
-          onGuessChange={updateGuess}
-          isDisabled={isSaving}
-        />
-      )}
-
-      <FormControls 
-        isLoading={isLoading}
-        isSaving={isSaving}
-        hasMatches={matches.length > 0}
-        onSubmit={handleSubmit}
-      />
     </div>
   );
 };
