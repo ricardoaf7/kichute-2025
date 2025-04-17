@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { PLAYERS, ROUNDS } from "../utils/mockData";
 import StandingsHeader from "../components/standings/StandingsHeader";
 import StandingsContent from "../components/standings/StandingsContent";
+import RoundScoreTable from "../components/standings/RoundScoreTable";
 
 const Standings = () => {
   const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic">("dynamic");
@@ -71,12 +71,21 @@ const Standings = () => {
           setUseDynamicTable={setUseDynamicTable}
         />
 
-        <StandingsContent
-          viewMode={viewMode}
-          sortedPlayers={sortedPlayers}
-          selectedRound={selectedRound}
-          isLoaded={isLoaded}
-        />
+        <div className="space-y-8">
+          <StandingsContent
+            viewMode={viewMode}
+            sortedPlayers={sortedPlayers}
+            selectedRound={selectedRound}
+            isLoaded={isLoaded}
+          />
+
+          {selectedRound && (
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">Pontuação da Rodada {selectedRound}</h2>
+              <RoundScoreTable selectedRound={selectedRound} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

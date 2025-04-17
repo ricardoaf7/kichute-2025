@@ -1,19 +1,14 @@
-
 import React, { useState } from "react";
 import { useMatches, MatchesProvider } from "@/contexts/MatchesContext";
 import RoundSelector from "@/components/RoundSelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { ScoreDisplay } from "@/components/match/ScoreDisplay";
-import { 
-  Trophy,
-  Medal,
-  Star
-} from "lucide-react";
+import { Trophy, Medal, Star } from "lucide-react";
 import { calculatePoints, getPointsBadgeClass } from "@/utils/scoring";
 import { PLAYERS } from "@/utils/mockData";
+import RoundTotalScore from "@/components/round-report/RoundTotalScore";
 
-// Mapeamento de ícones para diferentes pontuações
 const getPointsIcon = (points: number) => {
   if (points >= 7) return <Trophy className="h-4 w-4 text-yellow-500" />;
   if (points >= 4) return <Medal className="h-4 w-4 text-blue-500" />;
@@ -21,17 +16,12 @@ const getPointsIcon = (points: number) => {
   return null;
 };
 
-// Criando um componente interno para o conteúdo do relatório
-// que usará o hook useMatches dentro do MatchesProvider
 const RoundReportContent = () => {
   const { rounds, selectedRound, setSelectedRound } = useMatches();
   
-  // Encontrar a rodada atual
   const currentRound = rounds.find(r => r.number === selectedRound);
   
-  // Obter palpites simulados para cada jogador (em uma aplicação real, viria do banco de dados)
   const getPlayerGuesses = (matchId: string, playerId: string) => {
-    // Simular um palpite baseado no ID do jogador e da partida para demonstração
     const hash = (matchId + playerId).split('').reduce((a, b) => (a * 31 + b.charCodeAt(0)) & 0xfffffff, 0);
     return {
       homeScore: (hash % 4),
@@ -39,7 +29,6 @@ const RoundReportContent = () => {
     };
   };
   
-  // Calcular pontos para um palpite
   const calculatePlayerPoints = (matchId: string, playerId: string, match: any) => {
     if (!match.played) return null;
     
@@ -50,7 +39,6 @@ const RoundReportContent = () => {
     });
   };
   
-  // Calcular pontos totais do jogador na rodada
   const calculateTotalPoints = (playerId: string) => {
     if (!currentRound) return 0;
     
@@ -93,7 +81,7 @@ const RoundReportContent = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {currentRound.matches.map(match => (
+                  {currentRound?.matches.map((match) => (
                     <TableRow key={match.id}>
                       <TableCell className="font-medium">
                         {match.homeTeam.shortName} x {match.awayTeam.shortName}
@@ -132,25 +120,7 @@ const RoundReportContent = () => {
                     </TableRow>
                   ))}
                   
-                  {/* Linha de totais */}
-                  <TableRow className="bg-muted/30 font-bold">
-                    <TableCell colSpan={2} className="text-right">
-                      Total de Pontos:
-                    </TableCell>
-                    
-                    {PLAYERS.map(player => {
-                      const totalPoints = calculateTotalPoints(player.id);
-                      
-                      return (
-                        <TableCell key={player.id} className="text-center">
-                          <div className="flex items-center justify-center space-x-1">
-                            <Trophy className="h-4 w-4 text-amber-500" />
-                            <span>{totalPoints}</span>
-                          </div>
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
+                  {currentRound && <RoundTotalScore selectedRound={currentRound.number} />}
                 </TableBody>
               </Table>
             </CardContent>
@@ -167,7 +137,6 @@ const RoundReportContent = () => {
   );
 };
 
-// Componente principal que envolve o conteúdo com o MatchesProvider
 const RoundReport = () => {
   return (
     <MatchesProvider>

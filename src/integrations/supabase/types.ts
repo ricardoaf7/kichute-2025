@@ -158,6 +158,41 @@ export type Database = {
           },
         ]
       }
+      pontuacao_rodada: {
+        Row: {
+          created_at: string | null
+          id: string
+          jogador_id: string
+          pontos: number
+          rodada: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          jogador_id: string
+          pontos?: number
+          rodada: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          jogador_id?: string
+          pontos?: number
+          rodada?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pontuacao_rodada_jogador_id_fkey"
+            columns: ["jogador_id"]
+            isOneToOne: false
+            referencedRelation: "jogadores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       regras: {
         Row: {
           diferenca: number | null
