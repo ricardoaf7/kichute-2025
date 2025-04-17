@@ -28,7 +28,7 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
       
       // Somar os pontos de cada kichute para cada jogador
       kichutes.forEach(kichute => {
-        if (kichute.jogador_id && kichute.pontos) {
+        if (kichute.jogador_id && kichute.pontos !== null && kichute.pontos !== undefined) {
           totais[kichute.jogador_id] = (totais[kichute.jogador_id] || 0) + kichute.pontos;
         }
       });
