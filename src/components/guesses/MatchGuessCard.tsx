@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { MatchHeader } from "./MatchHeader";
 import { ScoreInput } from "./ScoreInput";
@@ -29,9 +28,10 @@ export const MatchGuessCard = ({
   onScoreChange,
   isDisabled = false,
 }: MatchGuessCardProps) => {
-  const handleScoreChange = (type: "home" | "away", value: number) => {
-    // Value is already validated in ScoreInput component
-    onScoreChange(match.id, type, value);
+  const handleScoreChange = (type: "home" | "away", value: string | number) => {
+    const parsed = typeof value === "string" ? parseInt(value) : value;
+    const validValue = isNaN(parsed) ? 0 : Math.min(Math.max(parsed, 0), 20);
+    onScoreChange(match.id, type, validValue);
   };
 
   return (
