@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { RotateCw } from "lucide-react";
+import { useParticipants } from "@/hooks/useParticipants";
+import { useAuth } from "@/contexts/auth";
 
 interface Match {
   id: string;
@@ -46,14 +47,16 @@ interface GuessingFormNewProps {
 
 const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
   const [selectedRound, setSelectedRound] = useState<string>("1");
+  const [selectedParticipant, setSelectedParticipant] = useState<string>("");
   const [rounds, setRounds] = useState<number[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+  const { participants } = useParticipants();
+  const { user } = useAuth();
 
-  // Buscar rodadas disponíveis
   useEffect(() => {
     const fetchRounds = async () => {
       try {
@@ -64,7 +67,6 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
         
         if (error) throw error;
         
-        // Extrair rodadas únicas
         const uniqueRounds = [...new Set(data?.map(item => item.rodada))].filter(Boolean) as number[];
         setRounds(uniqueRounds);
       } catch (err) {
@@ -80,7 +82,6 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     fetchRounds();
   }, [toast]);
 
-  // Buscar partidas da rodada selecionada
   useEffect(() => {
     const fetchMatches = async () => {
       if (!selectedRound) return;
@@ -106,14 +107,12 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
         
         setMatches(data || []);
         
-        // Inicializar os palpites com 0x0 para cada partida
         const initialGuesses = (data || []).map(match => ({
           matchId: match.id,
           homeScore: 0,
           awayScore: 0
         }));
         
-        // Buscar palpites existentes do usuário para esta rodada
         const { data: existingGuesses, error: guessesError } = await supabase
           .from('kichutes')
           .select('partida_id, palpite_casa, palpite_visitante')
@@ -123,7 +122,6 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
         if (guessesError) {
           console.error("Erro ao buscar palpites existentes:", guessesError);
         } else if (existingGuesses && existingGuesses.length > 0) {
-          // Substituir os valores iniciais pelos palpites existentes
           const updatedGuesses = initialGuesses.map(guess => {
             const existing = existingGuesses.find(g => g.partida_id === guess.matchId);
             if (existing) {
@@ -155,13 +153,11 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     fetchMatches();
   }, [selectedRound, toast]);
 
-  // Obter o ID do usuário logado
   const getUserId = async () => {
     const { data } = await supabase.auth.getSession();
     return data.session?.user?.id;
   };
 
-  // Atualizar um palpite específico
   const updateGuess = (matchId: string, type: 'home' | 'away', value: number) => {
     setGuesses(prev => 
       prev.map(guess => 
@@ -176,8 +172,16 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     );
   };
 
-  // Validar se todos os palpites foram preenchidos
   const validateGuesses = () => {
+    if (!user && !selectedParticipant) {
+      toast({
+        title: "Participante não selecionado",
+        description: "Por favor, selecione um participante para enviar os palpites.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
     const emptyGuesses = guesses.filter(
       guess => guess.homeScore === undefined || guess.awayScore === undefined
     );
@@ -194,7 +198,6 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     return true;
   };
 
-  // Enviar os palpites
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -202,21 +205,19 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     
     setIsSaving(true);
     try {
-      const userId = await getUserId();
+      const participantId = user?.id || selectedParticipant;
       
-      if (!userId) {
-        throw new Error("Usuário não autenticado");
+      if (!participantId) {
+        throw new Error("ID do participante não encontrado");
       }
       
-      // Preparar dados para inserção/atualização
       const guessesData = guesses.map(guess => ({
-        jogador_id: userId,
+        jogador_id: participantId,
         partida_id: guess.matchId,
         palpite_casa: guess.homeScore,
         palpite_visitante: guess.awayScore
       }));
       
-      // Usar upsert para inserir/atualizar palpites
       const { error } = await supabase
         .from('kichutes')
         .upsert(guessesData, { 
@@ -244,7 +245,6 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     }
   };
 
-  // Formatar a data para exibição
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -266,26 +266,46 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     <form onSubmit={handleSubmit}>
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row justify-between gap-4">
-          <div className="flex items-end gap-2">
+          {!user && (
             <div className="w-full md:w-48">
-              <Label htmlFor="round-select">Rodada</Label>
+              <Label htmlFor="participant-select">Participante</Label>
               <Select 
-                value={selectedRound} 
-                onValueChange={setSelectedRound}
-                disabled={isLoading || isSaving}
+                value={selectedParticipant} 
+                onValueChange={setSelectedParticipant}
+                required
               >
-                <SelectTrigger id="round-select">
-                  <SelectValue placeholder="Selecione a rodada" />
+                <SelectTrigger id="participant-select">
+                  <SelectValue placeholder="Selecione o participante" />
                 </SelectTrigger>
                 <SelectContent>
-                  {rounds.map((round) => (
-                    <SelectItem key={`round-${round}`} value={round.toString()}>
-                      Rodada {round}
+                  {participants.map((participant) => (
+                    <SelectItem key={participant.id} value={participant.id}>
+                      {participant.nome}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+          )}
+
+          <div className="w-full md:w-48">
+            <Label htmlFor="round-select">Rodada</Label>
+            <Select 
+              value={selectedRound} 
+              onValueChange={setSelectedRound}
+              disabled={isLoading || isSaving}
+            >
+              <SelectTrigger id="round-select">
+                <SelectValue placeholder="Selecione a rodada" />
+              </SelectTrigger>
+              <SelectContent>
+                {rounds.map((round) => (
+                  <SelectItem key={`round-${round}`} value={round.toString()}>
+                    Rodada {round}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
