@@ -27,6 +27,7 @@ const Matches = () => {
           local,
           placar_casa,
           placar_visitante,
+          played,
           time_casa:times!time_casa_id(id, nome, sigla, estadio),
           time_visitante:times!time_visitante_id(id, nome, sigla)
         `)
@@ -55,7 +56,7 @@ const Matches = () => {
         homeScore: match.placar_casa,
         awayScore: match.placar_visitante,
         date: match.data,
-        played: match.placar_casa !== null && match.placar_visitante !== null,
+        played: match.played || (match.placar_casa !== null && match.placar_visitante !== null),
         stadium: match.local ? match.local.split(',')[0].trim() : '',
         city: match.local && match.local.includes(',') 
           ? match.local.split(',').slice(1).join(',').trim() 

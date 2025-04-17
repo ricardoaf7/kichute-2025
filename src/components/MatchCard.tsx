@@ -9,7 +9,7 @@ interface MatchCardProps {
   match: Match;
   showResultForm?: boolean;
   onResultSaved?: () => void;
-  // Add the missing properties from GuessingForm
+  // Outras props do GuessingForm
   userGuess?: Guess;
   editable?: boolean;
   onGuessChange?: (homeScore: number, awayScore: number) => void;
@@ -20,7 +20,7 @@ const MatchCard = ({
   match,
   showResultForm = false,
   onResultSaved = () => {},
-  // Add the missing properties with default values
+  // Outras props com valores padrão
   userGuess,
   editable = false,
   onGuessChange,
@@ -35,7 +35,7 @@ const MatchCard = ({
     minute: "2-digit",
   });
 
-  // Handle guess changes if onGuessChange is provided
+  // Funções para manipular alterações nos palpites
   const handleHomeScoreChange = (value: number) => {
     if (onGuessChange && editable) {
       onGuessChange(value, userGuess?.awayScore || 0);
@@ -73,7 +73,7 @@ const MatchCard = ({
             </div>
           )}
 
-          {/* Show guessing inputs if onGuessChange is provided */}
+          {/* Mostrar inputs de palpites se onGuessChange for fornecido */}
           {onGuessChange && (
             <div className="flex items-center gap-2 px-2">
               <input
