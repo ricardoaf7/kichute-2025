@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { useMatches, MatchesProvider } from "@/contexts/MatchesContext";
 import RoundSelector from "@/components/RoundSelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Trophy, Medal, Star } from "lucide-react";
 import { calculatePoints, getPointsBadgeClass } from "@/utils/scoring";
 import RoundTotalScore from "@/components/round-report/RoundTotalScore";
 import { useParticipants } from "@/hooks/useParticipants";
+import { useKichutes } from "@/hooks/useKichutes";
 
 const getPointsIcon = (points: number) => {
   if (points >= 7) return <Trophy className="h-4 w-4 text-yellow-500" />;
@@ -20,26 +21,42 @@ const getPointsIcon = (points: number) => {
 const RoundReportContent = () => {
   const { rounds, selectedRound, setSelectedRound } = useMatches();
   const { participants, isLoading: isLoadingParticipants } = useParticipants();
+  const { kichutes, isLoading: isLoadingKichutes } = useKichutes(selectedRound);
   
   const currentRound = rounds.find(r => r.number === selectedRound);
   
-  const getPlayerGuesses = (matchId: string, playerId: string) => {
-    const hash = (matchId + playerId).split('').reduce((a, b) => (a * 31 + b.charCodeAt(0)) & 0xfffffff, 0);
-    return {
-      homeScore: (hash % 4),
-      awayScore: ((hash >> 2) % 4)
-    };
+  const getPlayerGuess = (matchId: string, playerId: string) => {
+    // Buscar o palpite real do jogador para esta partida
+    const kichute = kichutes.find(
+      k => k.partida_id === matchId && k.jogador_id === playerId
+    );
+    
+    if (kichute) {
+      return {
+        homeScore: kichute.palpite_casa,
+        awayScore: kichute.palpite_visitante
+      };
+    }
+    
+    // Se não existir palpite, retorna null
+    return null;
   };
   
   const calculatePlayerPoints = (matchId: string, playerId: string, match: any) => {
     if (!match.played) return null;
     
-    const guess = getPlayerGuesses(matchId, playerId);
+    const guess = getPlayerGuess(matchId, playerId);
+    
+    // Se não tiver palpite, retorna null
+    if (!guess) return null;
+    
     return calculatePoints(guess, { 
       homeScore: match.homeScore, 
       awayScore: match.awayScore 
     });
   };
+
+  const isLoading = isLoadingParticipants || isLoadingKichutes;
 
   return (
     <div className="container mx-auto px-4 py-8 pt-20">
@@ -54,7 +71,11 @@ const RoundReportContent = () => {
           />
         </div>
         
-        {currentRound ? (
+        {isLoading ? (
+          <div className="p-8 text-center bg-muted rounded-lg">
+            <p className="text-lg text-muted-foreground">Carregando dados...</p>
+          </div>
+        ) : currentRound ? (
           <Card className="overflow-hidden">
             <CardHeader className="bg-muted">
               <CardTitle className="text-xl">Comparativo de Palpites - Rodada {selectedRound}</CardTitle>
@@ -87,15 +108,19 @@ const RoundReportContent = () => {
                       </TableCell>
                       
                       {participants.map(participant => {
-                        const guess = getPlayerGuesses(match.id, participant.id);
+                        const guess = getPlayerGuess(match.id, participant.id);
                         const points = calculatePlayerPoints(match.id, participant.id, match);
                         
                         return (
                           <TableCell key={participant.id} className="text-center">
                             <div className="flex flex-col items-center space-y-1">
-                              <div className="text-sm font-medium">
-                                {guess.homeScore} x {guess.awayScore}
-                              </div>
+                              {guess ? (
+                                <div className="text-sm font-medium">
+                                  {guess.homeScore} x {guess.awayScore}
+                                </div>
+                              ) : (
+                                <div className="text-sm text-gray-400">-</div>
+                              )}
                               
                               {points !== null && (
                                 <div className={getPointsBadgeClass(points)}>
