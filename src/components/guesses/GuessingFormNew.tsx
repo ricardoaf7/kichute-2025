@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { RotateCw } from "lucide-react";
 import { useAuth } from "@/contexts/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { RoundSelector } from "./RoundSelector";
 import { ParticipantSelector } from "./ParticipantSelector";
-import { MatchGuessCard } from "./MatchGuessCard";
+import { LoadingMatches } from "./LoadingMatches";
+import { MatchesGrid } from "./MatchesGrid";
+import { FormControls } from "./FormControls";
+import { useGuesses } from "@/hooks/useGuesses";
 
 interface GuessingFormNewProps {
   onSubmitSuccess: () => void;
@@ -18,11 +18,9 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
   const [selectedParticipant, setSelectedParticipant] = useState<string>("");
   const [participantError, setParticipantError] = useState(false);
   const [matches, setMatches] = useState<any[]>([]);
-  const [guesses, setGuesses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const { toast } = useToast();
   const { user } = useAuth();
+  const { guesses, setGuesses, isSaving, updateGuess, saveGuesses } = useGuesses(onSubmitSuccess);
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -53,7 +51,6 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
           awayScore: 0
         }));
         
-        // Buscar palpites existentes para o jogador selecionado ou autenticado
         const playerId = user?.id || selectedParticipant;
         
         if (playerId) {
@@ -68,16 +65,14 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
           } else if (existingGuesses && existingGuesses.length > 0) {
             const updatedGuesses = initialGuesses.map(guess => {
               const existing = existingGuesses.find(g => g.partida_id === guess.matchId);
-              if (existing) {
-                return {
-                  ...guess,
-                  homeScore: existing.palpite_casa || 0,
-                  awayScore: existing.palpite_visitante || 0
-                };
-              }
-              return guess;
+              return existing 
+                ? {
+                    ...guess,
+                    homeScore: existing.palpite_casa || 0,
+                    awayScore: existing.palpite_visitante || 0
+                  }
+                : guess;
             });
-            
             setGuesses(updatedGuesses);
           } else {
             setGuesses(initialGuesses);
@@ -87,176 +82,68 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
         }
       } catch (err) {
         console.error("Erro ao buscar partidas:", err);
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar as partidas",
-          variant: "destructive"
-        });
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchMatches();
-  }, [selectedRound, selectedParticipant, user, toast]);
+  }, [selectedRound, selectedParticipant, user, setGuesses]);
 
   const handleParticipantChange = (participantId: string) => {
     setSelectedParticipant(participantId);
-    
-    // Limpar erro quando um participante é selecionado
     if (participantId) {
       setParticipantError(false);
     }
   };
 
-  const updateGuess = (matchId: string, type: 'home' | 'away', value: number) => {
-    setGuesses(prev => 
-      prev.map(guess => 
-        guess.matchId === matchId 
-          ? { 
-              ...guess, 
-              homeScore: type === 'home' ? value : guess.homeScore,
-              awayScore: type === 'away' ? value : guess.awayScore
-            } 
-          : guess
-      )
-    );
-  };
-
-  const validateGuesses = () => {
-    // Validar se um participante foi selecionado quando não há usuário autenticado
-    if (!user && !selectedParticipant) {
-      setParticipantError(true);
-      return false;
-    }
-
-    const emptyGuesses = guesses.filter(
-      guess => guess.homeScore === undefined || guess.awayScore === undefined
-    );
-    
-    if (emptyGuesses.length > 0) {
-      toast({
-        title: "Palpites incompletos",
-        description: `Existem ${emptyGuesses.length} partidas sem palpites. Por favor, preencha todos os palpites.`,
-        variant: "destructive"
-      });
-      return false;
-    }
-    
-    return true;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateGuesses()) return;
-    
-    setIsSaving(true);
-    try {
-      const participantId = user?.id || selectedParticipant;
-      
-      if (!participantId) {
-        throw new Error("ID do participante não encontrado");
-      }
-      
-      const guessesData = guesses.map(guess => ({
-        jogador_id: participantId,
-        partida_id: guess.matchId,
-        palpite_casa: guess.homeScore,
-        palpite_visitante: guess.awayScore
-      }));
-      
-      const { error } = await supabase
-        .from('kichutes')
-        .upsert(guessesData, { 
-          onConflict: 'jogador_id,partida_id',
-          ignoreDuplicates: false 
-        });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Sucesso!",
-        description: "Seus palpites foram salvos com sucesso!"
-      });
-      
-      onSubmitSuccess();
-    } catch (err) {
-      console.error("Erro ao salvar palpites:", err);
-      toast({
-        title: "Erro",
-        description: "Não foi possível salvar seus palpites. Tente novamente.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSaving(false);
+    if (!user && !selectedParticipant) {
+      setParticipantError(true);
+      return;
     }
+
+    await saveGuesses(user?.id || selectedParticipant);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="space-y-4">
-        <div className="flex flex-col md:flex-row justify-between gap-4">
-          {!user && (
-            <ParticipantSelector
-              selectedParticipant={selectedParticipant}
-              onParticipantChange={handleParticipantChange}
-              showError={participantError}
-            />
-          )}
-
-          <RoundSelector
-            selectedRound={selectedRound}
-            onRoundChange={setSelectedRound}
-            isDisabled={isLoading || isSaving}
+    <div className="space-y-4">
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        {!user && (
+          <ParticipantSelector
+            selectedParticipant={selectedParticipant}
+            onParticipantChange={handleParticipantChange}
+            showError={participantError}
           />
-        </div>
-
-        {isLoading ? (
-          <div className="flex justify-center items-center h-40">
-            <RotateCw className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2">Carregando partidas...</span>
-          </div>
-        ) : matches.length === 0 ? (
-          <div className="text-center p-8 border rounded-lg bg-muted/50">
-            Nenhuma partida encontrada para esta rodada.
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {matches.map((match) => {
-              const guess = guesses.find(g => g.matchId === match.id);
-              return (
-                <MatchGuessCard
-                  key={match.id}
-                  match={match}
-                  homeScore={guess?.homeScore || 0}
-                  awayScore={guess?.awayScore || 0}
-                  onScoreChange={updateGuess}
-                  isDisabled={isSaving}
-                />
-              );
-            })}
-          </div>
         )}
 
-        <div className="flex justify-end mt-6">
-          <Button 
-            type="submit" 
-            disabled={isLoading || isSaving || matches.length === 0}
-            className="w-full md:w-auto"
-          >
-            {isSaving ? (
-              <>
-                <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              'Enviar Palpites'
-            )}
-          </Button>
-        </div>
+        <RoundSelector
+          selectedRound={selectedRound}
+          onRoundChange={setSelectedRound}
+          isDisabled={isLoading || isSaving}
+        />
       </div>
-    </form>
+
+      {isLoading ? (
+        <LoadingMatches />
+      ) : (
+        <MatchesGrid 
+          matches={matches}
+          guesses={guesses}
+          onGuessChange={updateGuess}
+          isDisabled={isSaving}
+        />
+      )}
+
+      <FormControls 
+        isLoading={isLoading}
+        isSaving={isSaving}
+        hasMatches={matches.length > 0}
+        onSubmit={handleSubmit}
+      />
+    </div>
   );
 };
 
