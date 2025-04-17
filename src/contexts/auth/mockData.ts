@@ -2,7 +2,7 @@
 export const mockUser = {
   id: "temp-admin",
   nome: "Administrador Temporário",
-  tipo: "Administrador"
+  role: "Administrador"  // Changed from tipo to role to match the usage in the app
 };
 
 export const mockAuthData = {
