@@ -28,6 +28,11 @@ export const useGuesses = (onSubmitSuccess: () => void) => {
 
   const validateGuesses = (participantId?: string) => {
     if (!participantId) {
+      toast({
+        title: "Participante não selecionado",
+        description: "Por favor, selecione um participante antes de enviar os palpites.",
+        variant: "destructive"
+      });
       return false;
     }
 
@@ -59,14 +64,52 @@ export const useGuesses = (onSubmitSuccess: () => void) => {
         palpite_visitante: guess.awayScore
       }));
       
-      const { error } = await supabase
-        .from('kichutes')
-        .upsert(guessesData, { 
-          onConflict: 'jogador_id,partida_id',
-          ignoreDuplicates: false 
-        });
+      // Log dos dados que estão sendo enviados para depuração
+      console.log("Enviando palpites:", guessesData);
       
-      if (error) throw error;
+      // Vamos usar insert com upsert mais simples, sem especificar conflitos
+      // O erro anterior era devido à falta de constraint na tabela
+      for (const guess of guessesData) {
+        // Verificar se já existe um palpite para esta partida e jogador
+        const { data: existingGuess, error: checkError } = await supabase
+          .from('kichutes')
+          .select('*')
+          .eq('jogador_id', guess.jogador_id)
+          .eq('partida_id', guess.partida_id)
+          .single();
+        
+        if (checkError && checkError.code !== 'PGRST116') {
+          console.error("Erro ao verificar palpite existente:", checkError);
+          throw checkError;
+        }
+        
+        let saveError;
+        if (existingGuess) {
+          // Atualizar palpite existente
+          const { error } = await supabase
+            .from('kichutes')
+            .update({
+              palpite_casa: guess.palpite_casa,
+              palpite_visitante: guess.palpite_visitante
+            })
+            .eq('jogador_id', guess.jogador_id)
+            .eq('partida_id', guess.partida_id);
+          
+          saveError = error;
+        } else {
+          // Inserir novo palpite
+          const { error } = await supabase
+            .from('kichutes')
+            .insert(guess);
+          
+          saveError = error;
+        }
+        
+        if (saveError) {
+          console.error("Erro ao salvar palpite:", saveError);
+          throw saveError;
+        }
+      }
       
       toast({
         title: "Sucesso!",
