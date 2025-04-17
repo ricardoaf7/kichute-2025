@@ -26,8 +26,7 @@ export const ResultForm = ({ match, onResultSaved }: ResultFormProps) => {
         .from('partidas')
         .update({
           placar_casa: homeScore,
-          placar_visitante: awayScore,
-          played: true
+          placar_visitante: awayScore
         })
         .eq('id', match.id);
 
