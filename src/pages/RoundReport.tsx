@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useMatches, MatchesProvider } from "@/contexts/MatchesContext";
 import RoundSelector from "@/components/RoundSelector";
@@ -6,8 +7,8 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { ScoreDisplay } from "@/components/match/ScoreDisplay";
 import { Trophy, Medal, Star } from "lucide-react";
 import { calculatePoints, getPointsBadgeClass } from "@/utils/scoring";
-import { PLAYERS } from "@/utils/mockData";
 import RoundTotalScore from "@/components/round-report/RoundTotalScore";
+import { useParticipants } from "@/hooks/useParticipants";
 
 const getPointsIcon = (points: number) => {
   if (points >= 7) return <Trophy className="h-4 w-4 text-yellow-500" />;
@@ -18,6 +19,7 @@ const getPointsIcon = (points: number) => {
 
 const RoundReportContent = () => {
   const { rounds, selectedRound, setSelectedRound } = useMatches();
+  const { participants, isLoading: isLoadingParticipants } = useParticipants();
   
   const currentRound = rounds.find(r => r.number === selectedRound);
   
@@ -37,16 +39,6 @@ const RoundReportContent = () => {
       homeScore: match.homeScore, 
       awayScore: match.awayScore 
     });
-  };
-  
-  const calculateTotalPoints = (playerId: string) => {
-    if (!currentRound) return 0;
-    
-    return currentRound.matches.reduce((total, match) => {
-      if (!match.played) return total;
-      const points = calculatePlayerPoints(match.id, playerId, match) || 0;
-      return total + points;
-    }, 0);
   };
 
   return (
@@ -73,9 +65,9 @@ const RoundReportContent = () => {
                   <TableRow>
                     <TableHead className="w-[200px]">Partida</TableHead>
                     <TableHead className="w-[120px]">Resultado</TableHead>
-                    {PLAYERS.map(player => (
-                      <TableHead key={player.id} className="text-center">
-                        {player.name}
+                    {participants.map(participant => (
+                      <TableHead key={participant.id} className="text-center">
+                        {participant.nome}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -94,12 +86,12 @@ const RoundReportContent = () => {
                         />
                       </TableCell>
                       
-                      {PLAYERS.map(player => {
-                        const guess = getPlayerGuesses(match.id, player.id);
-                        const points = calculatePlayerPoints(match.id, player.id, match);
+                      {participants.map(participant => {
+                        const guess = getPlayerGuesses(match.id, participant.id);
+                        const points = calculatePlayerPoints(match.id, participant.id, match);
                         
                         return (
-                          <TableCell key={player.id} className="text-center">
+                          <TableCell key={participant.id} className="text-center">
                             <div className="flex flex-col items-center space-y-1">
                               <div className="text-sm font-medium">
                                 {guess.homeScore} x {guess.awayScore}

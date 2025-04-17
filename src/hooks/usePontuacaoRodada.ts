@@ -47,6 +47,7 @@ export const usePontuacaoRodada = (selectedRound?: number) => {
           pontos: item.pontos
         }));
 
+        console.log("Pontuação rodada:", formattedData);
         setPontuacoes(formattedData);
       } catch (err) {
         console.error("Erro ao carregar pontuação:", err);
