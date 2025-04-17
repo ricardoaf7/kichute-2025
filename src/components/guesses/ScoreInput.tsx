@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronUp, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ScoreInputProps {
   teamName: string;
@@ -14,6 +14,11 @@ interface ScoreInputProps {
 export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInputProps) => {
   // Use local state to handle text input
   const [inputValue, setInputValue] = useState<string>(score.toString());
+
+  // Update local state when prop changes (e.g. from parent)
+  useEffect(() => {
+    setInputValue(score.toString());
+  }, [score]);
 
   const handleIncrement = () => {
     // Ensure we don't exceed max value of 20
@@ -50,7 +55,18 @@ export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInput
 
   const handleBlur = () => {
     // When input loses focus, ensure the display value matches actual score
-    setInputValue(score.toString());
+    // But don't reset to 0 if the user's input was valid
+    if (inputValue === "" || !/^\d+$/.test(inputValue)) {
+      setInputValue(score.toString());
+    } else {
+      const numValue = parseInt(inputValue);
+      if (numValue < 0 || numValue > 20) {
+        setInputValue(score.toString());
+      } else {
+        // Ensure the parent component has the correct value
+        onChange(numValue);
+      }
+    }
   };
 
   return (
