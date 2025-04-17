@@ -16,6 +16,7 @@ interface GuessingFormNewProps {
 const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
   const [selectedRound, setSelectedRound] = useState<string>("1");
   const [selectedParticipant, setSelectedParticipant] = useState<string>("");
+  const [participantError, setParticipantError] = useState(false);
   const [matches, setMatches] = useState<any[]>([]);
   const [guesses, setGuesses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,28 +53,35 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
           awayScore: 0
         }));
         
-        const { data: existingGuesses, error: guessesError } = await supabase
-          .from('kichutes')
-          .select('partida_id, palpite_casa, palpite_visitante')
-          .eq('jogador_id', await getUserId())
-          .in('partida_id', (data || []).map(m => m.id));
+        // Buscar palpites existentes para o jogador selecionado ou autenticado
+        const playerId = user?.id || selectedParticipant;
         
-        if (guessesError) {
-          console.error("Erro ao buscar palpites existentes:", guessesError);
-        } else if (existingGuesses && existingGuesses.length > 0) {
-          const updatedGuesses = initialGuesses.map(guess => {
-            const existing = existingGuesses.find(g => g.partida_id === guess.matchId);
-            if (existing) {
-              return {
-                ...guess,
-                homeScore: existing.palpite_casa || 0,
-                awayScore: existing.palpite_visitante || 0
-              };
-            }
-            return guess;
-          });
+        if (playerId) {
+          const { data: existingGuesses, error: guessesError } = await supabase
+            .from('kichutes')
+            .select('partida_id, palpite_casa, palpite_visitante')
+            .eq('jogador_id', playerId)
+            .in('partida_id', (data || []).map(m => m.id));
           
-          setGuesses(updatedGuesses);
+          if (guessesError) {
+            console.error("Erro ao buscar palpites existentes:", guessesError);
+          } else if (existingGuesses && existingGuesses.length > 0) {
+            const updatedGuesses = initialGuesses.map(guess => {
+              const existing = existingGuesses.find(g => g.partida_id === guess.matchId);
+              if (existing) {
+                return {
+                  ...guess,
+                  homeScore: existing.palpite_casa || 0,
+                  awayScore: existing.palpite_visitante || 0
+                };
+              }
+              return guess;
+            });
+            
+            setGuesses(updatedGuesses);
+          } else {
+            setGuesses(initialGuesses);
+          }
         } else {
           setGuesses(initialGuesses);
         }
@@ -90,11 +98,15 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     };
 
     fetchMatches();
-  }, [selectedRound, toast]);
+  }, [selectedRound, selectedParticipant, user, toast]);
 
-  const getUserId = async () => {
-    const { data } = await supabase.auth.getSession();
-    return user?.id || selectedParticipant;
+  const handleParticipantChange = (participantId: string) => {
+    setSelectedParticipant(participantId);
+    
+    // Limpar erro quando um participante é selecionado
+    if (participantId) {
+      setParticipantError(false);
+    }
   };
 
   const updateGuess = (matchId: string, type: 'home' | 'away', value: number) => {
@@ -112,12 +124,9 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
   };
 
   const validateGuesses = () => {
+    // Validar se um participante foi selecionado quando não há usuário autenticado
     if (!user && !selectedParticipant) {
-      toast({
-        title: "Participante não selecionado",
-        description: "Por favor, selecione um participante para enviar os palpites.",
-        variant: "destructive"
-      });
+      setParticipantError(true);
       return false;
     }
 
@@ -191,7 +200,8 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
           {!user && (
             <ParticipantSelector
               selectedParticipant={selectedParticipant}
-              onParticipantChange={setSelectedParticipant}
+              onParticipantChange={handleParticipantChange}
+              showError={participantError}
             />
           )}
 
