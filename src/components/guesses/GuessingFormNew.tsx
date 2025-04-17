@@ -111,13 +111,11 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row justify-between gap-4">
-        {!user && (
-          <ParticipantSelector
-            selectedParticipant={selectedParticipant}
-            onParticipantChange={handleParticipantChange}
-            showError={participantError}
-          />
-        )}
+        <ParticipantSelector
+          selectedParticipant={selectedParticipant}
+          onParticipantChange={handleParticipantChange}
+          showError={participantError}
+        />
 
         <RoundSelector
           selectedRound={selectedRound}
