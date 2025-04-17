@@ -2,35 +2,55 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 interface ScoreInputProps {
   teamName: string;
   score: number;
-  onChange: (value: string) => void;
+  onChange: (value: number) => void;
   isDisabled: boolean;
 }
 
 export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInputProps) => {
+  // Use local state to handle text input
+  const [inputValue, setInputValue] = useState<string>(score.toString());
+
   const handleIncrement = () => {
     // Ensure we don't exceed max value of 20
     if (score < 20) {
-      onChange((score + 1).toString());
+      const newScore = score + 1;
+      setInputValue(newScore.toString());
+      onChange(newScore);
     }
   };
 
   const handleDecrement = () => {
     // Ensure we don't go below 0
     if (score > 0) {
-      onChange((score - 1).toString());
+      const newScore = score - 1;
+      setInputValue(newScore.toString());
+      onChange(newScore);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Only allow valid numbers 0-20
-    if (value === "" || (/^\d+$/.test(value) && parseInt(value) >= 0 && parseInt(value) <= 20)) {
-      onChange(value);
+    setInputValue(value);
+    
+    // Only update parent if it's a valid number
+    if (value === "") {
+      onChange(0);
+    } else if (/^\d+$/.test(value)) {
+      const numValue = parseInt(value);
+      if (numValue >= 0 && numValue <= 20) {
+        onChange(numValue);
+      }
     }
+  };
+
+  const handleBlur = () => {
+    // When input loses focus, ensure the display value matches actual score
+    setInputValue(score.toString());
   };
 
   return (
@@ -51,8 +71,9 @@ export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInput
         <Input
           type="text"
           className="w-12 text-center"
-          value={score}
+          value={inputValue}
           onChange={handleInputChange}
+          onBlur={handleBlur}
           disabled={isDisabled}
           min="0"
           max="20"
