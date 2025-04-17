@@ -16,7 +16,7 @@ interface GuessingFormNewProps {
 }
 
 const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
-  const [selectedRound, setSelectedRound] = useState<number>(1);
+  const [selectedRound, setSelectedRound] = useState<string>("1");
   const [selectedParticipant, setSelectedParticipant] = useState<string>("");
   const [matches, setMatches] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -46,7 +46,7 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
             time_casa:times!time_casa_id(id, nome, sigla),
             time_visitante:times!time_visitante_id(id, nome, sigla)
           `)
-          .eq("rodada", selectedRound)
+          .eq("rodada", parseInt(selectedRound))
           .order("data");
 
         if (error) throw error;
@@ -89,7 +89,7 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
         const { data: matchesData, error: matchesError } = await supabase
           .from("partidas")
           .select("id")
-          .eq("rodada", selectedRound);
+          .eq("rodada", parseInt(selectedRound));
 
         if (matchesError) throw matchesError;
 
@@ -148,7 +148,7 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     setSelectedParticipant(participantId);
   };
 
-  const handleRoundChange = (round: number) => {
+  const handleRoundChange = (round: string) => {
     setSelectedRound(round);
   };
 
@@ -194,6 +194,7 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
               <FormControls 
                 onSubmit={handleSubmit} 
                 isSaving={isSaving} 
+                hasMatches={guesses.length > 0}
                 isValid={guesses.length > 0 && selectedParticipant !== ""} 
               />
             )}
