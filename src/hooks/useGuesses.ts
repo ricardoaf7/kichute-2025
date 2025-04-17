@@ -64,60 +64,54 @@ export const useGuesses = (onSubmitSuccess: () => void) => {
         palpite_visitante: guess.awayScore
       }));
       
-      // Log dos dados que estão sendo enviados para depuração
       console.log("Enviando palpites:", guessesData);
       
       let saveSuccess = true;
-      const savedResults = [];
       
-      // Processa cada palpite individualmente para melhor controle de erros
+      // Processar cada palpite individualmente
       for (const guess of guessesData) {
+        console.log(`Processando palpite: Jogador ${guess.jogador_id}, Partida ${guess.partida_id}`);
+        
         // Verificar se já existe um palpite para esta partida e jogador
         const { data: existingGuess, error: checkError } = await supabase
           .from('kichutes')
           .select('*')
           .eq('jogador_id', guess.jogador_id)
           .eq('partida_id', guess.partida_id)
-          .single();
+          .maybeSingle();
         
-        if (checkError && checkError.code !== 'PGRST116') {
-          // PGRST116 significa que nenhum registro foi encontrado, o que é esperado
-          console.error("Erro ao verificar palpite existente:", checkError);
-          throw checkError;
-        }
+        console.log("Verificação de palpite existente:", { existingGuess, checkError });
         
         let result;
         if (existingGuess) {
           // Atualizar palpite existente
-          console.log(`Atualizando palpite existente: Jogador ${guess.jogador_id}, Partida ${guess.partida_id}`);
+          console.log(`Atualizando palpite existente: ID ${existingGuess.id}`);
           result = await supabase
             .from('kichutes')
             .update({
               palpite_casa: guess.palpite_casa,
               palpite_visitante: guess.palpite_visitante
             })
-            .eq('jogador_id', guess.jogador_id)
-            .eq('partida_id', guess.partida_id);
+            .eq('id', existingGuess.id);
         } else {
           // Inserir novo palpite
-          console.log(`Inserindo novo palpite: Jogador ${guess.jogador_id}, Partida ${guess.partida_id}`);
+          console.log('Inserindo novo palpite');
           result = await supabase
             .from('kichutes')
             .insert(guess);
         }
         
+        console.log("Resultado da operação:", result);
+        
         if (result.error) {
           console.error("Erro ao salvar palpite:", result.error);
           saveSuccess = false;
           throw result.error;
-        } else {
-          console.log("Palpite salvo com sucesso:", result.data);
-          savedResults.push(result);
         }
       }
       
       if (saveSuccess) {
-        console.log("Todos os palpites foram salvos com sucesso:", savedResults);
+        console.log("Todos os palpites foram salvos com sucesso!");
         toast({
           title: "Sucesso!",
           description: "Seus palpites foram salvos com sucesso!"

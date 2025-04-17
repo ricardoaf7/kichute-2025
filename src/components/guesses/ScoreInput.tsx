@@ -13,11 +13,13 @@ interface ScoreInputProps {
 
 export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInputProps) => {
   // Use local state to handle text input
-  const [inputValue, setInputValue] = useState<string>(score.toString());
+  const [inputValue, setInputValue] = useState<string>(score?.toString() || "0");
 
   // Update local state when prop changes (e.g. from parent)
   useEffect(() => {
-    setInputValue(score.toString());
+    if (score !== undefined) {
+      setInputValue(score.toString());
+    }
   }, [score]);
 
   const handleIncrement = () => {
@@ -40,12 +42,13 @@ export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInput
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    
+    // Always update the input field for better UX
     setInputValue(value);
     
     // Only update parent if it's a valid number
     if (value === "") {
-      // Não atualizamos o parent aqui para evitar resetar para 0 durante a digitação
-      // O valor será atualizado no handleBlur se necessário
+      // Let user type empty value temporarily without updating parent
     } else if (/^\d+$/.test(value)) {
       const numValue = parseInt(value);
       if (numValue >= 0 && numValue <= 20) {
@@ -55,20 +58,26 @@ export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInput
   };
 
   const handleBlur = () => {
-    // When input loses focus, ensure the display value matches actual score
+    // When input loses focus, ensure the display value is valid
+    let finalValue = 0;
+    
     if (inputValue === "" || !/^\d+$/.test(inputValue)) {
-      // If empty or invalid, reset to current score
-      setInputValue(score.toString());
+      // If empty or invalid, reset to zero
+      finalValue = 0;
     } else {
       const numValue = parseInt(inputValue);
-      if (numValue < 0 || numValue > 20) {
-        // If out of range, reset to current score
-        setInputValue(score.toString());
+      if (numValue < 0) {
+        finalValue = 0;
+      } else if (numValue > 20) {
+        finalValue = 20;
       } else {
-        // If valid, ensure parent component has the correct value
-        onChange(numValue);
+        finalValue = numValue;
       }
     }
+    
+    // Update both local state and parent component
+    setInputValue(finalValue.toString());
+    onChange(finalValue);
   };
 
   return (
@@ -95,6 +104,7 @@ export const ScoreInput = ({ teamName, score, onChange, isDisabled }: ScoreInput
           disabled={isDisabled}
           min="0"
           max="20"
+          aria-label={`Score for ${teamName}`}
         />
         
         <Button

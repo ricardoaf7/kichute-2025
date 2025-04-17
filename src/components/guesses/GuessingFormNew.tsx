@@ -59,8 +59,10 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
         awayScore: 0
       }));
       
+      setGuesses(initialGuesses);
+      
       // Determinar o ID do jogador (autenticado ou selecionado manualmente)
-      const playerId = user?.id || selectedParticipant;
+      const playerId = selectedParticipant;
       
       if (playerId) {
         console.log("Buscando palpites existentes para o jogador:", playerId);
@@ -68,7 +70,7 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
         // Buscar palpites existentes para este jogador e estas partidas
         const { data: existingGuesses, error: guessesError } = await supabase
           .from('kichutes')
-          .select('partida_id, palpite_casa, palpite_visitante')
+          .select('id, partida_id, palpite_casa, palpite_visitante')
           .eq('jogador_id', playerId)
           .in('partida_id', (matchesData || []).map(m => m.id));
         
@@ -98,12 +100,10 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
             setGuesses(updatedGuesses);
           } else {
             console.log("Nenhum palpite existente. Usando valores iniciais:", initialGuesses);
-            setGuesses(initialGuesses);
           }
         }
       } else {
         console.log("Nenhum jogador selecionado. Usando valores iniciais:", initialGuesses);
-        setGuesses(initialGuesses);
       }
     } catch (err) {
       console.error("Erro ao buscar partidas e palpites:", err);
@@ -120,7 +120,7 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
   // Carregar partidas quando a rodada ou participante mudar
   useEffect(() => {
     fetchMatchesAndGuesses();
-  }, [selectedRound, selectedParticipant, user]);
+  }, [selectedRound, selectedParticipant]);
 
   const handleParticipantChange = (participantId: string) => {
     console.log("Participante selecionado:", participantId);
@@ -133,20 +133,13 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user && !selectedParticipant) {
+    if (!selectedParticipant) {
       setParticipantError(true);
       return;
     }
 
-    const participantId = user?.id || selectedParticipant;
-    console.log("Enviando palpites para o participante:", participantId);
-    await saveGuesses(participantId);
-  };
-
-  const handleSubmitSuccess = () => {
-    console.log("Palpites salvos com sucesso, recarregando dados...");
-    fetchMatchesAndGuesses();
-    onSubmitSuccess();
+    console.log("Enviando palpites para o participante:", selectedParticipant);
+    await saveGuesses(selectedParticipant);
   };
 
   return (
