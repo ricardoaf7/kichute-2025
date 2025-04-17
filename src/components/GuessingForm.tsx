@@ -88,8 +88,7 @@ const GuessingForm = ({
             userGuess={findGuessForMatch(match.id)}
             editable={!roundClosed}
             onGuessChange={(home, away) => handleGuessChange(match.id, home, away)}
-            className={`animate-slide-up`}
-            // Add animation delay based on index
+            className="animate-slide-up"
           />
         ))}
       </div>
