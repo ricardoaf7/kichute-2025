@@ -1,13 +1,13 @@
 
 import { Team } from "@/types";
+import { getTeamImagePath } from "@/utils/teamImages";
 
 interface TeamDisplayProps {
   team: Team;
   alignment: 'left' | 'right';
-  getTeamImagePath: (name: string) => string;
 }
 
-export const TeamDisplay = ({ team, alignment, getTeamImagePath }: TeamDisplayProps) => {
+export const TeamDisplay = ({ team, alignment }: TeamDisplayProps) => {
   const isLeft = alignment === 'left';
   
   return (
@@ -16,7 +16,7 @@ export const TeamDisplay = ({ team, alignment, getTeamImagePath }: TeamDisplayPr
         <div className="mr-2 flex items-center justify-center">
           <img
             src={getTeamImagePath(team.name)}
-            alt={team.name}
+            alt={`Escudo do ${team.name}`}
             className="w-8 h-8 object-contain rounded-full border border-gray-300"
             onError={(e) => {
               e.currentTarget.src = "/placeholder.svg";
@@ -34,7 +34,7 @@ export const TeamDisplay = ({ team, alignment, getTeamImagePath }: TeamDisplayPr
         <div className="ml-2 flex items-center justify-center">
           <img
             src={getTeamImagePath(team.name)}
-            alt={team.name}
+            alt={`Escudo do ${team.name}`}
             className="w-8 h-8 object-contain rounded-full border border-gray-300"
             onError={(e) => {
               e.currentTarget.src = "/placeholder.svg";
