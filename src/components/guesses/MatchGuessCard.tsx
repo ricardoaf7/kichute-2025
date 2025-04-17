@@ -41,6 +41,13 @@ export const MatchGuessCard = ({
     }
   };
 
+  const handleScoreChange = (type: 'home' | 'away', value: string) => {
+    // Converter para número e limitar entre 0 e 20
+    const numValue = parseInt(value);
+    const validValue = isNaN(numValue) ? 0 : Math.min(Math.max(numValue, 0), 20);
+    onScoreChange(match.id, type, validValue);
+  };
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -56,9 +63,10 @@ export const MatchGuessCard = ({
               <Input
                 type="number"
                 min="0"
+                max="20"
                 className="w-16 text-center"
                 value={homeScore}
-                onChange={(e) => onScoreChange(match.id, 'home', parseInt(e.target.value) || 0)}
+                onChange={(e) => handleScoreChange('home', e.target.value)}
                 disabled={isDisabled}
               />
             </div>
@@ -72,9 +80,10 @@ export const MatchGuessCard = ({
               <Input
                 type="number"
                 min="0"
+                max="20"
                 className="w-16 text-center"
                 value={awayScore}
-                onChange={(e) => onScoreChange(match.id, 'away', parseInt(e.target.value) || 0)}
+                onChange={(e) => handleScoreChange('away', e.target.value)}
                 disabled={isDisabled}
               />
             </div>
