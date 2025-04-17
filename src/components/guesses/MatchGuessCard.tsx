@@ -2,7 +2,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { MatchHeader } from "./MatchHeader";
 import { ScoreInput } from "./ScoreInput";
-import { formatDate } from "@/utils/dateFormatter";
 
 interface MatchGuessCardProps {
   match: {
@@ -28,7 +27,7 @@ export const MatchGuessCard = ({
 }: MatchGuessCardProps) => {
   const handleScoreChange = (type: 'home' | 'away', value: string) => {
     // Converter para número e limitar entre 0 e 20
-    const numValue = parseInt(value);
+    const numValue = value === "" ? 0 : parseInt(value);
     const validValue = isNaN(numValue) ? 0 : Math.min(Math.max(numValue, 0), 20);
     onScoreChange(match.id, type, validValue);
   };
