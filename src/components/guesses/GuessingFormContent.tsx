@@ -43,7 +43,10 @@ export const GuessingFormContent = ({
       
       {!isRoundClosed && (
         <FormControls 
-          onSubmit={onSubmit} 
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }} 
           isSaving={isSaving} 
           hasMatches={guesses.length > 0}
           isValid={guesses.length > 0 && selectedParticipant !== ""} 
