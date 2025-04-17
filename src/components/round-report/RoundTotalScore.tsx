@@ -3,6 +3,8 @@ import { useParticipants } from "@/hooks/useParticipants";
 import { usePontuacaoRodada } from "@/hooks/usePontuacaoRodada";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Trophy } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useKichutes } from "@/hooks/useKichutes";
 
 interface RoundTotalScoreProps {
   selectedRound: number;
@@ -11,6 +13,37 @@ interface RoundTotalScoreProps {
 const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
   const { participants } = useParticipants();
   const { pontuacoes, isLoading } = usePontuacaoRodada(selectedRound);
+  const { kichutes } = useKichutes(selectedRound);
+  const [totaisPorJogador, setTotaisPorJogador] = useState<Record<string, number>>({});
+
+  // Calcular o total de pontos por jogador a partir dos kichutes
+  useEffect(() => {
+    if (!isLoading) {
+      const totais: Record<string, number> = {};
+      
+      // Inicializar todos os participantes com 0 pontos
+      participants.forEach(p => {
+        totais[p.id] = 0;
+      });
+      
+      // Somar os pontos de cada kichute para cada jogador
+      kichutes.forEach(kichute => {
+        if (kichute.jogador_id && kichute.pontos) {
+          totais[kichute.jogador_id] = (totais[kichute.jogador_id] || 0) + kichute.pontos;
+        }
+      });
+      
+      // Se temos pontuações da tabela pontuacao_rodada, usar esses valores
+      pontuacoes.forEach(pontuacao => {
+        if (pontuacao.jogador && pontuacao.jogador.id) {
+          totais[pontuacao.jogador.id] = pontuacao.pontos;
+        }
+      });
+      
+      console.log("Totais calculados:", totais);
+      setTotaisPorJogador(totais);
+    }
+  }, [pontuacoes, kichutes, participants, isLoading]);
 
   if (isLoading) {
     return (
@@ -29,19 +62,13 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
     );
   }
 
-  // Função para obter a pontuação de um jogador
-  const getPontuacaoJogador = (jogadorId: string) => {
-    const pontuacao = pontuacoes.find(p => p.jogador.id === jogadorId);
-    return pontuacao ? pontuacao.pontos : 0;
-  };
-
   return (
     <TableRow className="bg-muted/30 font-bold">
       <TableCell colSpan={2} className="text-right">
         Total de Pontos:
       </TableCell>
       {participants.map((participant) => {
-        const totalPontos = getPontuacaoJogador(participant.id);
+        const totalPontos = totaisPorJogador[participant.id] || 0;
         
         return (
           <TableCell key={participant.id} className="text-center">

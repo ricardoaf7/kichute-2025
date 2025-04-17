@@ -28,7 +28,7 @@ export const usePontuacaoRodada = (selectedRound?: number) => {
             id,
             rodada,
             pontos,
-            jogador:jogadores(id, nome)
+            jogador:jogador_id(id, nome)
           `)
           .order('pontos', { ascending: false });
 
