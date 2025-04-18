@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import { useKichuteData } from "@/hooks/useKichuteData";
+import { usePontuacaoPorJogador } from "@/hooks/usePontuacaoPorJogador";
 import {
   Table,
   TableBody,
@@ -18,54 +17,32 @@ export default function StandingsTable({
   selectedRodada,
   selectedJogador,
 }: StandingsTableProps) {
-  const { kichutes, isLoading, error } = useKichuteData(selectedRodada, selectedJogador);
+  const { jogadores, isLoading, error } = usePontuacaoPorJogador(selectedRodada, selectedJogador);
 
-  const pontosPorJogador = useMemo(() => {
-    const mapa: Record<string, number> = {};
-    kichutes.forEach((k) => {
-      const nome = k.jogador.nome;
-      mapa[nome] = (mapa[nome] || 0) + k.pontos;
-    });
-
-    // Ordenar decrescente por pontos
-    return Object.entries(mapa)
-      .sort((a, b) => b[1] - a[1])
-      .map(([nome, total], index) => ({
-        nome,
-        total,
-        icone:
-          index === 0
-            ? "🏆"
-            : index === 1
-            ? "🥈"
-            : index === 2
-            ? "⭐"
-            : null,
-      }));
-  }, [kichutes]);
-
-  if (isLoading) return <div>Carregando...</div>;
-  if (error) return <div>Erro ao carregar classificação</div>;
+  if (isLoading) return <div>Carregando classificação...</div>;
+  if (error) return <div>Erro ao carregar dados</div>;
 
   return (
     <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-left">#</TableHead>
-            <TableHead className="text-left">Jogador</TableHead>
+            <TableHead>#</TableHead>
+            <TableHead>Jogador</TableHead>
             <TableHead className="text-center">Total</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {pontosPorJogador.map((jogador, idx) => (
-            <TableRow key={jogador.nome}>
-              <TableCell>{idx + 1}</TableCell>
+          {jogadores.map((j, i) => (
+            <TableRow key={j.nome}>
+              <TableCell>{i + 1}</TableCell>
               <TableCell>
-                {jogador.icone && <span className="mr-1">{jogador.icone}</span>}
-                {jogador.nome}
+                {i === 0 && <span className="mr-1">🏆</span>}
+                {i === 1 && <span className="mr-1">🥈</span>}
+                {i === 2 && <span className="mr-1">⭐</span>}
+                {j.nome}
               </TableCell>
-              <TableCell className="text-center">{jogador.total}</TableCell>
+              <TableCell className="text-center">{j.total}</TableCell>
             </TableRow>
           ))}
         </TableBody>
