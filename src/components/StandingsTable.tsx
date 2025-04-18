@@ -8,41 +8,43 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface StandingsTableProps {
-  selectedRodada: string;
-  selectedJogador: string;
-}
-
 export default function StandingsTable({
   selectedRodada,
   selectedJogador,
-}: StandingsTableProps) {
-  const { jogadores, isLoading, error } = usePontuacaoPorJogador(selectedRodada, selectedJogador);
+}: {
+  selectedRodada: string;
+  selectedJogador: string;
+}) {
+  const { pontuacao, isLoading, error } = usePontuacaoPorJogador(
+    selectedRodada,
+    selectedJogador
+  );
 
   if (isLoading) return <div>Carregando classificação...</div>;
-  if (error) return <div>Erro ao carregar dados</div>;
+  if (error) return <div>Erro ao carregar a classificação</div>;
+
+  const medalhas = ["🥇", "🥈", "🥉"];
 
   return (
     <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>#</TableHead>
+            <TableHead className="w-4 text-center">#</TableHead>
             <TableHead>Jogador</TableHead>
             <TableHead className="text-center">Total</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {jogadores.map((j, i) => (
-            <TableRow key={j.nome}>
-              <TableCell>{i + 1}</TableCell>
-              <TableCell>
-                {i === 0 && <span className="mr-1">🏆</span>}
-                {i === 1 && <span className="mr-1">🥈</span>}
-                {i === 2 && <span className="mr-1">⭐</span>}
-                {j.nome}
+          {pontuacao.map((item, index) => (
+            <TableRow key={item.jogador_id}>
+              <TableCell className="text-center font-bold">
+                {medalhas[index] || "⭐"}
               </TableCell>
-              <TableCell className="text-center">{j.total}</TableCell>
+              <TableCell>{item.nome}</TableCell>
+              <TableCell className="text-center font-bold">
+                {item.total}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
