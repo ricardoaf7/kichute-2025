@@ -19,15 +19,6 @@ const getPointsIcon = (points: number) => {
 };
 
 export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesReportTableProps) => {
-  // Calculate totals for each participant
-  const participantTotals = participants.reduce((acc, participant) => {
-    const total = kichutes
-      .filter(k => k.jogador_id === participant.id)
-      .reduce((sum, k) => sum + (k.pontos || 0), 0);
-    acc[participant.id] = total;
-    return acc;
-  }, {});
-
   // Add safety checks for matches data
   const validMatches = matches?.filter(match => 
     match && match.time_casa && match.time_visitante && 
@@ -35,7 +26,8 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
   ) || [];
 
   console.log("Valid matches for report:", validMatches);
-  console.log("Participant totals:", participantTotals);
+  console.log("Participants:", participants);
+  console.log("Kichutes for report:", kichutes);
 
   return (
     <div className="rounded-lg border shadow-sm overflow-x-auto">
@@ -81,9 +73,9 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
                               {guess.palpite_casa} x {guess.palpite_visitante}
                             </div>
                             {guess.pontos !== null && (
-                              <div className={getPointsBadgeClass(guess.pontos)}>
+                              <div className={getPointsBadgeClass(Number(guess.pontos))}>
                                 <span className="flex items-center gap-1">
-                                  {getPointsIcon(guess.pontos)}
+                                  {getPointsIcon(Number(guess.pontos))}
                                   <span>{guess.pontos}</span>
                                 </span>
                               </div>

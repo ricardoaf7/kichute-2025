@@ -21,6 +21,7 @@ const RoundReportContent = () => {
   // Formatação dos matches no formato esperado pela MatchesReportTable
   const formattedMatches = matches.map(match => ({
     id: match.id,
+    rodada: match.rodada,
     time_casa: match.time_casa,
     time_visitante: match.time_visitante,
     placar_casa: match.placar_casa,

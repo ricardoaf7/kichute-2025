@@ -16,7 +16,7 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
 
   // Calcular o total de pontos por jogador diretamente a partir dos kichutes
   useEffect(() => {
-    if (!isLoadingKichutes) {
+    if (!isLoadingKichutes && kichutes.length > 0) {
       console.log("Calculando totais a partir dos kichutes:", kichutes);
       
       // Inicializar o objeto com todos os jogadores tendo 0 pontos
