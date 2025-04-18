@@ -19,6 +19,9 @@ export const useTableSort = () => {
   };
 
   const sortPlayers = (players: JogadorData[], selectedRodada?: string) => {
+    // Log dados antes da ordenação para depuração
+    console.log("Ordenando jogadores:", players.map(p => `${p.nome}: ${p.pontos_total}pts`));
+    
     return [...players].sort((a, b) => {
       if (sortField === "nome") {
         return sortDirection === "asc" 

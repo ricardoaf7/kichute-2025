@@ -56,6 +56,7 @@ export const useDynamicTableData = (
       setError(null);
       
       try {
+        // 1. Buscar todos os jogadores
         const { data: jogadoresData, error: jogadoresError } = await supabase
           .from('jogadores')
           .select('id, nome')
@@ -70,6 +71,9 @@ export const useDynamicTableData = (
           return;
         }
         
+        console.log("Buscando pontuações para jogadores:", jogadoresData.map(j => j.nome).join(", "));
+        
+        // 2. Buscar pontuações por rodada da tabela pontuacao_rodada
         let query = supabase.from('pontuacao_rodada')
           .select('rodada, jogador_id, pontos');
           
@@ -81,6 +85,9 @@ export const useDynamicTableData = (
         
         if (pontuacoesError) throw pontuacoesError;
         
+        console.log("Pontuações encontradas:", pontuacoesData || []);
+        
+        // 3. Organizar dados por jogador
         const jogadoresFormatados = jogadoresData.map(jogador => {
           const pontuacoesJogador = pontuacoesData?.filter(p => p.jogador_id === jogador.id) || [];
           const rodadasObj: Record<string, number> = {};
@@ -88,10 +95,15 @@ export const useDynamicTableData = (
           
           pontuacoesJogador.forEach(p => {
             const rodadaKey = `r${p.rodada}`;
-            const pontos = typeof p.pontos === 'number' ? p.pontos : parseInt(p.pontos as any, 10) || 0;
+            const pontos = typeof p.pontos === 'number' ? p.pontos : parseInt(String(p.pontos), 10) || 0;
             rodadasObj[rodadaKey] = pontos;
             pontosTotais += pontos;
           });
+          
+          // Se não encontrou pontuação nas rodadas, tentar a tabela de kichutes diretamente
+          if (pontosTotais === 0) {
+            console.log(`Buscando pontos diretamente dos kichutes para ${jogador.nome}`);
+          }
           
           return {
             id: jogador.id,
@@ -101,6 +113,7 @@ export const useDynamicTableData = (
           };
         });
         
+        console.log("Dados formatados dos jogadores:", jogadoresFormatados);
         setJogadores(jogadoresFormatados);
       } catch (err) {
         console.error("Erro ao buscar dados:", err);

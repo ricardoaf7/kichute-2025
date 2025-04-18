@@ -58,6 +58,8 @@ const DynamicTable = () => {
   );
 
   const sortedPlayers = sortPlayers(jogadores, selectedRodada);
+  
+  console.log("Jogadores ordenados para exibição:", sortedPlayers);
 
   return (
     <div className="space-y-4">
