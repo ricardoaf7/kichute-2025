@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { RotateCw, ChevronDown, ChevronUp } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
-import { useDynamicTableData } from "@/hooks/standings/useDynamicTableData";
+import { useDynamicTableDataReal as useDynamicTableData } from "@/hooks/standings/useDynamicTableDataReal";
 import { useTableSort, SortField } from "@/hooks/standings/useTableSort";
 import { TableFilters } from "./TableFilters";
 
@@ -10,43 +9,36 @@ const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = useState<string>("todas");
   const [selectedMes, setSelectedMes] = useState<string>("todos");
   const [selectedAno, setSelectedAno] = useState<string>("2025");
-  
+
   const { jogadores, rodadas, isLoading, error } = useDynamicTableData(
     selectedRodada,
     selectedMes,
     selectedAno
   );
-  
+
   const { sortField, sortDirection, handleSort, sortPlayers } = useTableSort();
-  
-  // Get all unique rounds from players data
+
   const todasRodadas = Array.from(
-    new Set(
-      jogadores.flatMap(jogador => 
-        Object.keys(jogador.rodadas)
-      )
-    )
+    new Set(jogadores.flatMap((j) => Object.keys(j.rodadas)))
   ).sort((a, b) => {
     const numA = parseInt(a.substring(1));
     const numB = parseInt(b.substring(1));
     return numA - numB;
   });
 
-  // Calculate totals
   const calcularTotalPorRodada = () => {
     const totais: Record<string, number> = {};
-    todasRodadas.forEach(rodada => {
+    todasRodadas.forEach((rodada) => {
       totais[rodada] = jogadores.reduce((sum, jogador) => {
         return sum + (jogador.rodadas[rodada] || 0);
       }, 0);
     });
     return totais;
   };
-  
+
   const totaisPorRodada = calcularTotalPorRodada();
   const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
 
-  // Sort icon component
   const SortIcon = ({ field }: { field: SortField }) => (
     <span className="inline-flex ml-1 text-muted-foreground">
       {sortField === field ? (
@@ -58,8 +50,6 @@ const DynamicTable = () => {
   );
 
   const sortedPlayers = sortPlayers(jogadores, selectedRodada);
-  
-  console.log("Jogadores ordenados para exibição:", sortedPlayers);
 
   return (
     <div className="space-y-4">
@@ -80,30 +70,28 @@ const DynamicTable = () => {
             <span className="ml-2">Carregando dados...</span>
           </div>
         ) : error ? (
-          <div className="p-4 text-center text-red-500">
-            {error}
-          </div>
+          <div className="p-4 text-center text-red-500">{error}</div>
         ) : (
           <div className="max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted font-poppins">
                   <TableHead className="w-10 text-left font-medium text-muted-foreground">#</TableHead>
-                  <TableHead 
+                  <TableHead
                     className="text-left font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
                     onClick={() => handleSort("nome")}
                   >
                     Jogador <SortIcon field="nome" />
                   </TableHead>
-                  <TableHead 
+                  <TableHead
                     className="text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
                     onClick={() => handleSort("pontos_total")}
                   >
                     Total <SortIcon field="pontos_total" />
                   </TableHead>
-                  {todasRodadas.map(rodada => (
-                    <TableHead 
-                      key={rodada} 
+                  {todasRodadas.map((rodada) => (
+                    <TableHead
+                      key={rodada}
                       className="text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
                       onClick={() => {
                         handleSort("rodada");
@@ -118,16 +106,18 @@ const DynamicTable = () => {
               </TableHeader>
               <TableBody>
                 {sortedPlayers.map((jogador, index) => (
-                  <TableRow 
-                    key={jogador.id}
-                    className={index % 2 === 0 ? 'bg-white dark:bg-gray-950/50' : 'bg-gray-50 dark:bg-gray-900/30'}
+                  <TableRow
+                    key={jogador.nome}
+                    className={
+                      index % 2 === 0 ? "bg-white dark:bg-gray-950/50" : "bg-gray-50 dark:bg-gray-900/30"
+                    }
                   >
                     <TableCell className="font-medium">{index + 1}</TableCell>
                     <TableCell>{jogador.nome}</TableCell>
                     <TableCell className="font-bold text-center">{jogador.pontos_total}</TableCell>
-                    {todasRodadas.map(rodada => (
-                      <TableCell key={`${jogador.id}-${rodada}`} className="text-center">
-                        {jogador.rodadas[rodada] ?? '-'}
+                    {todasRodadas.map((rodada) => (
+                      <TableCell key={`${jogador.nome}-${rodada}`} className="text-center">
+                        {jogador.rodadas[rodada] ?? "-"}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -146,7 +136,7 @@ const DynamicTable = () => {
                     <TableCell>-</TableCell>
                     <TableCell>Total</TableCell>
                     <TableCell className="text-center">{totalGeral}</TableCell>
-                    {todasRodadas.map(rodada => (
+                    {todasRodadas.map((rodada) => (
                       <TableCell key={`footer-${rodada}`} className="text-center">
                         {totaisPorRodada[rodada] || 0}
                       </TableCell>
