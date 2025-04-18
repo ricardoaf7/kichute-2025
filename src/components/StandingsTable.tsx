@@ -2,6 +2,8 @@
 import { useState, useMemo } from "react";
 import { Player } from "../types";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableFooter } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface StandingsTableProps {
   players: Player[];
@@ -48,7 +50,6 @@ const StandingsTable = ({
     });
   }, [players, sortField, sortDirection, selectedRound]);
 
-  // Get all rounds across all players
   const allRounds = useMemo(() => {
     const rounds = new Set<number>();
     players.forEach(player => {
@@ -57,6 +58,25 @@ const StandingsTable = ({
       });
     });
     return Array.from(rounds).sort((a, b) => a - b);
+  }, [players]);
+
+  // Calculate round totals
+  const roundTotals = useMemo(() => {
+    const totals: { [key: number]: number } = {};
+    
+    if (showRoundPoints) {
+      allRounds.forEach(round => {
+        totals[round] = players.reduce((sum, player) => {
+          return sum + (player.roundPoints[round] || 0);
+        }, 0);
+      });
+    }
+    
+    return totals;
+  }, [players, allRounds, showRoundPoints]);
+
+  const totalPoints = useMemo(() => {
+    return players.reduce((sum, player) => sum + player.totalPoints, 0);
   }, [players]);
 
   const SortIcon = ({ field }: { field: SortField }) => (
@@ -74,66 +94,109 @@ const StandingsTable = ({
   );
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border/50 shadow-subtle animate-fadeIn">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-muted/50">
-            <th className="px-4 py-3 text-left font-medium text-muted-foreground">#</th>
-            <th
-              className="px-4 py-3 text-left font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
-              onClick={() => handleSort("name")}
-            >
-              Jogador
-              <SortIcon field="name" />
-            </th>
-            <th
-              className="px-4 py-3 text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
-              onClick={() => handleSort("totalPoints")}
-            >
-              Total
-              <SortIcon field="totalPoints" />
-            </th>
-            
-            {showRoundPoints && allRounds.map(round => (
-              <th 
-                key={`round-${round}`} 
-                className={`px-3 py-3 text-center font-medium text-muted-foreground ${
-                  selectedRound === round ? 'cursor-pointer hover:bg-muted/80' : ''
-                }`}
-                onClick={() => selectedRound === round ? handleSort("roundPoints") : null}
+    <div className="overflow-hidden rounded-lg border border-border/50 shadow-subtle animate-fadeIn">
+      <ScrollArea className="h-[calc(100vh-16rem)] w-full">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead 
+                className="sticky left-0 z-20 bg-muted/50 px-4 py-3 text-left font-medium text-muted-foreground"
+                style={{ minWidth: "200px" }}
               >
-                R{round}
-                {selectedRound === round && <SortIcon field="roundPoints" />}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedPlayers.map((player, index) => (
-            <tr 
-              key={player.id} 
-              className={`border-t border-border/30 transition-colors ${
-                index % 2 === 0 ? 'bg-white dark:bg-gray-950/50' : 'bg-gray-50 dark:bg-gray-900/30'
-              } hover:bg-muted/30`}
-            >
-              <td className="px-4 py-3 text-left">{index + 1}</td>
-              <td className="px-4 py-3 text-left font-medium">{player.name}</td>
-              <td className="px-4 py-3 text-center font-semibold">{player.totalPoints}</td>
+                #
+              </TableHead>
+              <TableHead
+                className="sticky left-[65px] z-20 bg-muted/50 px-4 py-3 text-left font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
+                style={{ minWidth: "200px" }}
+                onClick={() => handleSort("name")}
+              >
+                Nome
+                <SortIcon field="name" />
+              </TableHead>
+              <TableHead
+                className="px-4 py-3 text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
+                onClick={() => handleSort("totalPoints")}
+              >
+                Total
+                <SortIcon field="totalPoints" />
+              </TableHead>
               
               {showRoundPoints && allRounds.map(round => (
-                <td 
-                  key={`${player.id}-round-${round}`} 
-                  className={`px-3 py-3 text-center ${
-                    selectedRound === round ? 'font-medium' : ''
+                <TableHead 
+                  key={`round-${round}`} 
+                  className={`px-3 py-3 text-center font-medium text-muted-foreground ${
+                    selectedRound === round ? 'cursor-pointer hover:bg-muted/80' : ''
                   }`}
+                  onClick={() => selectedRound === round ? handleSort("roundPoints") : null}
                 >
-                  {player.roundPoints[round] || '-'}
-                </td>
+                  R{round}
+                  {selectedRound === round && <SortIcon field="roundPoints" />}
+                </TableHead>
               ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sortedPlayers.map((player, index) => (
+              <TableRow 
+                key={player.id}
+                className={`${
+                  index % 2 === 0 ? 'bg-white dark:bg-gray-950/50' : 'bg-gray-50 dark:bg-gray-900/30'
+                } hover:bg-muted/30`}
+              >
+                <TableCell 
+                  className="sticky left-0 z-10 bg-inherit px-4 py-3 text-left"
+                >
+                  {index + 1}
+                </TableCell>
+                <TableCell 
+                  className="sticky left-[65px] z-10 bg-inherit px-4 py-3 text-left font-medium"
+                >
+                  {player.name}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-center font-semibold">
+                  {player.totalPoints}
+                </TableCell>
+                
+                {showRoundPoints && allRounds.map(round => (
+                  <TableCell 
+                    key={`${player.id}-round-${round}`} 
+                    className={`px-3 py-3 text-center ${
+                      selectedRound === round ? 'font-medium' : ''
+                    }`}
+                  >
+                    {player.roundPoints[round] || '-'}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow className="border-t-2 border-border bg-muted/30 font-bold">
+              <TableCell 
+                className="sticky left-0 z-10 bg-inherit px-4 py-3 text-left"
+              >
+                -
+              </TableCell>
+              <TableCell 
+                className="sticky left-[65px] z-10 bg-inherit px-4 py-3 text-left"
+              >
+                Total
+              </TableCell>
+              <TableCell className="px-4 py-3 text-center">
+                {totalPoints}
+              </TableCell>
+              {showRoundPoints && allRounds.map(round => (
+                <TableCell 
+                  key={`total-round-${round}`}
+                  className="px-3 py-3 text-center"
+                >
+                  {roundTotals[round] || '-'}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </ScrollArea>
     </div>
   );
 };
