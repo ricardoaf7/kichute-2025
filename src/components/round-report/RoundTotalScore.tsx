@@ -22,12 +22,22 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
         totais[p.id] = 0;
       });
 
+      // Debug para verificar os kichutes e seus pontos
+      console.log("Kichutes recebidos para cálculo:", kichutes);
+      
       // Para cada kichute, somar os pontos ao total do jogador
       kichutes.forEach(kichute => {
         if (kichute.jogador_id) {
-          // Usamos diretamente o campo pontos do kichute
-          const points = Number(kichute.pontos || 0);
-          totais[kichute.jogador_id] += points;
+          // Garantir que estamos usando um valor numérico, mesmo se vier como string
+          const points = typeof kichute.pontos === 'string' 
+            ? parseInt(kichute.pontos, 10) 
+            : (Number(kichute.pontos) || 0);
+          
+          // Debug para verificar o valor que está sendo somado
+          console.log(`Somando ${points} pontos para jogador ${kichute.jogador_id}`);
+          
+          // Atualizar o total do jogador
+          totais[kichute.jogador_id] = (totais[kichute.jogador_id] || 0) + points;
         }
       });
 
