@@ -26,6 +26,8 @@ interface Kichute {
     id: string;
     time_casa: { nome: string; sigla: string };
     time_visitante: { nome: string; sigla: string };
+    placar_casa: number | null;
+    placar_visitante: number | null;
   };
   jogador: { id: string; nome: string };
   palpite_casa: number;
