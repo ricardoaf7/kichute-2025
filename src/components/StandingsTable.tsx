@@ -15,7 +15,7 @@ export default function StandingsTable({
   selectedRodada: string;
   selectedJogador: string;
 }) {
-  const { pontuacao, isLoading, error } = usePontuacaoPorJogador(
+  const { jogadores, isLoading, error } = usePontuacaoPorJogador(
     selectedRodada,
     selectedJogador
   );
@@ -36,8 +36,8 @@ export default function StandingsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {pontuacao.map((item, index) => (
-            <TableRow key={item.jogador_id}>
+          {jogadores.map((item, index) => (
+            <TableRow key={item.nome}>
               <TableCell className="text-center font-bold">
                 {medalhas[index] || "⭐"}
               </TableCell>
