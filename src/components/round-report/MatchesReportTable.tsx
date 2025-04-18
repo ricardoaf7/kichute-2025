@@ -27,6 +27,13 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
     return acc;
   }, {});
 
+  // Add safety checks for matches data
+  const validMatches = matches?.filter(match => 
+    match && match.time_casa && match.time_visitante && 
+    match.time_casa.sigla && match.time_visitante.sigla
+  ) || [];
+
+  console.log("Valid matches for report:", validMatches);
   console.log("Totais calculados:", participantTotals);
 
   return (
@@ -45,50 +52,58 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
         </TableHeader>
         
         <TableBody>
-          {matches.map((match) => (
-            <TableRow key={match.id}>
-              <TableCell className="sticky left-0 z-10 bg-inherit font-medium whitespace-nowrap">
-                {match.time_casa.sigla} x {match.time_visitante.sigla}
-              </TableCell>
-              <TableCell className="sticky left-[200px] z-10 bg-inherit">
-                <ScoreDisplay 
-                  homeScore={match.placar_casa} 
-                  awayScore={match.placar_visitante} 
-                  isMatchPlayed={match.placar_casa !== null && match.placar_visitante !== null} 
-                />
-              </TableCell>
-              
-              {participants.map(participant => {
-                const guess = kichutes.find(
-                  k => k.partida_id === match.id && k.jogador_id === participant.id
-                );
+          {validMatches.length > 0 ? (
+            validMatches.map((match) => (
+              <TableRow key={match.id}>
+                <TableCell className="sticky left-0 z-10 bg-inherit font-medium whitespace-nowrap">
+                  {match.time_casa.sigla} x {match.time_visitante.sigla}
+                </TableCell>
+                <TableCell className="sticky left-[200px] z-10 bg-inherit">
+                  <ScoreDisplay 
+                    homeScore={match.placar_casa} 
+                    awayScore={match.placar_visitante} 
+                    isMatchPlayed={match.placar_casa !== null && match.placar_visitante !== null} 
+                  />
+                </TableCell>
                 
-                return (
-                  <TableCell key={`${match.id}-${participant.id}`} className="text-center">
-                    <div className="flex flex-col items-center space-y-1">
-                      {guess ? (
-                        <>
-                          <div className="text-sm font-medium">
-                            {guess.palpite_casa} x {guess.palpite_visitante}
-                          </div>
-                          {guess.pontos !== null && (
-                            <div className={getPointsBadgeClass(guess.pontos)}>
-                              <span className="flex items-center gap-1">
-                                {getPointsIcon(guess.pontos)}
-                                <span>{guess.pontos}</span>
-                              </span>
+                {participants.map(participant => {
+                  const guess = kichutes.find(
+                    k => k.partida_id === match.id && k.jogador_id === participant.id
+                  );
+                  
+                  return (
+                    <TableCell key={`${match.id}-${participant.id}`} className="text-center">
+                      <div className="flex flex-col items-center space-y-1">
+                        {guess ? (
+                          <>
+                            <div className="text-sm font-medium">
+                              {guess.palpite_casa} x {guess.palpite_visitante}
                             </div>
-                          )}
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </div>
-                  </TableCell>
-                );
-              })}
+                            {guess.pontos !== null && (
+                              <div className={getPointsBadgeClass(guess.pontos)}>
+                                <span className="flex items-center gap-1">
+                                  {getPointsIcon(guess.pontos)}
+                                  <span>{guess.pontos}</span>
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </div>
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={participants.length + 2} className="text-center py-4">
+                Nenhuma partida disponível para esta rodada.
+              </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
 
         <TableFooter>

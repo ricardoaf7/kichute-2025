@@ -17,6 +17,10 @@ const RoundReportContent = () => {
   const currentRound = rounds.find(r => r.number === selectedRound);
   const isLoading = isLoadingParticipants || isLoadingKichutes;
 
+  console.log("Current round data:", currentRound);
+  console.log("Selected round:", selectedRound);
+  console.log("Rounds available:", rounds.map(r => r.number));
+
   return (
     <div className="container mx-auto px-4 py-8 pt-20 print:pt-8 print:px-0">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -45,7 +49,7 @@ const RoundReportContent = () => {
             <div className="p-8 text-center">
               <p className="text-lg text-muted-foreground">Carregando dados...</p>
             </div>
-          ) : currentRound ? (
+          ) : currentRound && currentRound.matches && currentRound.matches.length > 0 ? (
             <Card>
               <CardHeader className="bg-muted print:bg-white">
                 <CardTitle className="text-xl">Rodada {selectedRound} - Relatório de Palpites</CardTitle>
@@ -61,7 +65,7 @@ const RoundReportContent = () => {
           ) : (
             <div className="text-center p-8">
               <p className="text-lg text-muted-foreground">
-                Nenhuma rodada selecionada ou disponível.
+                Nenhuma partida disponível para a rodada {selectedRound}.
               </p>
             </div>
           )}
