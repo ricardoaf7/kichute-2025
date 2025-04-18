@@ -4,7 +4,6 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useKichutes } from "@/hooks/useKichutes";
-import { calculatePoints } from "@/utils/scoring";
 
 interface RoundTotalScoreProps {
   selectedRound: number;
@@ -23,17 +22,11 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
         totais[p.id] = 0;
       });
 
-      // Para cada kichute, calcular os pontos e somar ao total do jogador
+      // Para cada kichute, somar os pontos ao total do jogador
       kichutes.forEach(kichute => {
         if (kichute.jogador_id) {
-          // Obtém os dados da partida e palpites diretamente do kichute
-          const palpiteCasa = kichute.palpite_casa || 0;
-          const palpiteVisitante = kichute.palpite_visitante || 0;
-          
-          // Obtemos os dados da partida através do hook useKichutes
-          // que já traz a lista de kichutes com seus respectivos pontos
-          const points = kichute.pontos || 0;
-          
+          // Usamos diretamente o campo pontos do kichute
+          const points = Number(kichute.pontos || 0);
           totais[kichute.jogador_id] += points;
         }
       });
