@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -47,7 +46,6 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Buscar rodadas disponíveis
   useEffect(() => {
     const fetchRodadas = async () => {
       try {
@@ -58,7 +56,6 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
         
         if (error) throw error;
         
-        // Extrair rodadas únicas
         const uniqueRodadas = [...new Set(data?.map(item => item.rodada))].filter(Boolean) as number[];
         setRodadas(uniqueRodadas);
       } catch (err) {
@@ -70,7 +67,6 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
     fetchRodadas();
   }, []);
 
-  // Buscar jogadores
   useEffect(() => {
     const fetchJogadores = async () => {
       try {
@@ -91,7 +87,6 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
     fetchJogadores();
   }, []);
 
-  // Buscar kichutes com filtros
   useEffect(() => {
     const fetchKichutes = async () => {
       setIsLoading(true);
@@ -111,17 +106,17 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
             partida:partidas(
               id,
               rodada,
+              placar_casa,
+              placar_visitante,
               time_casa:times!time_casa_id(nome, sigla),
               time_visitante:times!time_visitante_id(nome, sigla)
             )
           `);
         
-        // Aplicar filtro de rodada se selecionado
         if (selectedRodada !== "todas") {
           query = query.eq('partida.rodada', parseInt(selectedRodada));
         }
         
-        // Aplicar filtro de jogador se selecionado
         if (selectedJogador !== "todos") {
           query = query.eq('jogador_id', selectedJogador);
         }
@@ -132,7 +127,6 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
         
         console.log("Dados brutos dos kichutes:", data);
         
-        // Formatar os dados para o formato necessário para a tabela
         const formattedData = (data || []).map(item => ({
           id: item.id,
           rodada: item.partida?.rodada,
@@ -145,7 +139,9 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
             time_visitante: {
               nome: item.partida?.time_visitante?.nome || 'N/A',
               sigla: item.partida?.time_visitante?.sigla || 'N/A'
-            }
+            },
+            placar_casa: item.partida?.placar_casa,
+            placar_visitante: item.partida?.placar_visitante
           },
           jogador: {
             id: item.jogador_id,
@@ -153,12 +149,11 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
           },
           palpite_casa: item.palpite_casa || 0,
           palpite_visitante: item.palpite_visitante || 0,
-          pontos: item.pontos || 0
+          pontos: Number(item.pontos) || 0
         }));
         
         console.log("Dados formatados dos kichutes:", formattedData);
         
-        // Ordenar por rodada e então por pontos (decrescente)
         formattedData.sort((a, b) => {
           if (a.rodada !== b.rodada) {
             return a.rodada - b.rodada;
@@ -178,7 +173,6 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
     fetchKichutes();
   }, [selectedRodada, selectedJogador]);
 
-  // Função para renderizar ícone de pontuação
   const getPontosIcon = (pontos: number) => {
     if (pontos >= 7) return <Trophy className="h-4 w-4 text-yellow-500 inline mr-1" />;
     if (pontos >= 4) return <Medal className="h-4 w-4 text-blue-500 inline mr-1" />;
@@ -186,8 +180,7 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
     return null;
   };
 
-  // Função para obter classe CSS com base na pontuação
-  const getPontosClass = (pontos: number) => {
+  const getPointsBadgeClass = (pontos: number) => {
     if (pontos >= 7) return "font-bold text-yellow-600 dark:text-yellow-400";
     if (pontos >= 4) return "font-semibold text-blue-600 dark:text-blue-400";
     if (pontos >= 2) return "font-medium text-green-600 dark:text-green-400";
@@ -196,7 +189,6 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* Filtros */}
       <div className="flex flex-wrap gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex flex-col gap-1">
           <label htmlFor="rodada-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -237,7 +229,6 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
         </div>
       </div>
 
-      {/* Tabela */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="flex justify-center items-center p-8">
@@ -254,6 +245,7 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
               <TableRow className="bg-gray-50 dark:bg-gray-900 font-poppins">
                 <TableHead className="text-center">Rodada</TableHead>
                 <TableHead className="text-center">Jogo</TableHead>
+                <TableHead className="text-center">Resultado</TableHead>
                 <TableHead className="text-center">Jogador</TableHead>
                 <TableHead className="text-center">Palpite</TableHead>
                 <TableHead className="text-center font-semibold">Pontos</TableHead>
@@ -273,20 +265,29 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
                       {kichute.partida.time_casa.sigla} x {kichute.partida.time_visitante.sigla}
                     </TableCell>
                     <TableCell className="text-center">
+                      {kichute.partida.placar_casa !== null && kichute.partida.placar_visitante !== null ? (
+                        `${kichute.partida.placar_casa} x ${kichute.partida.placar_visitante}`
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
                       {kichute.jogador.nome}
                     </TableCell>
                     <TableCell className="text-center">
                       {kichute.palpite_casa} x {kichute.palpite_visitante}
                     </TableCell>
-                    <TableCell className={cn("text-center", getPontosClass(kichute.pontos))}>
-                      {getPontosIcon(kichute.pontos)}
-                      {kichute.pontos}
+                    <TableCell className={cn("text-center", getPointsBadgeClass(kichute.pontos))}>
+                      <div className="flex items-center justify-center space-x-1">
+                        {getPontosIcon(kichute.pontos)}
+                        <span>{kichute.pontos}</span>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
                     Nenhum kichute encontrado para os filtros selecionados
                   </TableCell>
                 </TableRow>
