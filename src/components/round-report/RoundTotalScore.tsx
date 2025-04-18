@@ -67,7 +67,7 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
         const totalPontos = totaisPorJogador[participant.id] || 0;
         
         return (
-          <TableCell key={participant.id} className="text-center">
+          <TableCell key={`total-${participant.id}`} className="text-center">
             <div className="flex items-center justify-center space-x-1">
               <Trophy className="h-4 w-4 text-amber-500" />
               <span>{totalPontos}</span>

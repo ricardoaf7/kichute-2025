@@ -3,6 +3,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableFoo
 import { ScoreDisplay } from "@/components/match/ScoreDisplay";
 import { Trophy, Medal, Star } from "lucide-react";
 import { getPointsBadgeClass } from "@/utils/scoring";
+import RoundTotalScore from "./RoundTotalScore";
 
 interface MatchesReportTableProps {
   matches: any[];
@@ -107,15 +108,7 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
         </TableBody>
 
         <TableFooter>
-          <TableRow className="font-bold">
-            <TableCell className="sticky left-0 z-20 bg-muted">Total da Rodada</TableCell>
-            <TableCell className="sticky left-[200px] z-20 bg-muted">-</TableCell>
-            {participants.map(participant => (
-              <TableCell key={`total-${participant.id}`} className="text-center">
-                {participantTotals[participant.id] || 0}
-              </TableCell>
-            ))}
-          </TableRow>
+          <RoundTotalScore selectedRound={Number(validMatches[0]?.rodada || 0)} />
         </TableFooter>
       </Table>
     </div>
