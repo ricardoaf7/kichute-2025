@@ -39,7 +39,10 @@ export const useKichutes = (round?: number) => {
             .select('id')
             .eq('rodada', round);
             
-          if (matchesError) throw matchesError;
+          if (matchesError) {
+            console.error("Erro ao buscar partidas da rodada:", matchesError);
+            throw matchesError;
+          }
           
           if (matchesData && matchesData.length > 0) {
             const matchIds = matchesData.map(match => match.id);
@@ -49,10 +52,22 @@ export const useKichutes = (round?: number) => {
 
         const { data, error } = await query;
 
-        if (error) throw error;
+        if (error) {
+          console.error("Erro na consulta de kichutes:", error);
+          throw error;
+        }
 
-        console.log("Kichutes carregados:", data);
-        setKichutes(data || []);
+        // Verificar o formato dos dados
+        console.log("Kichutes carregados (dados brutos):", data);
+        
+        // Garantir que todos os kichutes tenham valores apropriados para pontos
+        const formattedData = data.map(kichute => ({
+          ...kichute,
+          pontos: kichute.pontos === null ? 0 : Number(kichute.pontos)
+        }));
+        
+        console.log("Kichutes processados:", formattedData);
+        setKichutes(formattedData || []);
       } catch (err) {
         console.error("Erro ao carregar kichutes:", err);
         toast({

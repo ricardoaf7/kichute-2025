@@ -29,8 +29,7 @@ export const usePontuacaoRodada = (selectedRound?: number) => {
             rodada,
             pontos,
             jogador:jogador_id(id, nome)
-          `)
-          .order('pontos', { ascending: false });
+          `);
 
         if (selectedRound) {
           query = query.eq('rodada', selectedRound);
@@ -38,16 +37,22 @@ export const usePontuacaoRodada = (selectedRound?: number) => {
 
         const { data, error } = await query;
 
-        if (error) throw error;
+        if (error) {
+          console.error("Erro na consulta:", error);
+          throw error;
+        }
+
+        // Verificar o formato dos dados retornados
+        console.log("Dados brutos de pontuacao_rodada:", data);
 
         const formattedData = data.map(item => ({
           id: item.id,
           rodada: item.rodada,
           jogador: item.jogador,
-          pontos: item.pontos
+          pontos: Number(item.pontos) // Garantir que pontos seja um número
         }));
 
-        console.log("Pontuação rodada:", formattedData);
+        console.log("Pontuação rodada formatada:", formattedData);
         setPontuacoes(formattedData);
       } catch (err) {
         console.error("Erro ao carregar pontuação:", err);

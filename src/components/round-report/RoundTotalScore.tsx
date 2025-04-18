@@ -26,19 +26,25 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
         totais[p.id] = 0;
       });
       
+      // Debug para verificar os kichutes carregados
+      console.log("Kichutes para cálculo:", kichutes);
+      
       // Somar os pontos de cada kichute para cada jogador
       kichutes.forEach(kichute => {
-        if (kichute.jogador_id && kichute.pontos !== null && kichute.pontos !== undefined) {
+        if (kichute.jogador_id && typeof kichute.pontos === 'number') {
           totais[kichute.jogador_id] = (totais[kichute.jogador_id] || 0) + kichute.pontos;
         }
       });
       
       // Se temos pontuações da tabela pontuacao_rodada, usar esses valores
-      pontuacoes.forEach(pontuacao => {
-        if (pontuacao.jogador && pontuacao.jogador.id) {
-          totais[pontuacao.jogador.id] = pontuacao.pontos;
-        }
-      });
+      console.log("Pontuações da rodada:", pontuacoes);
+      if (pontuacoes && pontuacoes.length > 0) {
+        pontuacoes.forEach(pontuacao => {
+          if (pontuacao.jogador && pontuacao.jogador.id) {
+            totais[pontuacao.jogador.id] = pontuacao.pontos;
+          }
+        });
+      }
       
       console.log("Totais calculados:", totais);
       setTotaisPorJogador(totais);
