@@ -73,7 +73,7 @@ export const useDynamicTableData = (
         
         console.log("Buscando pontuações para jogadores:", jogadoresData.map(j => j.nome).join(", "));
         
-        // 2. Buscar pontuações por rodada da tabela pontuacao_rodada
+        // 2. Buscar pontuações da tabela pontuacao_rodada
         let query = supabase.from('pontuacao_rodada')
           .select('rodada, jogador_id, pontos');
           
@@ -88,11 +88,15 @@ export const useDynamicTableData = (
         console.log("Pontuações encontradas:", pontuacoesData || []);
         
         // 3. Organizar dados por jogador
-        const jogadoresFormatados = jogadoresData.map(jogador => {
+        const jogadoresFormatados: JogadorData[] = [];
+        
+        for (const jogador of jogadoresData) {
+          // Filtrar pontuações para este jogador
           const pontuacoesJogador = pontuacoesData?.filter(p => p.jogador_id === jogador.id) || [];
           const rodadasObj: Record<string, number> = {};
           let pontosTotais = 0;
           
+          // Processar pontuações da tabela pontuacao_rodada
           pontuacoesJogador.forEach(p => {
             const rodadaKey = `r${p.rodada}`;
             const pontos = typeof p.pontos === 'number' ? p.pontos : parseInt(String(p.pontos), 10) || 0;
@@ -100,18 +104,59 @@ export const useDynamicTableData = (
             pontosTotais += pontos;
           });
           
-          // Se não encontrou pontuação nas rodadas, tentar a tabela de kichutes diretamente
+          // Se não encontrou pontuação na tabela pontuacao_rodada, buscar diretamente na tabela kichutes
           if (pontosTotais === 0) {
             console.log(`Buscando pontos diretamente dos kichutes para ${jogador.nome}`);
+            
+            // Vamos buscar pontos de kichutes agrupados por rodada
+            try {
+              const { data: kichutesData, error: kichutesError } = await supabase
+                .from('kichutes')
+                .select('pontos, partida:partidas(rodada)')
+                .eq('jogador_id', jogador.id);
+              
+              if (kichutesError) throw kichutesError;
+              
+              if (kichutesData && kichutesData.length > 0) {
+                console.log(`Encontrados ${kichutesData.length} kichutes para ${jogador.nome}:`, kichutesData);
+                
+                // Agrupar pontos por rodada
+                const pontosPorRodada: Record<string, number> = {};
+                
+                kichutesData.forEach(kichute => {
+                  if (kichute.partida && kichute.partida.rodada) {
+                    const rodada = kichute.partida.rodada;
+                    const rodadaKey = `r${rodada}`;
+                    const pontos = typeof kichute.pontos === 'number' ? kichute.pontos : parseInt(String(kichute.pontos), 10) || 0;
+                    
+                    if (!pontosPorRodada[rodadaKey]) {
+                      pontosPorRodada[rodadaKey] = 0;
+                    }
+                    
+                    pontosPorRodada[rodadaKey] += pontos;
+                    pontosTotais += pontos;
+                  }
+                });
+                
+                // Adicionar pontos das rodadas ao objeto de rodadas
+                Object.entries(pontosPorRodada).forEach(([rodada, pontos]) => {
+                  rodadasObj[rodada] = pontos;
+                });
+                
+                console.log(`Total de pontos calculados para ${jogador.nome}: ${pontosTotais}`);
+              }
+            } catch (kichutesErr) {
+              console.error(`Erro ao buscar kichutes para ${jogador.nome}:`, kichutesErr);
+            }
           }
           
-          return {
+          jogadoresFormatados.push({
             id: jogador.id,
             nome: jogador.nome,
             pontos_total: pontosTotais,
             rodadas: rodadasObj
-          };
-        });
+          });
+        }
         
         console.log("Dados formatados dos jogadores:", jogadoresFormatados);
         setJogadores(jogadoresFormatados);

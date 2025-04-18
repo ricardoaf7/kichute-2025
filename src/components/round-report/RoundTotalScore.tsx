@@ -33,9 +33,9 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
           // Converter explicitamente para número, tratando valores nulos, undefined ou strings vazias
           let points = 0;
           if (kichute.pontos !== null && kichute.pontos !== undefined && String(kichute.pontos) !== '') {
-            points = typeof kichute.pontos === 'string' 
-              ? parseInt(kichute.pontos, 10) || 0
-              : Number(kichute.pontos) || 0;
+            points = typeof kichute.pontos === 'number' 
+              ? kichute.pontos 
+              : parseInt(String(kichute.pontos), 10) || 0;
           }
           
           // Debug para verificar o valor que está sendo somado
