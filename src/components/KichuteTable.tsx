@@ -10,7 +10,8 @@ import {
 import { useKichuteData } from "@/hooks/useKichuteData";
 
 const KichuteTable = () => {
-  const { kichutes, isLoading, error } = useKichuteData();
+  // Corrigido: passando os dois argumentos obrigatórios para o hook
+  const { kichutes, isLoading, error } = useKichuteData("1", "todos");
 
   // Agrupar pontos por jogador
   const pontosPorJogador: Record<string, number> = {};
