@@ -26,16 +26,14 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
       // Para cada kichute, calcular os pontos e somar ao total do jogador
       kichutes.forEach(kichute => {
         if (kichute.jogador_id) {
-          const points = calculatePoints(
-            { 
-              homeScore: kichute.palpite_casa, 
-              awayScore: kichute.palpite_visitante 
-            },
-            { 
-              homeScore: kichute.partida?.placar_casa, 
-              awayScore: kichute.partida?.placar_visitante 
-            }
-          );
+          // Obtém os dados da partida e palpites diretamente do kichute
+          const palpiteCasa = kichute.palpite_casa || 0;
+          const palpiteVisitante = kichute.palpite_visitante || 0;
+          
+          // Obtemos os dados da partida através do hook useKichutes
+          // que já traz a lista de kichutes com seus respectivos pontos
+          const points = kichute.pontos || 0;
+          
           totais[kichute.jogador_id] += points;
         }
       });
