@@ -3,6 +3,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableFoo
 import { ScoreDisplay } from "@/components/match/ScoreDisplay";
 import { Trophy, Medal, Star } from "lucide-react";
 import { getPointsBadgeClass } from "@/utils/scoring";
+import { calculatePoints } from "@/utils/scoring";
 import RoundTotalScore from "./RoundTotalScore";
 
 interface MatchesReportTableProps {
@@ -28,6 +29,19 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
   console.log("Valid matches for report:", validMatches);
   console.log("Participants:", participants);
   console.log("Kichutes for report:", kichutes);
+
+  // Função para calcular pontos do palpite
+  const calculateGuessPoints = (guess: any, match: any) => {
+    if (!guess || !match) return 0;
+    
+    // Se o jogo ainda não tem resultado, retorna 0
+    if (match.placar_casa === null || match.placar_visitante === null) return 0;
+    
+    return calculatePoints(
+      { homeScore: guess.palpite_casa, awayScore: guess.palpite_visitante },
+      { homeScore: match.placar_casa, awayScore: match.placar_visitante }
+    );
+  };
 
   return (
     <div className="rounded-lg border shadow-sm overflow-x-auto">
@@ -64,6 +78,8 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
                     k => k.partida_id === match.id && k.jogador_id === participant.id
                   );
                   
+                  const points = calculateGuessPoints(guess, match);
+                  
                   return (
                     <TableCell key={`${match.id}-${participant.id}`} className="text-center">
                       <div className="flex flex-col items-center space-y-1">
@@ -72,14 +88,12 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
                             <div className="text-sm font-medium">
                               {guess.palpite_casa} x {guess.palpite_visitante}
                             </div>
-                            {guess.pontos !== null && (
-                              <div className={getPointsBadgeClass(Number(guess.pontos))}>
-                                <span className="flex items-center gap-1">
-                                  {getPointsIcon(Number(guess.pontos))}
-                                  <span>{guess.pontos}</span>
-                                </span>
-                              </div>
-                            )}
+                            <div className={getPointsBadgeClass(points)}>
+                              <span className="flex items-center gap-1">
+                                {getPointsIcon(points)}
+                                <span>{points}</span>
+                              </span>
+                            </div>
                           </>
                         ) : (
                           <span className="text-muted-foreground">-</span>
