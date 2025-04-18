@@ -9,6 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableFooter
 } from "@/components/ui/table";
 import { 
   Select,
@@ -17,7 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RotateCw } from "lucide-react";
+import { RotateCw, ChevronDown, ChevronUp } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface JogadorData {
   id: string;
@@ -26,11 +28,10 @@ interface JogadorData {
   rodadas: Record<string, number>;
 }
 
-interface DynamicTableProps {
-  className?: string;
-}
+type SortDirection = "asc" | "desc";
+type SortField = "nome" | "pontos_total" | "rodada";
 
-const DynamicTable = ({ className }: DynamicTableProps) => {
+const DynamicTable = () => {
   const [jogadores, setJogadores] = useState<JogadorData[]>([]);
   const [rodadas, setRodadas] = useState<number[]>([]);
   const [meses, setMeses] = useState<string[]>([]);
@@ -39,6 +40,29 @@ const DynamicTable = ({ className }: DynamicTableProps) => {
   const [selectedAno, setSelectedAno] = useState<string>("2025");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<SortField>("pontos_total");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const { toast } = useToast();
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+
+  // Função para obter ícone de ordenação
+  const SortIcon = ({ field }: { field: SortField }) => (
+    <span className="inline-flex ml-1 text-muted-foreground">
+      {sortField === field ? (
+        sortDirection === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+      ) : (
+        <ChevronDown className="h-4 w-4 opacity-30" />
+      )}
+    </span>
+  );
 
   // Buscar rodadas disponíveis no Supabase
   useEffect(() => {
@@ -57,113 +81,118 @@ const DynamicTable = ({ className }: DynamicTableProps) => {
       } catch (err) {
         console.error("Erro ao buscar rodadas:", err);
         setError("Não foi possível carregar as rodadas");
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar as rodadas",
+          variant: "destructive"
+        });
       }
     };
 
     fetchRodadas();
-  }, []);
+  }, [toast]);
 
-  // Buscar jogadores e seus pontos
+  // Buscar pontuações por rodada para todos os jogadores
   useEffect(() => {
-    const fetchJogadores = async () => {
+    const fetchPontuacoes = async () => {
       setIsLoading(true);
+      setError(null);
+      
       try {
-        // Buscar os jogadores
+        console.log("Buscando pontuações com filtro rodada:", selectedRodada);
+        
+        // 1. Buscar todos os jogadores
         const { data: jogadoresData, error: jogadoresError } = await supabase
           .from('jogadores')
-          .select('id, nome, pagamento_total');
+          .select('id, nome')
+          .order('nome');
         
         if (jogadoresError) throw jogadoresError;
-
-        // Buscar kichutes dos jogadores para calcular pontos por rodada
-        const { data: kichutesData, error: kichutesError } = await supabase
-          .from('kichutes')
-          .select('jogador_id, partida_id, pontos')
-          .eq('pontos', selectedRodada !== "todas" ? parseInt(selectedRodada) : undefined);
         
-        if (kichutesError) throw kichutesError;
-
-        // Buscar informações das partidas para saber a rodada de cada kichute
-        const { data: partidasData, error: partidasError } = await supabase
-          .from('partidas')
-          .select('id, rodada, data');
+        if (!jogadoresData || jogadoresData.length === 0) {
+          setJogadores([]);
+          setIsLoading(false);
+          setError("Nenhum jogador encontrado");
+          return;
+        }
         
-        if (partidasError) throw partidasError;
+        console.log("Jogadores encontrados:", jogadoresData.length);
 
-        // Criar mapa de partidas por ID
-        const partidasPorId = partidasData.reduce((acc, partida) => {
-          acc[partida.id] = partida;
-          return acc;
-        }, {} as Record<string, any>);
-
-        // Extrair meses únicos das datas das partidas
-        const mesesDisponiveis = [...new Set(partidasData
-          .map(partida => {
-            const data = new Date(partida.data);
-            return `${data.getMonth() + 1}-${data.getFullYear()}`;
-          }))];
-        
-        setMeses(mesesDisponiveis);
-
-        // Agrupar pontos por jogador e rodada
-        const pontosPorJogador: Record<string, Record<string, number>> = {};
-        const pontosTotaisPorJogador: Record<string, number> = {};
-
-        kichutesData.forEach(kichute => {
-          const partida = partidasPorId[kichute.partida_id];
-          if (!partida) return;
-
-          const rodada = `r${partida.rodada}`;
-          const jogadorId = kichute.jogador_id;
-          const pontos = kichute.pontos || 0;
-
-          // Filtrar por mês se selecionado
-          if (selectedMes !== "todos") {
-            const dataPartida = new Date(partida.data);
-            const mesPartida = `${dataPartida.getMonth() + 1}-${dataPartida.getFullYear()}`;
-            if (mesPartida !== selectedMes) return;
-          }
-
-          // Inicializar estruturas de dados se necessário
-          if (!pontosPorJogador[jogadorId]) {
-            pontosPorJogador[jogadorId] = {};
-          }
-          if (!pontosPorJogador[jogadorId][rodada]) {
-            pontosPorJogador[jogadorId][rodada] = 0;
-          }
+        // 2. Buscar pontuações por rodada
+        let query = supabase.from('pontuacao_rodada')
+          .select('rodada, jogador_id, pontos');
           
-          // Acumular pontos
-          pontosPorJogador[jogadorId][rodada] += pontos;
+        if (selectedRodada !== "todas") {
+          query = query.eq('rodada', parseInt(selectedRodada));
+        }
+        
+        const { data: pontuacoesData, error: pontuacoesError } = await query;
+        
+        if (pontuacoesError) throw pontuacoesError;
+        
+        console.log("Pontuações encontradas:", pontuacoesData?.length || 0);
+        
+        // 3. Organizar dados por jogador
+        const jogadoresFormatados: JogadorData[] = jogadoresData.map(jogador => {
+          // Filtrar pontuações para este jogador
+          const pontuacoesJogador = pontuacoesData?.filter(p => p.jogador_id === jogador.id) || [];
           
-          // Acumular total de pontos
-          if (!pontosTotaisPorJogador[jogadorId]) {
-            pontosTotaisPorJogador[jogadorId] = 0;
-          }
-          pontosTotaisPorJogador[jogadorId] += pontos;
+          // Mapear rodadas e pontos
+          const rodadasObj: Record<string, number> = {};
+          let pontosTotais = 0;
+          
+          pontuacoesJogador.forEach(p => {
+            const rodadaKey = `r${p.rodada}`;
+            const pontos = typeof p.pontos === 'number' ? p.pontos : parseInt(p.pontos as any, 10) || 0;
+            rodadasObj[rodadaKey] = pontos;
+            pontosTotais += pontos;
+          });
+          
+          return {
+            id: jogador.id,
+            nome: jogador.nome,
+            pontos_total: pontosTotais,
+            rodadas: rodadasObj
+          };
         });
 
-        // Mapear dados para o formato da tabela
-        const jogadoresFormatados = jogadoresData.map(jogador => ({
-          id: jogador.id,
-          nome: jogador.nome,
-          pontos_total: pontosTotaisPorJogador[jogador.id] || 0,
-          rodadas: pontosPorJogador[jogador.id] || {}
-        }));
+        // Ordenar jogadores
+        const sortedJogadores = [...jogadoresFormatados].sort((a, b) => {
+          if (sortField === "nome") {
+            return sortDirection === "asc" 
+              ? a.nome.localeCompare(b.nome) 
+              : b.nome.localeCompare(a.nome);
+          } else if (sortField === "pontos_total") {
+            return sortDirection === "asc" 
+              ? a.pontos_total - b.pontos_total 
+              : b.pontos_total - a.pontos_total;
+          } else if (sortField === "rodada" && selectedRodada !== "todas") {
+            const rodadaKey = `r${selectedRodada}`;
+            const pontosA = a.rodadas[rodadaKey] || 0;
+            const pontosB = b.rodadas[rodadaKey] || 0;
+            return sortDirection === "asc" ? pontosA - pontosB : pontosB - pontosA;
+          }
+          return 0;
+        });
+        
+        setJogadores(sortedJogadores);
+        console.log("Dados formatados:", sortedJogadores);
 
-        // Ordenar por pontos totais (decrescente)
-        jogadoresFormatados.sort((a, b) => b.pontos_total - a.pontos_total);
-
-        setJogadores(jogadoresFormatados);
       } catch (err) {
         console.error("Erro ao buscar dados:", err);
         setError("Não foi possível carregar os dados dos jogadores");
+        toast({
+          title: "Erro",
+          description: "Erro ao carregar dados dos jogadores",
+          variant: "destructive"
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchJogadores();
-  }, [selectedRodada, selectedMes, selectedAno]);
+    fetchPontuacoes();
+  }, [selectedRodada, selectedMes, selectedAno, sortField, sortDirection, toast]);
 
   // Obter todas as rodadas disponíveis dos jogadores
   const todasRodadas = Array.from(
@@ -191,6 +220,22 @@ const DynamicTable = ({ className }: DynamicTableProps) => {
     
     return `${nomesMeses[parseInt(mes) - 1]} de ${ano}`;
   };
+
+  // Calcular o total de pontos por rodada (para o rodapé)
+  const calcularTotalPorRodada = () => {
+    const totais: Record<string, number> = {};
+    
+    todasRodadas.forEach(rodada => {
+      totais[rodada] = jogadores.reduce((sum, jogador) => {
+        return sum + (jogador.rodadas[rodada] || 0);
+      }, 0);
+    });
+    
+    return totais;
+  };
+  
+  const totaisPorRodada = calcularTotalPorRodada();
+  const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
 
   return (
     <div className="space-y-4">
@@ -261,44 +306,79 @@ const DynamicTable = ({ className }: DynamicTableProps) => {
             {error}
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50 dark:bg-gray-900 font-poppins">
-                <TableHead className="w-10 text-left">#</TableHead>
-                <TableHead className="text-left">Jogador</TableHead>
-                <TableHead className="text-left font-semibold">Total</TableHead>
-                {todasRodadas.map(rodada => (
-                  <TableHead key={rodada} className="text-left">
-                    {rodada.toUpperCase()}
+          <div className="max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted font-poppins">
+                  <TableHead className="w-10 text-left font-medium text-muted-foreground">#</TableHead>
+                  <TableHead 
+                    className="text-left font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
+                    onClick={() => handleSort("nome")}
+                  >
+                    Jogador <SortIcon field="nome" />
                   </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {jogadores.map((jogador, index) => (
-                <TableRow 
-                  key={jogador.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
-                >
-                  <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell>{jogador.nome}</TableCell>
-                  <TableCell className="font-bold">{jogador.pontos_total}</TableCell>
+                  <TableHead 
+                    className="text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
+                    onClick={() => handleSort("pontos_total")}
+                  >
+                    Total <SortIcon field="pontos_total" />
+                  </TableHead>
                   {todasRodadas.map(rodada => (
-                    <TableCell key={`${jogador.id}-${rodada}`}>
-                      {jogador.rodadas[rodada] || '-'}
-                    </TableCell>
+                    <TableHead 
+                      key={rodada} 
+                      className="text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
+                      onClick={() => {
+                        setSortField("rodada");
+                        setSelectedRodada(rodada.substring(1));
+                        setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+                      }}
+                    >
+                      {rodada.toUpperCase()}
+                      {selectedRodada === rodada.substring(1) && <SortIcon field="rodada" />}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))}
-              {jogadores.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={3 + todasRodadas.length} className="text-center py-8 text-gray-500">
-                    Nenhum resultado encontrado
-                  </TableCell>
-                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {jogadores.map((jogador, index) => (
+                  <TableRow 
+                    key={jogador.id}
+                    className={index % 2 === 0 ? 'bg-white dark:bg-gray-950/50' : 'bg-gray-50 dark:bg-gray-900/30'}
+                  >
+                    <TableCell className="font-medium">{index + 1}</TableCell>
+                    <TableCell>{jogador.nome}</TableCell>
+                    <TableCell className="font-bold text-center">{jogador.pontos_total}</TableCell>
+                    {todasRodadas.map(rodada => (
+                      <TableCell key={`${jogador.id}-${rodada}`} className="text-center">
+                        {jogador.rodadas[rodada] ?? '-'}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+                {jogadores.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3 + todasRodadas.length} className="text-center py-8 text-gray-500">
+                      Nenhum resultado encontrado
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+              {jogadores.length > 0 && (
+                <TableFooter>
+                  <TableRow className="border-t-2 border-border bg-muted/30 font-bold">
+                    <TableCell>-</TableCell>
+                    <TableCell>Total</TableCell>
+                    <TableCell className="text-center">{totalGeral}</TableCell>
+                    {todasRodadas.map(rodada => (
+                      <TableCell key={`footer-${rodada}`} className="text-center">
+                        {totaisPorRodada[rodada] || 0}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableFooter>
               )}
-            </TableBody>
-          </Table>
+            </Table>
+          </div>
         )}
       </div>
     </div>

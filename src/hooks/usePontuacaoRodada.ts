@@ -31,7 +31,7 @@ export const usePontuacaoRodada = (selectedRound?: number) => {
             jogador:jogador_id(id, nome)
           `);
 
-        if (selectedRound) {
+        if (selectedRound !== undefined) {
           query = query.eq('rodada', selectedRound);
         }
 
@@ -45,12 +45,20 @@ export const usePontuacaoRodada = (selectedRound?: number) => {
         // Verificar o formato dos dados retornados
         console.log("Dados brutos de pontuacao_rodada:", data);
 
+        if (!data || data.length === 0) {
+          setPontuacoes([]);
+          return;
+        }
+
         const formattedData = data.map(item => ({
           id: item.id,
           rodada: item.rodada,
-          jogador: item.jogador,
-          pontos: Number(item.pontos) // Garantir que pontos seja um número
+          jogador: item.jogador || { id: "", nome: "Jogador não encontrado" },
+          pontos: typeof item.pontos === 'number' ? item.pontos : parseInt(item.pontos as any, 10) || 0
         }));
+
+        // Ordenar por pontos (decrescente)
+        formattedData.sort((a, b) => b.pontos - a.pontos);
 
         console.log("Pontuação rodada formatada:", formattedData);
         setPontuacoes(formattedData);

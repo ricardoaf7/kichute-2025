@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from "react";
-import { PLAYERS, ROUNDS } from "../utils/mockData";
 import StandingsHeader from "../components/standings/StandingsHeader";
 import StandingsContent from "../components/standings/StandingsContent";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import RoundScoreTable from "../components/standings/RoundScoreTable";
 
 const Standings = () => {
@@ -11,20 +13,39 @@ const Standings = () => {
   const [selectedYear, setSelectedYear] = useState<string>("2025");
   const [isLoaded, setIsLoaded] = useState(false);
   const [useDynamicTable, setUseDynamicTable] = useState(true);
+  const [availableRounds, setAvailableRounds] = useState<number[]>([]);
+  const { toast } = useToast();
 
+  // Buscar rodadas disponíveis
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, []);
+    const fetchRounds = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('partidas')
+          .select('rodada')
+          .order('rodada');
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Obter rodadas únicas
+        const uniqueRounds = [...new Set(data?.map(item => item.rodada))].filter(Boolean) as number[];
+        setAvailableRounds(uniqueRounds);
+      } catch (err) {
+        console.error("Erro ao buscar rodadas:", err);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar as rodadas disponíveis",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoaded(true);
+      }
+    };
 
-  // Sort players by total points
-  const sortedPlayers = [...PLAYERS].sort((a, b) => b.totalPoints - a.totalPoints);
-  
-  // Get all rounds across all players
-  const allRounds = ROUNDS.map(round => round.number).sort((a, b) => a - b);
+    fetchRounds();
+  }, [toast]);
 
   const handleRoundChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -63,7 +84,7 @@ const Standings = () => {
           selectedRound={selectedRound}
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
-          allRounds={allRounds}
+          allRounds={availableRounds}
           handleRoundChange={handleRoundChange}
           handleMonthChange={handleMonthChange}
           handleYearChange={handleYearChange}
@@ -74,7 +95,7 @@ const Standings = () => {
         <div className="space-y-8">
           <StandingsContent
             viewMode={viewMode}
-            sortedPlayers={sortedPlayers}
+            sortedPlayers={[]} // Não usado quando viewMode é dynamic
             selectedRound={selectedRound}
             isLoaded={isLoaded}
           />
