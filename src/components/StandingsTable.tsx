@@ -1,9 +1,10 @@
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Player } from "../types";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableFooter } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow, TableFooter } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { StandingsTableHeader } from "./standings/StandingsTableHeader";
+import { useSortedPlayers } from "@/hooks/standings/useSortedPlayers";
 
 interface StandingsTableProps {
   players: Player[];
@@ -11,44 +12,12 @@ interface StandingsTableProps {
   selectedRound?: number;
 }
 
-type SortDirection = "asc" | "desc";
-type SortField = "name" | "totalPoints" | "roundPoints";
-
 const StandingsTable = ({ 
   players, 
   showRoundPoints = false,
   selectedRound
 }: StandingsTableProps) => {
-  const [sortField, setSortField] = useState<SortField>("totalPoints");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("desc");
-    }
-  };
-
-  const sortedPlayers = useMemo(() => {
-    return [...players].sort((a, b) => {
-      if (sortField === "name") {
-        return sortDirection === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name);
-      } else if (sortField === "totalPoints") {
-        return sortDirection === "asc"
-          ? a.totalPoints - b.totalPoints
-          : b.totalPoints - a.totalPoints;
-      } else if (sortField === "roundPoints" && selectedRound) {
-        const aPoints = a.roundPoints[selectedRound] || 0;
-        const bPoints = b.roundPoints[selectedRound] || 0;
-        return sortDirection === "asc" ? aPoints - bPoints : bPoints - aPoints;
-      }
-      return 0;
-    });
-  }, [players, sortField, sortDirection, selectedRound]);
+  const { sortField, sortDirection, handleSort, sortedPlayers } = useSortedPlayers(players, selectedRound);
 
   const allRounds = useMemo(() => {
     const rounds = new Set<number>();
@@ -79,62 +48,18 @@ const StandingsTable = ({
     return players.reduce((sum, player) => sum + player.totalPoints, 0);
   }, [players]);
 
-  const SortIcon = ({ field }: { field: SortField }) => (
-    <span className="inline-flex ml-1 text-muted-foreground">
-      {sortField === field ? (
-        sortDirection === "asc" ? (
-          <ChevronUp className="h-4 w-4" />
-        ) : (
-          <ChevronDown className="h-4 w-4" />
-        )
-      ) : (
-        <ChevronDown className="h-4 w-4 opacity-30" />
-      )}
-    </span>
-  );
-
   return (
     <div className="overflow-hidden rounded-lg border border-border/50 shadow-subtle animate-fadeIn">
       <ScrollArea className="h-[calc(100vh-16rem)] w-full">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead 
-                className="sticky left-0 z-20 bg-muted/50 px-4 py-3 text-left font-medium text-muted-foreground"
-                style={{ minWidth: "200px" }}
-              >
-                #
-              </TableHead>
-              <TableHead
-                className="sticky left-[65px] z-20 bg-muted/50 px-4 py-3 text-left font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
-                style={{ minWidth: "200px" }}
-                onClick={() => handleSort("name")}
-              >
-                Nome
-                <SortIcon field="name" />
-              </TableHead>
-              <TableHead
-                className="px-4 py-3 text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
-                onClick={() => handleSort("totalPoints")}
-              >
-                Total
-                <SortIcon field="totalPoints" />
-              </TableHead>
-              
-              {showRoundPoints && allRounds.map(round => (
-                <TableHead 
-                  key={`round-${round}`} 
-                  className={`px-3 py-3 text-center font-medium text-muted-foreground ${
-                    selectedRound === round ? 'cursor-pointer hover:bg-muted/80' : ''
-                  }`}
-                  onClick={() => selectedRound === round ? handleSort("roundPoints") : null}
-                >
-                  R{round}
-                  {selectedRound === round && <SortIcon field="roundPoints" />}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
+          <StandingsTableHeader
+            handleSort={handleSort}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            showRoundPoints={showRoundPoints}
+            allRounds={allRounds}
+            selectedRound={selectedRound}
+          />
           <TableBody>
             {sortedPlayers.map((player, index) => (
               <TableRow 
