@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { RotateCw, ChevronDown, ChevronUp } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
-import { useDynamicTableDataReal as useDynamicTableData } from "@/hooks/standings/useDynamicTableDataReal";
-import { useTableSort, SortField } from "@/hooks/standings/useTableSort";
 import { TableFilters } from "./TableFilters";
+import { useTableSort, SortField } from "@/hooks/standings/useTableSort";
+import { useDynamicTableDataReal as useDynamicTableData } from "@/hooks/standings/useDynamicTableDataReal";
+
+type RodadaKey = string;
 
 const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = useState<string>("todas");
@@ -18,13 +20,7 @@ const DynamicTable = () => {
 
   const { sortField, sortDirection, handleSort, sortPlayers } = useTableSort();
 
-  const todasRodadas = Array.from(
-    new Set(jogadores.flatMap((j) => Object.keys(j.rodadas)))
-  ).sort((a, b) => {
-    const numA = parseInt(a.substring(1));
-    const numB = parseInt(b.substring(1));
-    return numA - numB;
-  });
+  const todasRodadas: RodadaKey[] = rodadas;
 
   const calcularTotalPorRodada = () => {
     const totais: Record<string, number> = {};
@@ -70,69 +66,54 @@ const DynamicTable = () => {
             <span className="ml-2">Carregando dados...</span>
           </div>
         ) : error ? (
-          <div className="p-4 text-center text-red-500">{error}</div>
+          <div className="p-4 text-center text-red-500">
+            {error}
+          </div>
         ) : (
           <div className="max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted font-poppins">
                   <TableHead className="w-10 text-left font-medium text-muted-foreground">#</TableHead>
-                  <TableHead
+                  <TableHead 
                     className="text-left font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
                     onClick={() => handleSort("nome")}
                   >
                     Jogador <SortIcon field="nome" />
                   </TableHead>
-                  <TableHead
+                  <TableHead 
                     className="text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
                     onClick={() => handleSort("pontos_total")}
                   >
                     Total <SortIcon field="pontos_total" />
                   </TableHead>
                   {todasRodadas.map((rodada) => (
-                    <TableHead
-                      key={rodada}
-                      className="text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
-                      onClick={() => {
-                        handleSort("rodada");
-                        setSelectedRodada(rodada.substring(1));
-                      }}
+                    <TableHead 
+                      key={rodada} 
+                      className="text-center font-medium text-muted-foreground"
                     >
                       {rodada.toUpperCase()}
-                      {selectedRodada === rodada.substring(1) && <SortIcon field="rodada" />}
                     </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedPlayers.map((jogador, index) => (
-                  <TableRow
-                    key={jogador.nome}
-                    className={
-                      index % 2 === 0 ? "bg-white dark:bg-gray-950/50" : "bg-gray-50 dark:bg-gray-900/30"
-                    }
-                  >
-                    <TableCell className="font-medium">{index + 1}</TableCell>
+                  <TableRow key={jogador.id}>
+                    <TableCell>{index + 1}</TableCell>
                     <TableCell>{jogador.nome}</TableCell>
-                    <TableCell className="font-bold text-center">{jogador.pontos_total}</TableCell>
+                    <TableCell className="text-center">{jogador.pontos_total}</TableCell>
                     {todasRodadas.map((rodada) => (
-                      <TableCell key={`${jogador.nome}-${rodada}`} className="text-center">
+                      <TableCell key={`${jogador.id}-${rodada}`} className="text-center">
                         {jogador.rodadas[rodada] ?? "-"}
                       </TableCell>
                     ))}
                   </TableRow>
                 ))}
-                {jogadores.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={3 + todasRodadas.length} className="text-center py-8 text-gray-500">
-                      Nenhum resultado encontrado
-                    </TableCell>
-                  </TableRow>
-                )}
               </TableBody>
               {jogadores.length > 0 && (
                 <TableFooter>
-                  <TableRow className="border-t-2 border-border bg-muted/30 font-bold">
+                  <TableRow>
                     <TableCell>-</TableCell>
                     <TableCell>Total</TableCell>
                     <TableCell className="text-center">{totalGeral}</TableCell>
