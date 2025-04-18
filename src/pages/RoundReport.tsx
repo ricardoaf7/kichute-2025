@@ -7,19 +7,30 @@ import { MatchesReportTable } from "@/components/round-report/MatchesReportTable
 import { ReportActions } from "@/components/round-report/ReportActions";
 import { useParticipants } from "@/hooks/useParticipants";
 import { useKichutes } from "@/hooks/useKichutes";
+import { useMatchesByRound } from "@/hooks/useMatchesByRound";
 
 const RoundReportContent = () => {
   const reportRef = useRef<HTMLDivElement>(null);
   const { rounds, selectedRound, setSelectedRound } = useMatches();
   const { participants, isLoading: isLoadingParticipants } = useParticipants();
   const { kichutes, isLoading: isLoadingKichutes } = useKichutes(selectedRound);
+  const { matches, isLoading: isLoadingMatches } = useMatchesByRound(selectedRound.toString());
   
-  const currentRound = rounds.find(r => r.number === selectedRound);
-  const isLoading = isLoadingParticipants || isLoadingKichutes;
+  const isLoading = isLoadingParticipants || isLoadingKichutes || isLoadingMatches;
 
-  console.log("Current round data:", currentRound);
-  console.log("Selected round:", selectedRound);
-  console.log("Rounds available:", rounds.map(r => r.number));
+  // Formatação dos matches no formato esperado pela MatchesReportTable
+  const formattedMatches = matches.map(match => ({
+    id: match.id,
+    time_casa: match.time_casa,
+    time_visitante: match.time_visitante,
+    placar_casa: match.placar_casa,
+    placar_visitante: match.placar_visitante
+  }));
+
+  console.log("Matches from direct query:", matches);
+  console.log("Formatted matches for report:", formattedMatches);
+  console.log("Participants:", participants);
+  console.log("Kichutes for round:", kichutes);
 
   return (
     <div className="container mx-auto px-4 py-8 pt-20 print:pt-8 print:px-0">
@@ -49,14 +60,14 @@ const RoundReportContent = () => {
             <div className="p-8 text-center">
               <p className="text-lg text-muted-foreground">Carregando dados...</p>
             </div>
-          ) : currentRound && currentRound.matches && currentRound.matches.length > 0 ? (
+          ) : formattedMatches.length > 0 ? (
             <Card>
               <CardHeader className="bg-muted print:bg-white">
                 <CardTitle className="text-xl">Rodada {selectedRound} - Relatório de Palpites</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <MatchesReportTable
-                  matches={currentRound.matches}
+                  matches={formattedMatches}
                   participants={participants}
                   kichutes={kichutes}
                 />

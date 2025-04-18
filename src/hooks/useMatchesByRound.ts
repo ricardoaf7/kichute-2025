@@ -19,15 +19,17 @@ export const useMatchesByRound = (selectedRound: string) => {
             rodada,
             data,
             local,
-            time_casa:times!time_casa_id(id, nome, sigla),
-            time_visitante:times!time_visitante_id(id, nome, sigla)
+            placar_casa,
+            placar_visitante,
+            time_casa:times!time_casa_id(id, nome, sigla, escudo_url),
+            time_visitante:times!time_visitante_id(id, nome, sigla, escudo_url)
           `)
           .eq("rodada", parseInt(selectedRound))
           .order("data");
 
         if (error) throw error;
 
-        console.log("Partidas encontradas:", data);
+        console.log("Partidas encontradas para rodada", selectedRound, ":", data);
         setMatches(data || []);
       } catch (err) {
         console.error("Erro ao carregar partidas:", err);
@@ -36,12 +38,15 @@ export const useMatchesByRound = (selectedRound: string) => {
           description: "Não foi possível carregar as partidas para esta rodada.",
           variant: "destructive"
         });
+        setMatches([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchMatches();
+    if (selectedRound) {
+      fetchMatches();
+    }
   }, [selectedRound, toast]);
 
   return { matches, isLoading };

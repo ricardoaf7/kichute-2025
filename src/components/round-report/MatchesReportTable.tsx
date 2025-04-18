@@ -34,10 +34,10 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
   ) || [];
 
   console.log("Valid matches for report:", validMatches);
-  console.log("Totais calculados:", participantTotals);
+  console.log("Participant totals:", participantTotals);
 
   return (
-    <div className="rounded-lg border shadow-sm">
+    <div className="rounded-lg border shadow-sm overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
