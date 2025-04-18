@@ -1,3 +1,4 @@
+
 import { useParticipants } from "@/hooks/useParticipants";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Trophy } from "lucide-react";
