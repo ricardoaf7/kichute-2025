@@ -1,4 +1,3 @@
-
 import { useParticipants } from "@/hooks/useParticipants";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Trophy } from "lucide-react";
@@ -15,32 +14,40 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
   const [totaisPorJogador, setTotaisPorJogador] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    if (!isLoadingKichutes && kichutes.length > 0) {
+    if (!isLoadingKichutes && kichutes && kichutes.length > 0) {
       // Inicializar totais com 0 para cada participante
       const totais: Record<string, number> = {};
       participants.forEach(p => {
         totais[p.id] = 0;
       });
-
+      
       // Debug para verificar os kichutes e seus pontos
       console.log("Kichutes recebidos para cálculo:", kichutes);
       
       // Para cada kichute, somar os pontos ao total do jogador
       kichutes.forEach(kichute => {
         if (kichute.jogador_id) {
-          // Garantir que estamos usando um valor numérico, mesmo se vier como string
-          const points = typeof kichute.pontos === 'string' 
-            ? parseInt(kichute.pontos, 10) 
-            : (Number(kichute.pontos) || 0);
+          const jogadorId = String(kichute.jogador_id);
+          
+          // Converter explicitamente para número, tratando valores nulos, undefined ou strings vazias
+          let points = 0;
+          if (kichute.pontos !== null && kichute.pontos !== undefined && kichute.pontos !== '') {
+            points = typeof kichute.pontos === 'string' 
+              ? parseInt(kichute.pontos, 10) || 0
+              : Number(kichute.pontos) || 0;
+          }
           
           // Debug para verificar o valor que está sendo somado
-          console.log(`Somando ${points} pontos para jogador ${kichute.jogador_id}`);
+          console.log(`Somando ${points} pontos para jogador ${jogadorId}`);
           
           // Atualizar o total do jogador
-          totais[kichute.jogador_id] = (totais[kichute.jogador_id] || 0) + points;
+          if (!totais[jogadorId]) {
+            totais[jogadorId] = 0;
+          }
+          totais[jogadorId] += points;
         }
       });
-
+      
       console.log("Totais calculados por jogador:", totais);
       setTotaisPorJogador(totais);
     }
@@ -69,10 +76,14 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
         Total de Pontos:
       </TableCell>
       {participants.map((participant) => {
-        const totalPontos = totaisPorJogador[participant.id] || 0;
+        // Converter o ID para string para garantir compatibilidade
+        const participantId = String(participant.id);
+        const totalPontos = totaisPorJogador[participantId] || 0;
+        
+        console.log(`Exibindo total para ${participantId}: ${totalPontos}`);
         
         return (
-          <TableCell key={`total-${participant.id}`} className="text-center">
+          <TableCell key={`total-${participantId}`} className="text-center">
             <div className="flex items-center justify-center space-x-1">
               <Trophy className="h-4 w-4 text-amber-500" />
               <span>{totalPontos}</span>
