@@ -4,6 +4,7 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useKichutes } from "@/hooks/useKichutes";
+import { calculatePoints } from "@/utils/scoring";
 
 interface RoundTotalScoreProps {
   selectedRound: number;
@@ -14,29 +15,32 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
   const { kichutes, isLoading: isLoadingKichutes } = useKichutes(selectedRound);
   const [totaisPorJogador, setTotaisPorJogador] = useState<Record<string, number>>({});
 
-  // Calcular o total de pontos por jogador diretamente a partir dos kichutes
   useEffect(() => {
     if (!isLoadingKichutes && kichutes.length > 0) {
-      console.log("Calculando totais a partir dos kichutes:", kichutes);
-      
-      // Inicializar o objeto com todos os jogadores tendo 0 pontos
+      // Inicializar totais com 0 para cada participante
       const totais: Record<string, number> = {};
       participants.forEach(p => {
         totais[p.id] = 0;
       });
-      
-      // Somar pontos de cada kichute para o respectivo jogador
+
+      // Para cada kichute, calcular os pontos e somar ao total do jogador
       kichutes.forEach(kichute => {
-        if (kichute.jogador_id && kichute.pontos !== null && kichute.pontos !== undefined) {
-          // Garantir que pontos seja um número
-          const pontosNum = Number(kichute.pontos);
-          if (!isNaN(pontosNum)) {
-            totais[kichute.jogador_id] = (totais[kichute.jogador_id] || 0) + pontosNum;
-          }
+        if (kichute.jogador_id) {
+          const points = calculatePoints(
+            { 
+              homeScore: kichute.palpite_casa, 
+              awayScore: kichute.palpite_visitante 
+            },
+            { 
+              homeScore: kichute.partida?.placar_casa, 
+              awayScore: kichute.partida?.placar_visitante 
+            }
+          );
+          totais[kichute.jogador_id] += points;
         }
       });
-      
-      console.log("Totais calculados diretamente dos kichutes:", totais);
+
+      console.log("Totais calculados por jogador:", totais);
       setTotaisPorJogador(totais);
     }
   }, [kichutes, participants, isLoadingKichutes, selectedRound]);
