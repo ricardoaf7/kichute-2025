@@ -57,17 +57,16 @@ export const useKichutes = (round?: number) => {
           throw error;
         }
 
-        // Verificar o formato dos dados
-        console.log("Kichutes carregados (dados brutos):", data);
+        console.log("Dados brutos de kichutes carregados:", data);
         
         // Garantir que todos os kichutes tenham valores apropriados para pontos
-        const formattedData = data.map(kichute => ({
+        const formattedData = data?.map(kichute => ({
           ...kichute,
           pontos: kichute.pontos === null ? 0 : Number(kichute.pontos)
-        }));
+        })) || [];
         
-        console.log("Kichutes processados:", formattedData);
-        setKichutes(formattedData || []);
+        console.log("Kichutes processados com pontos normalizados:", formattedData);
+        setKichutes(formattedData);
       } catch (err) {
         console.error("Erro ao carregar kichutes:", err);
         toast({

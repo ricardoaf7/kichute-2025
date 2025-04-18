@@ -58,6 +58,13 @@ const RoundReportContent = () => {
 
   const isLoading = isLoadingParticipants || isLoadingKichutes;
 
+  console.log("Dados para RoundReport:", {
+    selectedRound,
+    participantsCount: participants.length,
+    kichutesCount: kichutes.length,
+    isLoading
+  });
+
   return (
     <div className="container mx-auto px-4 py-8 pt-20">
       <div className="max-w-7xl mx-auto">
@@ -84,8 +91,8 @@ const RoundReportContent = () => {
               <Table>
                 <TableHeader className="bg-muted/50">
                   <TableRow>
-                    <TableHead className="w-[200px]">Partida</TableHead>
-                    <TableHead className="w-[120px]">Resultado</TableHead>
+                    <TableHead className="w-[200px] sticky left-0 z-20 bg-muted/50">Partida</TableHead>
+                    <TableHead className="w-[120px] sticky left-[200px] z-20 bg-muted/50">Resultado</TableHead>
                     {participants.map(participant => (
                       <TableHead key={participant.id} className="text-center">
                         {participant.nome}
@@ -96,10 +103,10 @@ const RoundReportContent = () => {
                 <TableBody>
                   {currentRound?.matches.map((match) => (
                     <TableRow key={match.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium sticky left-0 z-10 bg-inherit">
                         {match.homeTeam.shortName} x {match.awayTeam.shortName}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="sticky left-[200px] z-10 bg-inherit">
                         <ScoreDisplay 
                           homeScore={match.homeScore} 
                           awayScore={match.awayScore} 
