@@ -1,6 +1,7 @@
 
 import { Star, Medal, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getScoringDescription } from "@/utils/scoring";
 
 interface KichutePointsProps {
   points: number;
@@ -25,7 +26,11 @@ export const KichutePoints = ({ points }: KichutePointsProps) => {
     <div className={cn("flex items-center justify-center space-x-1", getPointsBadgeClass(points))}>
       {getPontosIcon(points)}
       <span>{points}</span>
+      {points > 0 && (
+        <span className="text-xs ml-1 opacity-75">
+          ({getScoringDescription(points).split('!')[0]})
+        </span>
+      )}
     </div>
   );
 };
-

@@ -102,4 +102,3 @@ const KichuteTable = ({ className }: KichuteTableProps) => {
 };
 
 export default KichuteTable;
-
