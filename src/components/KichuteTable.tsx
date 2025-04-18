@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { useKichuteData } from "@/hooks/useKichuteData";
 
-export const KichuteTable = () => {
+const KichuteTable = () => {
   const { kichutes, isLoading, error } = useKichuteData();
 
   // Agrupar pontos por jogador
@@ -91,3 +91,5 @@ export const KichuteTable = () => {
     </Table>
   );
 };
+
+export default KichuteTable;
