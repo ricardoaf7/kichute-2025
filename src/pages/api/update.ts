@@ -1,10 +1,10 @@
-// api/update.ts
+import { createClient } from '@supabase/supabase-js';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = process.env.VITE_SUPABASE_URL!;
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL!,
+  process.env.VITE_SUPABASE_ANON_KEY!
+);
 
 // Regras de pontuação
 const regras = {
@@ -27,31 +27,28 @@ function calcularPontuacao(palpite: any, resultado: any): number {
   const diffPalpite = palpite.palpite_casa - palpite.palpite_visitante;
   const diffResultado = resultado.placar_casa - resultado.placar_fora;
 
-  const resultadoEmpate = resultado.placar_casa === resultado.placar_fora;
-  const palpiteEmpate = palpite.palpite_casa === palpite.palpite_visitante;
+  const vencedorPalpite = palpite.palpite_casa > palpite.palpite_visitante
+    ? 'casa' : palpite.palpite_casa < palpite.palpite_visitante
+    ? 'fora' : 'empate';
+
+  const vencedorReal = resultado.placar_casa > resultado.placar_fora
+    ? 'casa' : resultado.placar_casa < resultado.placar_fora
+    ? 'fora' : 'empate';
 
   if (
-    (resultadoEmpate && palpiteEmpate) ||
-    (diffPalpite === diffResultado &&
-      Math.sign(palpite.palpite_casa - palpite.palpite_visitante) ===
-        Math.sign(resultado.placar_casa - resultado.placar_fora))
-  ) {
-    return regras.correctDifferenceOrDraw;
-  }
+    vencedorPalpite === vencedorReal &&
+    diffPalpite === diffResultado
+  ) return regras.correctDifferenceOrDraw;
 
-  const vencedorPalpite = palpite.palpite_casa > palpite.palpite_visitante ? "casa" :
-                          palpite.palpite_casa < palpite.palpite_visitante ? "fora" : "empate";
-  const vencedorReal = resultado.placar_casa > resultado.placar_fora ? "casa" :
-                       resultado.placar_casa < resultado.placar_fora ? "fora" : "empate";
-
-  if (vencedorPalpite === vencedorReal) return regras.correctWinner;
+  if (vencedorPalpite === vencedorReal)
+    return regras.correctWinner;
 
   return 0;
 }
 
-export default async function handler(req: Request): Promise<Response> {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const rodada = 1;
+    const rodada = 1; // ou req.query.rodada para receber por parâmetro futuramente
 
     const { data: partidas, error: erroPartidas } = await supabase
       .from("partidas")
@@ -59,9 +56,7 @@ export default async function handler(req: Request): Promise<Response> {
       .eq("rodada", rodada);
 
     if (erroPartidas || !partidas) {
-      return new Response(JSON.stringify({ erro: "Erro ao buscar partidas", detalhes: erroPartidas }), {
-        status: 500,
-      });
+      return res.status(500).json({ error: "Erro ao buscar partidas", detalhes: erroPartidas });
     }
 
     const { data: palpites, error: erroPalpites } = await supabase
@@ -70,16 +65,12 @@ export default async function handler(req: Request): Promise<Response> {
       .in("partida_id", partidas.map((p) => p.id));
 
     if (erroPalpites || !palpites) {
-      return new Response(JSON.stringify({ erro: "Erro ao buscar palpites", detalhes: erroPalpites }), {
-        status: 500,
-      });
+      return res.status(500).json({ error: "Erro ao buscar palpites", detalhes: erroPalpites });
     }
 
-    const atualizacoes = palpites.map(async (palpite) => {
-      const partida = partidas.find((p) => p.id === palpite.partida_id);
-      if (!partida) return null;
-
-      const pontos = calcularPontuacao(palpite, partida);
+    const updates = palpites.map(async (palpite) => {
+      const resultado = partidas.find(p => p.id === palpite.partida_id);
+      const pontos = resultado ? calcularPontuacao(palpite, resultado) : 0;
 
       return supabase
         .from("kichutes")
@@ -87,15 +78,10 @@ export default async function handler(req: Request): Promise<Response> {
         .eq("id", palpite.id);
     });
 
-    await Promise.all(atualizacoes);
+    await Promise.all(updates);
 
-    return new Response(
-      JSON.stringify({ mensagem: "Pontuação da rodada 1 atualizada com sucesso!" }),
-      { status: 200 }
-    );
+    return res.status(200).json({ mensagem: "Pontuações atualizadas com sucesso!" });
   } catch (erro) {
-    return new Response(JSON.stringify({ erro: "Erro geral", detalhes: erro }), {
-      status: 500,
-    });
+    return res.status(500).json({ error: "Erro inesperado", detalhes: erro });
   }
 }
