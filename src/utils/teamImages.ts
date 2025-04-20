@@ -1,35 +1,47 @@
 
 export const getTeamImagePath = (name: string): string => {
+  if (!name) return "/placeholder.svg";
+
+  // Normaliza o nome do time (remove acentos, converte para minúsculas)
+  const normalizedName = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
   // Mapeamento de nomes de times para os arquivos de escudo
   const teamMap: { [key: string]: string } = {
-    "Atlético-MG": "atletico_mineiro",
-    "Athletico-PR": "athletico_paranaense",
-    "Bahia": "bahia",
-    "Botafogo": "botafogo",
-    "Corinthians": "corinthians",
-    "Cruzeiro": "cruzeiro",
-    "Cuiabá": "cuiaba",
-    "Flamengo": "flamengo",
-    "Fluminense": "fluminense",
-    "Fortaleza": "fortaleza",
-    "Grêmio": "gremio",
-    "Internacional": "internacional",
-    "Juventude": "juventude",
-    "Palmeiras": "palmeiras",
-    "Red Bull Bragantino": "bragantino",
-    "São Paulo": "sao_paulo",
-    "Vasco": "vasco",
-    "Vitória": "vitoria",
-    "Criciúma": "criciuma",
-    "Atlético-GO": "atletico_goianiense",
-    // Outros times que possam estar nos dados de exemplo
-    "Santos": "santos",
-    "Sport": "sport",
-    "Ceará": "ceara",
-    "Mirassol": "mirassol"
+    "atletico-mg": "atletico_mineiro",
+    "atletico mineiro": "atletico_mineiro",
+    "atletico-pr": "athletico_paranaense",
+    "athletico-pr": "athletico_paranaense",
+    "athletico paranaense": "athletico_paranaense",
+    "bahia": "bahia",
+    "botafogo": "botafogo",
+    "corinthians": "corinthians",
+    "cruzeiro": "cruzeiro",
+    "cuiaba": "cuiaba",
+    "flamengo": "flamengo",
+    "fluminense": "fluminense",
+    "fortaleza": "fortaleza",
+    "gremio": "gremio",
+    "internacional": "internacional",
+    "juventude": "juventude",
+    "palmeiras": "palmeiras",
+    "red bull bragantino": "bragantino",
+    "bragantino": "bragantino",
+    "sao paulo": "sao_paulo",
+    "vasco": "vasco",
+    "vitoria": "vitoria",
+    "criciuma": "criciuma",
+    "atletico-go": "atletico_goianiense",
+    "atletico goianiense": "atletico_goianiense",
+    "santos": "santos",
+    "sport": "sport",
+    "ceara": "ceara",
+    "mirassol": "mirassol"
   };
 
   // Buscar a chave correta no mapa ou retornar nome convertido (fallback)
-  const teamKey = teamMap[name] || name.toLowerCase().replace(/ /g, "_");
+  const teamKey = teamMap[normalizedName] || normalizedName.replace(/ /g, "_");
+
+  console.log(`Buscando escudo para: ${name} (normalizado: ${normalizedName}) -> ${teamKey}`);
+
   return `/escudos/${teamKey}.png`;
 };

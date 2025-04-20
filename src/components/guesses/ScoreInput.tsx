@@ -1,6 +1,8 @@
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { MinusIcon, PlusIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface ScoreInputProps {
   teamName: string;
@@ -15,17 +17,51 @@ export const ScoreInput = ({
   onChange,
   isDisabled = false,
 }: ScoreInputProps) => {
+  const [inputValue, setInputValue] = useState<string>(score.toString());
+
+  // Atualiza o input quando o score muda externamente
+  useEffect(() => {
+    setInputValue(score.toString());
+  }, [score]);
+
   // Para screen readers
   const ariaLabel = `Score for ${teamName}`;
 
   const increment = () => {
     if (isDisabled) return;
-    onChange(Math.min(20, score + 1));
+    const newValue = Math.min(20, score + 1);
+    onChange(newValue);
   };
 
   const decrement = () => {
     if (isDisabled) return;
-    onChange(Math.max(0, score - 1));
+    const newValue = Math.max(0, score - 1);
+    onChange(newValue);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // Permite apenas dígitos
+    if (!/^\d*$/.test(value)) return;
+
+    setInputValue(value);
+  };
+
+  const handleInputBlur = () => {
+    // Converte para número e limita entre 0 e 20
+    let numValue = parseInt(inputValue, 10);
+
+    // Se não for um número válido, volta para o valor anterior
+    if (isNaN(numValue)) {
+      setInputValue(score.toString());
+      return;
+    }
+
+    // Limita o valor entre 0 e 20
+    numValue = Math.max(0, Math.min(20, numValue));
+    setInputValue(numValue.toString());
+    onChange(numValue);
   };
 
   return (
@@ -47,12 +83,16 @@ export const ScoreInput = ({
           <MinusIcon className="h-4 w-4" />
         </Button>
 
-        <div 
-          className="w-12 mx-2 text-center text-xl font-bold"
+        <Input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          className="w-12 mx-2 text-center text-xl font-bold h-8 p-0"
+          disabled={isDisabled}
           aria-label={ariaLabel}
-        >
-          {score}
-        </div>
+          maxLength={2}
+        />
 
         <Button
           type="button"
