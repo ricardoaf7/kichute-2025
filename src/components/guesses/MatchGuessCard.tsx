@@ -1,4 +1,4 @@
-
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MatchHeader } from "./MatchHeader";
 import { ScoreInput } from "./ScoreInput";
@@ -9,17 +9,13 @@ interface MatchGuessCardProps {
     rodada: number;
     data: string;
     local: string;
-    time_casa: { nome: string };
-    time_visitante: { nome: string };
+    time_casa: { nome: string; sigla: string };
+    time_visitante: { nome: string; sigla: string };
   };
   homeScore: number;
   awayScore: number;
-  onScoreChange: (
-    matchId: string,
-    type: "home" | "away",
-    value: number
-  ) => void;
-  isDisabled?: boolean;
+  onScoreChange: (matchId: string, type: "home" | "away", value: number) => void;
+  isDisabled: boolean;
 }
 
 export const MatchGuessCard = ({
@@ -27,37 +23,39 @@ export const MatchGuessCard = ({
   homeScore,
   awayScore,
   onScoreChange,
-  isDisabled = false,
+  isDisabled,
 }: MatchGuessCardProps) => {
   const handleScoreChange = (type: "home" | "away", value: number) => {
     onScoreChange(match.id, type, value);
   };
 
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex flex-col space-y-4">
-          <MatchHeader round={match.rodada} date={match.data} />
+    <Card className="border hover:shadow-md transition-shadow">
+      <CardContent>
+        {/* Cabeçalho com rodada e data */}
+        <MatchHeader round={match.rodada} date={match.data} />
 
-          <div className="flex items-center justify-between">
-            <ScoreInput
-              teamName={match.time_casa.nome}
-              score={homeScore}
-              onChange={(value) => handleScoreChange("home", value)}
-              isDisabled={isDisabled}
-            />
+        {/* Linha com as siglas dos times */}
+        <div className="flex justify-between items-center mt-4">
+          <span className="font-semibold">{match.time_casa.sigla}</span>
+          <span className="text-muted-foreground">x</span>
+          <span className="font-semibold">{match.time_visitante.sigla}</span>
+        </div>
 
-            <div className="flex-shrink-0 text-center w-1/5">
-              <span className="text-xl font-bold">X</span>
-            </div>
-
-            <ScoreInput
-              teamName={match.time_visitante.nome}
-              score={awayScore}
-              onChange={(value) => handleScoreChange("away", value)}
-              isDisabled={isDisabled}
-            />
-          </div>
+        {/* Controles de placar */}
+        <div className="flex justify-between items-center mt-2">
+          <ScoreInput
+            teamName={match.time_casa.nome}
+            score={homeScore}
+            onChange={(v) => handleScoreChange("home", v)}
+            isDisabled={isDisabled}
+          />
+          <ScoreInput
+            teamName={match.time_visitante.nome}
+            score={awayScore}
+            onChange={(v) => handleScoreChange("away", v)}
+            isDisabled={isDisabled}
+          />
         </div>
       </CardContent>
     </Card>

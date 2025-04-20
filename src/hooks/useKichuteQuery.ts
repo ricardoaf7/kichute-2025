@@ -1,5 +1,3 @@
-// src/hooks/useKichuteQuery.ts
-
 import { useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { KichuteQueryResponse } from "@/types/supabase-responses";
@@ -27,7 +25,7 @@ export const useKichuteQuery = () => {
           )
         `);
 
-      // *** FILTRO CORRIGIDO usando o alias 'partida' ***
+      // ⚠️ Usa o ALIAS 'partida' (não 'partidas') para filtrar corretamente
       if (selectedRodada !== "todas") {
         query = query.eq("partida.rodada", parseInt(selectedRodada, 10));
       }
