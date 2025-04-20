@@ -52,18 +52,14 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
 
         console.log("Palpites existentes:", existingGuesses);
 
-        // Update guesses state with existing guesses
-        const updatedGuesses = [...guesses];
-        
-        existingGuesses.forEach(guess => {
-          const index = updatedGuesses.findIndex(g => g.matchId === guess.partida_id);
-          if (index !== -1) {
-            updatedGuesses[index] = {
-              ...updatedGuesses[index],
-              homeScore: guess.palpite_casa || 0,
-              awayScore: guess.palpite_visitante || 0
-            };
-          }
+        // Crie um novo array em vez de modificar o existente
+        const updatedGuesses = matches.map(match => {
+          const existingGuess = existingGuesses.find(g => g.partida_id === match.id);
+          return {
+            matchId: match.id,
+            homeScore: existingGuess ? existingGuess.palpite_casa || 0 : 0,
+            awayScore: existingGuess ? existingGuess.palpite_visitante || 0 : 0
+          };
         });
 
         setGuesses(updatedGuesses);
@@ -78,7 +74,7 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     };
 
     fetchExistingGuesses();
-  }, [selectedParticipant, selectedRound, guesses, setGuesses, toast]);
+  }, [selectedParticipant, selectedRound, matches, toast]); // Removido guesses e setGuesses
 
   // Check if current user is admin
   const isAdmin = user?.role === "Administrador";
@@ -113,13 +109,15 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
 
   // Initialize guesses when matches change
   useEffect(() => {
+    if (!matches || matches.length === 0) return;
+
     const initialGuesses = matches.map(match => ({
       matchId: match.id,
       homeScore: 0,
       awayScore: 0
     }));
-    
-    console.log("Nenhum jogador selecionado. Usando valores iniciais:", initialGuesses);
+
+    console.log("Inicializando palpites com valores padrão:", initialGuesses);
     setGuesses(initialGuesses);
   }, [matches, setGuesses]);
 

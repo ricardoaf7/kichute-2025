@@ -20,13 +20,18 @@ export const ParticipantSelector = ({
 }: ParticipantSelectorProps) => {
   const { participants, isLoading } = useParticipants();
 
+  const handleChange = (value: string) => {
+    console.log("Participante selecionado:", value);
+    onParticipantChange(value);
+  };
+
   return (
     <div className="w-full space-y-2">
       <div>
         <Label htmlFor="participant-select">Participante</Label>
         <Select 
           value={selectedParticipant} 
-          onValueChange={onParticipantChange}
+          onValueChange={handleChange}
           required={isRequired}
           disabled={isLoading}
         >
@@ -42,7 +47,7 @@ export const ParticipantSelector = ({
           </SelectContent>
         </Select>
       </div>
-      
+
       {showError && (
         <Alert variant="destructive" className="mt-2">
           <AlertTriangle className="h-4 w-4" />
