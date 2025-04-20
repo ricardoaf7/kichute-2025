@@ -32,29 +32,26 @@ interface RankingRow {
 }
 
 const Index = () => {
-  const [rankingType, setRankingType] = useState<"round" | "month" | "annual">(
-    "round"
-  );
+  const [rankingType, setRankingType] =
+    useState<"round" | "month" | "annual">("round");
   const [rankingData, setRankingData] = useState<RankingRow[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // ===== 1) Classificação da Rodada =====
+  // 1) Classificação da Rodada
   const fetchRoundRanking = async () => {
     setLoading(true);
     try {
-      // Pega a última rodada calculada
       const { data: latestArr, error: errL } = await supabase
         .from("pontuacao_rodada")
-        .select("rodada", { distinct: true })
+        .select("rodada", { count: "exact" }) // só para contar, distinct não é suportado
         .order("rodada", { ascending: false })
         .limit(1);
       if (errL) throw errL;
       const latest = latestArr?.[0]?.rodada ?? 1;
 
-      // Busca top5 da rodada
       const { data: rows, error } = await supabase
         .from("pontuacao_rodada")
-        .select("pontos, jogador:jogadores(name)")
+        .select("pontos, jogador_id, jogador: jogadores(name)")
         .eq("rodada", latest)
         .order("pontos", { ascending: false })
         .limit(5);
@@ -75,7 +72,7 @@ const Index = () => {
     }
   };
 
-  // ===== 2) Classificação Mensal =====
+  // 2) Classificação Mensal
   const fetchMonthlyRanking = async () => {
     setLoading(true);
     try {
@@ -84,13 +81,10 @@ const Index = () => {
       const month = String(now.getMonth() + 1).padStart(2, "0");
       const start = `${year}-${month}-01`;
       const nextMonth =
-        now.getMonth() === 11
-          ? "01"
-          : String(now.getMonth() + 2).padStart(2, "0");
-      const nextYear = now.getMonth() === 11 ? year + 1 : year;
+        month === "12" ? "01" : String(Number(month) + 1).padStart(2, "0");
+      const nextYear = month === "12" ? year + 1 : year;
       const end = `${nextYear}-${nextMonth}-01`;
 
-      // Rodadas do mês
       const { data: parts, error: errP } = await supabase
         .from("partidas")
         .select("rodada")
@@ -99,20 +93,17 @@ const Index = () => {
       if (errP) throw errP;
       const rondas = [...new Set(parts.map((p) => p.rodada))];
 
-      // Pontuações agregadas
       const { data: pts, error: errR } = await supabase
         .from("pontuacao_rodada")
-        .select("pontos, jogador:jogadores(name)")
+        .select("pontos, jogador_id, jogador: jogadores(name)")
         .in("rodada", rondas);
       if (errR) throw errR;
 
       const sums: Record<string, { name: string; points: number }> = {};
       pts.forEach((r) => {
-        sums[r.jogador.name] = sums[r.jogador.name] || {
-          name: r.jogador.name,
-          points: 0,
-        };
-        sums[r.jogador.name].points += r.pontos;
+        const name = r.jogador.name;
+        sums[name] = sums[name] || { name, points: 0 };
+        sums[name].points += r.pontos;
       });
 
       const formatted = Object.values(sums)
@@ -132,7 +123,7 @@ const Index = () => {
     }
   };
 
-  // ===== 3) Classificação Anual =====
+  // 3) Classificação Anual
   const fetchAnnualRanking = async () => {
     setLoading(true);
     try {
@@ -140,7 +131,6 @@ const Index = () => {
       const start = `${year}-01-01`;
       const end = `${year + 1}-01-01`;
 
-      // Rodadas do ano
       const { data: parts, error: errP } = await supabase
         .from("partidas")
         .select("rodada")
@@ -149,20 +139,17 @@ const Index = () => {
       if (errP) throw errP;
       const rondas = [...new Set(parts.map((p) => p.rodada))];
 
-      // Pontuações agregadas
       const { data: pts, error: errR } = await supabase
         .from("pontuacao_rodada")
-        .select("pontos, jogador:jogadores(name)")
+        .select("pontos, jogador_id, jogador: jogadores(name)")
         .in("rodada", rondas);
       if (errR) throw errR;
 
       const sums: Record<string, { name: string; points: number }> = {};
       pts.forEach((r) => {
-        sums[r.jogador.name] = sums[r.jogador.name] || {
-          name: r.jogador.name,
-          points: 0,
-        };
-        sums[r.jogador.name].points += r.pontos;
+        const name = r.jogador.name;
+        sums[name] = sums[name] || { name, points: 0 };
+        sums[name].points += r.pontos;
       });
 
       const formatted = Object.values(sums)
@@ -182,38 +169,33 @@ const Index = () => {
     }
   };
 
-  // dispara a busca certa ao trocar o tipo
+  // dispara a busca certa
   useEffect(() => {
     if (rankingType === "round") fetchRoundRanking();
     else if (rankingType === "month") fetchMonthlyRanking();
     else fetchAnnualRanking();
   }, [rankingType]);
 
-  const getRankingTitle = () => {
-    switch (rankingType) {
-      case "round":
-        return "Classificação da Rodada";
-      case "month":
-        return "Classificação Mensal";
-      case "annual":
-        return "Classificação Anual";
-    }
-  };
-  const getRankingIcon = () => {
-    switch (rankingType) {
-      case "round":
-        return <ListOrdered className="h-4 w-4 mr-2" />;
-      case "month":
-        return <CalendarIcon className="h-4 w-4 mr-2" />;
-      case "annual":
-        return <Trophy className="h-4 w-4 mr-2" />;
-    }
-  };
+  const getTitle = () =>
+    rankingType === "round"
+      ? "Classificação da Rodada"
+      : rankingType === "month"
+      ? "Classificação Mensal"
+      : "Classificação Anual";
+
+  const getIcon = () =>
+    rankingType === "round" ? (
+      <ListOrdered className="h-4 w-4 mr-2" />
+    ) : rankingType === "month" ? (
+      <CalendarIcon className="h-4 w-4 mr-2" />
+    ) : (
+      <Trophy className="h-4 w-4 mr-2" />
+    );
 
   return (
-    <div className="container mx-auto px-4 py-8 pt-20">
+    <div className="container mx-auto px-4 py-8 pt-24">
       <div className="max-w-5xl mx-auto">
-        {/* Cabeçalho */}
+        {/* cabeçalho */}
         <div className="text-center mb-12">
           <span className="inline-block px-4 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-4">
             Kichute do Brasileirão Série A 2025
@@ -227,7 +209,7 @@ const Index = () => {
           </p>
         </div>
 
-        {/* Cards de navegação */}
+        {/* cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <Card className="border hover:shadow-md transition-shadow">
             <CardContent className="pt-6 flex flex-col items-center space-y-4">
@@ -270,11 +252,11 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Seção de classificação */}
+        {/* seção de classificação */}
         <div className="mb-4 flex justify-between items-center">
           <h2 className="text-2xl font-bold flex items-center">
-            {getRankingIcon()}
-            {getRankingTitle()}
+            {getIcon()}
+            {getTitle()}
           </h2>
           <div className="flex items-center gap-4">
             <Select
@@ -301,7 +283,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Tabela de resultados */}
+        {/* tabela */}
         <Card className="border mb-8">
           {loading ? (
             <div className="p-8 text-center">Carregando classificação…</div>
