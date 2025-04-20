@@ -45,8 +45,19 @@ const Standings = () => {
     fetchRounds();
   }, [toast]);
 
-  // 2) Quando o usuário muda a rodada, primeiro chamamos o endpoint /update,
-  //    depois atualizamos o estado, o que disparará o hook usePontuacaoRodada
+  // 2) Auto-update ao mudar selectedRound (escolha A)
+  useEffect(() => {
+    if (selectedRound !== undefined) {
+      fetch(
+        `https://kichute-update-endpoint.deno.dev/update?rodada=${selectedRound}`
+      )
+        .then((res) => res.json())
+        .then((json) => console.log("Update automático:", json))
+        .catch((err) => console.error("Erro update automático:", err));
+    }
+  }, [selectedRound]);
+
+  // 3) Quando o usuário muda a rodada manualmente
   const handleRoundChange = async (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -78,6 +89,7 @@ const Standings = () => {
     }
   };
 
+  // 4) Handlers de mês e ano
   const handleMonthChange = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -92,7 +104,7 @@ const Standings = () => {
     setSelectedYear(e.target.value);
   };
 
-  // 3) Render da tela
+  // 5) Render da tela
   return (
     <div className="page-container">
       <div className="max-w-6xl mx-auto">
