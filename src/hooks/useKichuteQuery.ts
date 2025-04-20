@@ -27,12 +27,11 @@ export const useKichuteQuery = () => {
           )
         `);
 
-      // Filtra por rodada corretamente usando o nome da tabela 'partidas'
+      // *** FILTRO CORRIGIDO usando o alias 'partida' ***
       if (selectedRodada !== "todas") {
-        query = query.eq("partidas.rodada", parseInt(selectedRodada, 10));
+        query = query.eq("partida.rodada", parseInt(selectedRodada, 10));
       }
 
-      // Filtra por jogador diretamente
       if (selectedJogador !== "todos") {
         query = query.eq("jogador_id", selectedJogador);
       }
