@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
 import StandingsHeader from "../components/standings/StandingsHeader";
 import StandingsContent from "../components/standings/StandingsContent";
+import RoundScoreTable from "../components/standings/RoundScoreTable";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import RoundScoreTable from "../components/standings/RoundScoreTable";
 
 const Standings = () => {
-  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic">(
-    "dynamic"
-  );
-  const [selectedRound, setSelectedRound] = useState<number | undefined>(
-    undefined
-  );
+  const [viewMode, setViewMode] =
+    useState<"table" | "cards" | "dynamic">("dynamic");
+  const [selectedRound, setSelectedRound] =
+    useState<number | undefined>(undefined);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("2025");
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -19,7 +17,7 @@ const Standings = () => {
   const [availableRounds, setAvailableRounds] = useState<number[]>([]);
   const { toast } = useToast();
 
-  // 1) Buscar rodadas disponíveis do Supabase
+  // 1) Carregar rodadas disponíveis
   useEffect(() => {
     const fetchRounds = async () => {
       try {
@@ -29,7 +27,6 @@ const Standings = () => {
           .order("rodada");
 
         if (error) throw error;
-
         const uniqueRounds = [
           ...new Set(data?.map((item) => item.rodada)),
         ].filter(Boolean) as number[];
@@ -38,39 +35,44 @@ const Standings = () => {
         console.error("Erro ao buscar rodadas:", err);
         toast({
           title: "Erro",
-          description: "Não foi possível carregar as rodadas disponíveis",
+          description: "Não foi possível carregar as rodadas",
           variant: "destructive",
         });
       } finally {
         setIsLoaded(true);
       }
     };
-
     fetchRounds();
   }, [toast]);
 
-  // 2) Sempre que mudar a rodada, chama o /update no Deno Deploy
-  useEffect(() => {
-    if (selectedRound) {
-      fetch(
-        `https://kichute-update-endpoint.deno.dev/update?rodada=${selectedRound}`
-      )
-        .then((res) => res.json())
-        .then((data) => console.log("Pontuação atualizada:", data))
-        .catch((err) =>
-          console.error("Erro ao atualizar pontuação:", err)
-        );
-    }
-  }, [selectedRound]);
-
-  // 3) Handlers de seleção
-  const handleRoundChange = (
+  // 2) Quando o usuário muda a rodada, primeiro chamamos o endpoint /update,
+  //    depois atualizamos o estado, o que disparará o hook usePontuacaoRodada
+  const handleRoundChange = async (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const value = e.target.value;
-    setSelectedRound(
-      value === "total" ? undefined : parseInt(value, 10)
-    );
+    const round =
+      value === "total" ? undefined : parseInt(value, 10);
+
+    if (round !== undefined) {
+      toast({ title: "Atualizando pontuação...", variant: "default" });
+      try {
+        const res = await fetch(
+          `https://kichute-update-endpoint.deno.dev/update?rodada=${round}`
+        );
+        const json = await res.json();
+        console.log("Pontuação atualizada:", json);
+      } catch (err) {
+        console.error("Erro ao atualizar pontuação:", err);
+        toast({
+          title: "Erro",
+          description: "Não foi possível atualizar pontuação.",
+          variant: "destructive",
+        });
+      }
+    }
+
+    setSelectedRound(round);
     if (value !== "total") {
       setSelectedMonth("all");
     }
@@ -84,14 +86,13 @@ const Standings = () => {
       setSelectedRound(undefined);
     }
   };
-
   const handleYearChange = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setSelectedYear(e.target.value);
   };
 
-  // 4) Render da tela de Classificação
+  // 3) Render da tela
   return (
     <div className="page-container">
       <div className="max-w-6xl mx-auto">
@@ -119,7 +120,7 @@ const Standings = () => {
         <div className="space-y-8">
           <StandingsContent
             viewMode={viewMode}
-            sortedPlayers={[]} // Não usado quando viewMode é dynamic
+            sortedPlayers={[]}
             selectedRound={selectedRound}
             isLoaded={isLoaded}
           />
