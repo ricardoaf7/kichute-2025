@@ -25,16 +25,25 @@ export const useMatchSubmit = (setRounds: React.Dispatch<React.SetStateAction<Ro
 
       // Formato para o campo 'local' no banco de dados
       const location = values.stadium + (values.city ? `, ${values.city}` : '');
-      
+
       // Obtém a data/hora exatamente como informada pelo usuário
       const matchDate = values.matchDate;
-      
-      // Formata a data para string ISO, mas mantém o fuso horário local do usuário
-      // Isso garante que a data salva será exatamente a mesma que o usuário selecionou
-      const formattedDate = matchDate.toISOString();
-      
+
+      // Cria uma string ISO com a data e hora local, mas com ajuste para o fuso horário
+      // Isso garante que a data/hora exibida será a mesma que foi inserida
+      const year = matchDate.getFullYear();
+      const month = String(matchDate.getMonth() + 1).padStart(2, '0');
+      const day = String(matchDate.getDate()).padStart(2, '0');
+      const hours = String(matchDate.getHours()).padStart(2, '0');
+      const minutes = String(matchDate.getMinutes()).padStart(2, '0');
+
+      // Formato: YYYY-MM-DDTHH:MM:00-03:00 (para horário de Brasília)
+      const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:00-03:00`;
+
+      console.log('Data formatada para salvar:', formattedDate);
+
       // Salvar a data/hora no localStorage para reutilização
-      localStorage.setItem('lastMatchDateTime', formattedDate);
+      localStorage.setItem('lastMatchDateTime', matchDate.toISOString());
 
       // Preparar dados para inserção ou atualização
       const matchData = {
@@ -64,7 +73,7 @@ export const useMatchSubmit = (setRounds: React.Dispatch<React.SetStateAction<Ro
 
       // Refresh matches from the database
       const { data: matches, error: fetchError } = await fetchAllMatches();
-      
+
       if (fetchError) {
         toast({
           title: "Erro ao atualizar lista",
