@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import StandingsHeader from "../components/standings/StandingsHeader";
 import StandingsContent from "../components/standings/StandingsContent";
@@ -7,37 +6,40 @@ import { supabase } from "@/integrations/supabase/client";
 import RoundScoreTable from "../components/standings/RoundScoreTable";
 
 const Standings = () => {
-  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic">("dynamic");
-  const [selectedRound, setSelectedRound] = useState<number | undefined>(undefined);
+  const [viewMode, setViewMode] = useState<"table" | "cards" | "dynamic">(
+    "dynamic"
+  );
+  const [selectedRound, setSelectedRound] = useState<number | undefined>(
+    undefined
+  );
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("2025");
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [useDynamicTable, setUseDynamicTable] = useState(true);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [useDynamicTable, setUseDynamicTable] = useState<boolean>(true);
   const [availableRounds, setAvailableRounds] = useState<number[]>([]);
   const { toast } = useToast();
 
-  // Buscar rodadas disponíveis
+  // 1) Buscar rodadas disponíveis do Supabase
   useEffect(() => {
     const fetchRounds = async () => {
       try {
         const { data, error } = await supabase
-          .from('partidas')
-          .select('rodada')
-          .order('rodada');
-        
-        if (error) {
-          throw error;
-        }
-        
-        // Obter rodadas únicas
-        const uniqueRounds = [...new Set(data?.map(item => item.rodada))].filter(Boolean) as number[];
+          .from("partidas")
+          .select("rodada")
+          .order("rodada");
+
+        if (error) throw error;
+
+        const uniqueRounds = [
+          ...new Set(data?.map((item) => item.rodada)),
+        ].filter(Boolean) as number[];
         setAvailableRounds(uniqueRounds);
       } catch (err) {
         console.error("Erro ao buscar rodadas:", err);
         toast({
           title: "Erro",
           description: "Não foi possível carregar as rodadas disponíveis",
-          variant: "destructive"
+          variant: "destructive",
         });
       } finally {
         setIsLoaded(true);
@@ -47,27 +49,49 @@ const Standings = () => {
     fetchRounds();
   }, [toast]);
 
-  const handleRoundChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  // 2) Sempre que mudar a rodada, chama o /update no Deno Deploy
+  useEffect(() => {
+    if (selectedRound) {
+      fetch(
+        `https://kichute-update-endpoint.deno.dev/update?rodada=${selectedRound}`
+      )
+        .then((res) => res.json())
+        .then((data) => console.log("Pontuação atualizada:", data))
+        .catch((err) =>
+          console.error("Erro ao atualizar pontuação:", err)
+        );
+    }
+  }, [selectedRound]);
+
+  // 3) Handlers de seleção
+  const handleRoundChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const value = e.target.value;
-    setSelectedRound(value === "total" ? undefined : parseInt(value));
-    // Reset month when selecting a specific round
+    setSelectedRound(
+      value === "total" ? undefined : parseInt(value, 10)
+    );
     if (value !== "total") {
       setSelectedMonth("all");
     }
   };
 
-  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleMonthChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setSelectedMonth(e.target.value);
-    // Reset round when selecting a specific month
     if (e.target.value !== "all") {
       setSelectedRound(undefined);
     }
   };
 
-  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleYearChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setSelectedYear(e.target.value);
   };
 
+  // 4) Render da tela de Classificação
   return (
     <div className="page-container">
       <div className="max-w-6xl mx-auto">
@@ -102,7 +126,9 @@ const Standings = () => {
 
           {selectedRound && (
             <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">Pontuação da Rodada {selectedRound}</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                Pontuação da Rodada {selectedRound}
+              </h2>
               <RoundScoreTable selectedRound={selectedRound} />
             </div>
           )}
