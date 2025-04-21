@@ -6,27 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import MatchCard from "@/components/MatchCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MatchesTable from "@/components/MatchesTable";
-import { useCurrentRound } from "@/hooks/useCurrentRound";
 
 const Matches = () => {
   const [activeTab, setActiveTab] = useState("cards");
-  const { currentRound, isLoading: isLoadingRound } = useCurrentRound();
-  const [selectedRound, setSelectedRound] = useState<number | null>(null);
+  const [selectedRound, setSelectedRound] = useState(1);
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const isAdmin = user?.role === "Administrador";
 
-  // Atualizar selectedRound quando currentRound for carregado
-  useEffect(() => {
-    if (selectedRound === null && !isLoadingRound) {
-      setSelectedRound(currentRound);
-    }
-  }, [currentRound, isLoadingRound, selectedRound]);
-
   const fetchMatches = async () => {
-    if (selectedRound === null) return;
-
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -82,30 +71,12 @@ const Matches = () => {
   };
 
   useEffect(() => {
-    if (selectedRound !== null) {
-      fetchMatches();
-    }
+    fetchMatches();
   }, [selectedRound]);
 
   const handleRoundChange = (round: number) => {
     setSelectedRound(round);
   };
-
-  // Se ainda estiver carregando a rodada atual, mostrar indicador de carregamento
-  if (isLoadingRound || selectedRound === null) {
-    return (
-      <div className="page-container">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold">Partidas</h1>
-            <p className="text-muted-foreground mt-2">
-              Carregando rodada atual...
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="page-container">
