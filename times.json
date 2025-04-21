@@ -1,0 +1,102 @@
+[
+  {
+    "nome": "Atlético-MG",
+    "sigla": "CAM",
+    "escudo": "/escudos/atletico_mineiro.png"
+  },
+  {
+    "nome": "Bahia",
+    "sigla": "BAH",
+    "escudo": "/escudos/bahia.png"
+  },
+  {
+    "nome": "Botafogo",
+    "sigla": "BOT",
+    "escudo": "/escudos/botafogo.png"
+  },
+  {
+    "nome": "Bragantino",
+    "sigla": "RBB",
+    "escudo": "/escudos/bragantino.png"
+  },
+  {
+    "nome": "Corinthians",
+    "sigla": "COR",
+    "escudo": "/escudos/corinthians.png"
+  },
+  {
+    "nome": "Cruzeiro",
+    "sigla": "CRU",
+    "escudo": "/escudos/cruzeiro.png"
+  },
+  {
+    "nome": "Ceará",
+    "sigla": "CEA",
+    "escudo": "/escudos/ceara.png"
+  },
+  {
+    "nome": "Flamengo",
+    "sigla": "FLA",
+    "escudo": "/escudos/flamengo.png"
+  },
+  {
+    "nome": "Fluminense",
+    "sigla": "FLU",
+    "escudo": "/escudos/fluminense.png"
+  },
+  {
+    "nome": "Fortaleza",
+    "sigla": "FOR",
+    "escudo": "/escudos/fortaleza.png"
+  },
+  {
+    "nome": "Grêmio",
+    "sigla": "GRE",
+    "escudo": "/escudos/gremio.png"
+  },
+  {
+    "nome": "Internacional",
+    "sigla": "INT",
+    "escudo": "/escudos/internacional.png"
+  },
+  {
+    "nome": "Mirassol",
+    "sigla": "MIR",
+    "escudo": "/escudos/mirassol.png"
+  },
+  {
+    "nome": "Palmeiras",
+    "sigla": "PAL",
+    "escudo": "/escudos/palmeiras.png"
+  },
+  {
+    "nome": "Santos",
+    "sigla": "SAN",
+    "escudo": "/escudos/santos.png"
+  },
+  {
+    "nome": "São Paulo",
+    "sigla": "SAO",
+    "escudo": "/escudos/sao_paulo.png"
+  },
+  {
+    "nome": "Sport",
+    "sigla": "SPO",
+    "escudo": "/escudos/sport.png"
+  },
+  {
+    "nome": "Vasco",
+    "sigla": "VAS",
+    "escudo": "/escudos/vasco.png"
+  },
+  {
+    "nome": "Vitória",
+    "sigla": "VIT",
+    "escudo": "/escudos/vitoria.png"
+  },
+  {
+    "nome": "Juventude",
+    "sigla": "JUV",
+    "escudo": "/escudos/juventude.png"
+  }
+]
