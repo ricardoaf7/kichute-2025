@@ -1,3 +1,4 @@
+
 // src/pages/Index.tsx
 
 import React from "react";
@@ -31,7 +32,7 @@ const Index = () => {
             <CardContent className="pt-6 flex flex-col items-center space-y-4">
               <CalendarIcon className="h-12 w-12 text-blue-600 bg-blue-100 p-2 rounded-lg" />
               <h2 className="text-xl font-semibold">Partidas</h2>
-              <Link to="/partidas" className="text-blue-600 hover:underline">
+              <Link to="/matches" className="text-blue-600 hover:underline">
                 Ver partidas →
               </Link>
             </CardContent>
