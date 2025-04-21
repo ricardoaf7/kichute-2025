@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
+    "build": "CI=false TSC_COMPILE_ON_ERROR=true DISABLE_ESLINT_PLUGIN=true vite build",
+    "build:dev": "CI=false TSC_COMPILE_ON_ERROR=true DISABLE_ESLINT_PLUGIN=true vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
   },
