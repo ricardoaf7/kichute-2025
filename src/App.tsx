@@ -1,107 +1,81 @@
 
-import { useToast } from "@/hooks/use-toast";
-import { Match, Round } from "@/types";
-import { MatchFormValues } from "./types";
-import { saveMatch, fetchAllMatches } from "./utils/supabaseHelpers";
-import { groupMatchesToRounds } from "./utils/matchTransformers";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-export const useMatchSubmit = (setRounds: React.Dispatch<React.SetStateAction<Round[]>>) => {
-  const { toast } = useToast();
+export const useCurrentRound = () => {
+  const [currentRound, setCurrentRound] = useState<number>(1);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const handleSubmitMatch = async (values: MatchFormValues, editingMatch: Match | null) => {
-    try {
-      const homeTeamId = values.homeTeam;
-      const awayTeamId = values.awayTeam;
-      const roundNumber = parseInt(values.round);
+  useEffect(() => {
+    const fetchCurrentRound = async () => {
+      setIsLoading(true);
+      try {
+        // Buscar todas as partidas ordenadas por rodada
+        const { data, error } = await supabase
+          .from("partidas")
+          .select("rodada, data")
+          .order("data", { ascending: true });
 
-      if (homeTeamId === awayTeamId) {
-        toast({
-          title: "Erro ao salvar partida",
-          description: "Os times da casa e visitante não podem ser os mesmos.",
-          variant: "destructive"
-        });
-        return false;
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          // Se não houver partidas, a rodada atual é 1
+          setCurrentRound(1);
+          return;
+        }
+
+        // Agrupar partidas por rodada
+        const matchesByRound = data.reduce((acc, match) => {
+          const round = match.rodada;
+          if (!acc[round]) {
+            acc[round] = [];
+          }
+          acc[round].push(match);
+          return acc;
+        }, {});
+
+        // Obter a data atual
+        const now = new Date();
+
+        // Encontrar a próxima rodada que ainda não começou
+        let nextRound = 1;
+        let foundNextRound = false;
+
+        // Ordenar as rodadas numericamente
+        const sortedRounds = Object.keys(matchesByRound)
+          .map(Number)
+          .sort((a, b) => a - b);
+
+        for (const round of sortedRounds) {
+          const matches = matchesByRound[round];
+          // Verificar se todas as partidas da rodada já aconteceram
+          const allMatchesPlayed = matches.every(match => new Date(match.data) < now);
+
+          if (!allMatchesPlayed) {
+            // Se nem todas as partidas aconteceram, esta é a próxima rodada
+            nextRound = round;
+            foundNextRound = true;
+            break;
+          }
+        }
+
+        // Se todas as rodadas já aconteceram, a rodada atual é a última
+        if (!foundNextRound && sortedRounds.length > 0) {
+          nextRound = sortedRounds[sortedRounds.length - 1];
+        }
+
+        setCurrentRound(nextRound);
+      } catch (err) {
+        console.error("Erro ao determinar a rodada atual:", err);
+        // Em caso de erro, usar rodada 1 como fallback
+        setCurrentRound(1);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      // Formato para o campo 'local' no banco de dados
-      const location = values.stadium + (values.city ? `, ${values.city}` : '');
+    fetchCurrentRound();
+  }, []);
 
-      // Obtém a data/hora exatamente como informada pelo usuário
-      const matchDate = values.matchDate;
-
-      // Cria uma string ISO com a data e hora local, mas com ajuste para o fuso horário
-      // Isso garante que a data/hora exibida será a mesma que foi inserida
-      const year = matchDate.getFullYear();
-      const month = String(matchDate.getMonth() + 1).padStart(2, '0');
-      const day = String(matchDate.getDate()).padStart(2, '0');
-      const hours = String(matchDate.getHours()).padStart(2, '0');
-      const minutes = String(matchDate.getMinutes()).padStart(2, '0');
-
-      // Formato: YYYY-MM-DDTHH:MM:00-03:00 (para horário de Brasília)
-      const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:00-03:00`;
-
-      console.log('Data formatada para salvar:', formattedDate);
-
-      // Salvar a data/hora no localStorage para reutilização
-      localStorage.setItem('lastMatchDateTime', matchDate.toISOString());
-
-      // Preparar dados para inserção ou atualização
-      const matchData = {
-        rodada: roundNumber,
-        data: formattedDate,
-        time_casa_id: homeTeamId,
-        time_visitante_id: awayTeamId,
-        local: location
-      };
-
-      // Save match to database
-      const { success, error } = await saveMatch(
-        matchData, 
-        editingMatch?.id
-      );
-
-      if (!success) {
-        throw new Error(error || "Erro ao salvar partida");
-      }
-
-      toast({
-        title: editingMatch ? "Partida atualizada" : "Partida adicionada",
-        description: editingMatch 
-          ? "A partida foi atualizada com sucesso." 
-          : "A partida foi adicionada com sucesso."
-      });
-
-      // Refresh matches from the database
-      const { data: matches, error: fetchError } = await fetchAllMatches();
-
-      if (fetchError) {
-        toast({
-          title: "Erro ao atualizar lista",
-          description: fetchError,
-          variant: "destructive"
-        });
-        return true; // Return true because the save was successful
-      }
-
-      if (matches) {
-        // Update rounds with fresh data
-        const newRounds = groupMatchesToRounds(matches);
-        setRounds(newRounds);
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Erro ao salvar partida:', error);
-      toast({
-        title: "Erro ao salvar partida",
-        description: error instanceof Error 
-          ? error.message 
-          : "Não foi possível salvar a partida no banco de dados.",
-        variant: "destructive"
-      });
-      return false;
-    }
-  };
-
-  return { handleSubmitMatch };
+  return { currentRound, isLoading };
 };
