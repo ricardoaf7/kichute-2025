@@ -4,6 +4,9 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -23,6 +26,7 @@ jobs:
       - name: Build
         run: |
           npm run build
+          touch dist/.nojekyll
         env:
           CI: false
           DISABLE_ESLINT_PLUGIN: true
@@ -33,3 +37,4 @@ jobs:
         with:
           folder: dist
           branch: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
