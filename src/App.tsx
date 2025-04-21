@@ -1,110 +1,107 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Navbar from "./components/navbar/Navbar";
-import Index from "./pages/Index";
-import Matches from "./pages/Matches";
-import Kichutes from "./pages/Guesses";
-import Standings from "./pages/Standings";
-import Payments from "./pages/Payments";
-import Prizes from "./pages/Prizes";
-import RoundReport from "./pages/RoundReport";
-import AdminMatches from "./pages/AdminMatches";
-import AdminTeams from "./pages/AdminTeams";
-import AdminScoring from "./pages/AdminScoring";
-import AdminUsers from "./pages/AdminUsers";
-import NotFound from "./pages/NotFound";
-import TesteEscudos from "./pages/TesteEscudos";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import { AuthProvider } from "./contexts/auth";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { useToast } from "@/hooks/use-toast";
+import { Match, Round } from "@/types";
+import { MatchFormValues } from "./types";
+import { saveMatch, fetchAllMatches } from "./utils/supabaseHelpers";
+import { groupMatchesToRounds } from "./utils/matchTransformers";
 
-const queryClient = new QueryClient();
+export const useMatchSubmit = (setRounds: React.Dispatch<React.SetStateAction<Round[]>>) => {
+  const { toast } = useToast();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Navbar />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            
-            {/* Protected Routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Index />
-              </ProtectedRoute>
-            } />
-            <Route path="/matches" element={
-              <ProtectedRoute>
-                <Matches />
-              </ProtectedRoute>
-            } />
-            <Route path="/kichutes" element={
-              <ProtectedRoute>
-                <Kichutes />
-              </ProtectedRoute>
-            } />
-            <Route path="/standings" element={
-              <ProtectedRoute>
-                <Standings />
-              </ProtectedRoute>
-            } />
-            <Route path="/prizes" element={
-              <ProtectedRoute>
-                <Prizes />
-              </ProtectedRoute>
-            } />
-            <Route path="/payments" element={
-              <ProtectedRoute>
-                <Payments />
-              </ProtectedRoute>
-            } />
-            <Route path="/round-report" element={
-              <ProtectedRoute>
-                <RoundReport />
-              </ProtectedRoute>
-            } />
-            
-            {/* Admin-only Routes */}
-            <Route path="/admin/matches" element={
-              <ProtectedRoute adminOnly>
-                <AdminMatches />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/teams" element={
-              <ProtectedRoute adminOnly>
-                <AdminTeams />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/scoring" element={
-              <ProtectedRoute adminOnly>
-                <AdminScoring />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/users" element={
-              <ProtectedRoute adminOnly>
-                <AdminUsers />
-              </ProtectedRoute>
-            } />
-            
-            {/* Misc Routes */}
-            <Route path="/teste" element={<TesteEscudos />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  const handleSubmitMatch = async (values: MatchFormValues, editingMatch: Match | null) => {
+    try {
+      const homeTeamId = values.homeTeam;
+      const awayTeamId = values.awayTeam;
+      const roundNumber = parseInt(values.round);
 
-export default App;
+      if (homeTeamId === awayTeamId) {
+        toast({
+          title: "Erro ao salvar partida",
+          description: "Os times da casa e visitante não podem ser os mesmos.",
+          variant: "destructive"
+        });
+        return false;
+      }
+
+      // Formato para o campo 'local' no banco de dados
+      const location = values.stadium + (values.city ? `, ${values.city}` : '');
+
+      // Obtém a data/hora exatamente como informada pelo usuário
+      const matchDate = values.matchDate;
+
+      // Cria uma string ISO com a data e hora local, mas com ajuste para o fuso horário
+      // Isso garante que a data/hora exibida será a mesma que foi inserida
+      const year = matchDate.getFullYear();
+      const month = String(matchDate.getMonth() + 1).padStart(2, '0');
+      const day = String(matchDate.getDate()).padStart(2, '0');
+      const hours = String(matchDate.getHours()).padStart(2, '0');
+      const minutes = String(matchDate.getMinutes()).padStart(2, '0');
+
+      // Formato: YYYY-MM-DDTHH:MM:00-03:00 (para horário de Brasília)
+      const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:00-03:00`;
+
+      console.log('Data formatada para salvar:', formattedDate);
+
+      // Salvar a data/hora no localStorage para reutilização
+      localStorage.setItem('lastMatchDateTime', matchDate.toISOString());
+
+      // Preparar dados para inserção ou atualização
+      const matchData = {
+        rodada: roundNumber,
+        data: formattedDate,
+        time_casa_id: homeTeamId,
+        time_visitante_id: awayTeamId,
+        local: location
+      };
+
+      // Save match to database
+      const { success, error } = await saveMatch(
+        matchData, 
+        editingMatch?.id
+      );
+
+      if (!success) {
+        throw new Error(error || "Erro ao salvar partida");
+      }
+
+      toast({
+        title: editingMatch ? "Partida atualizada" : "Partida adicionada",
+        description: editingMatch 
+          ? "A partida foi atualizada com sucesso." 
+          : "A partida foi adicionada com sucesso."
+      });
+
+      // Refresh matches from the database
+      const { data: matches, error: fetchError } = await fetchAllMatches();
+
+      if (fetchError) {
+        toast({
+          title: "Erro ao atualizar lista",
+          description: fetchError,
+          variant: "destructive"
+        });
+        return true; // Return true because the save was successful
+      }
+
+      if (matches) {
+        // Update rounds with fresh data
+        const newRounds = groupMatchesToRounds(matches);
+        setRounds(newRounds);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Erro ao salvar partida:', error);
+      toast({
+        title: "Erro ao salvar partida",
+        description: error instanceof Error 
+          ? error.message 
+          : "Não foi possível salvar a partida no banco de dados.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  return { handleSubmitMatch };
+};
