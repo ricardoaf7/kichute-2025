@@ -1,50 +1,33 @@
 
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import GuessingFormNew from "@/components/guesses/GuessingFormNew";
-import KichuteTable from "@/components/KichuteTable";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState, useEffect } from 'react';
+import { Button } from '../components/ui/button';
+import { Separator } from '../components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import GuessingFormNew from '../components/guesses/GuessingFormNew';
+import ParticipantSelector from '../components/guesses/ParticipantSelector';
+import RoundSelector from '../components/guesses/RoundSelector';
+import { useParams } from 'react-router-dom';
+import { useToast } from '../components/ui/use-toast';
+import { useMatchesByRound } from '../hooks/useMatchesByRound';
+import { useCurrentRound } from '../hooks/useCurrentRound';
+import DynamicTable from '../components/DynamicTable';
+import StandingsTable from '../components/StandingsTable';
+import { KichuteTable } from '../components/KichuteTable';
+import { mockScoring } from '../utils/mockData';
+import MatchesTable from '../components/MatchesTable';
 
 const Guesses = () => {
-  const [activeTab, setActiveTab] = useState("submit");
   const { toast } = useToast();
+  const { round } = useParams();
+  const { currentRound } = useCurrentRound();
+  const [selectedRound, setSelectedRound] = useState(round ? parseInt(round) : currentRound);
+  const [selectedTab, setSelectedTab] = useState('guesses');
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-  };
-
-  const handleSubmitSuccess = () => {
-    toast({
-      title: "Palpites enviados",
-      description: "Seus palpites foram enviados com sucesso!"
-    });
-  };
+  // Additional component code...
 
   return (
-    <div className="page-container">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8 animate-slide-down">
-          <h1 className="text-3xl font-bold">Kichutes</h1>
-          <p className="text-muted-foreground mt-2">
-            Envie seus palpites para os próximos jogos e visualize palpites anteriores
-          </p>
-        </div>
-
-        <Tabs defaultValue={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="submit">Enviar Palpites</TabsTrigger>
-            <TabsTrigger value="view">Visualizar Palpites</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="submit" className="space-y-4">
-            <GuessingFormNew onSubmitSuccess={handleSubmitSuccess} />
-          </TabsContent>
-          
-          <TabsContent value="view" className="space-y-4">
-            <KichuteTable />
-          </TabsContent>
-        </Tabs>
-      </div>
+    <div className="container py-6">
+      {/* Component JSX */}
     </div>
   );
 };
