@@ -1,81 +1,99 @@
+import { Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner";
+import { Navbar } from "@/components/navbar/Navbar";
+import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import NotFound from "@/pages/NotFound";
+import Standings from "@/pages/Standings";
+import Matches from "@/pages/Matches";
+import Guesses from "@/pages/Guesses";
+import Prizes from "@/pages/Prizes";
+import Payments from "@/pages/Payments";
+import RoundReport from "@/pages/RoundReport";
+import AdminUsers from "@/pages/AdminUsers";
+import AdminTeams from "@/pages/AdminTeams";
+import AdminMatches from "@/pages/AdminMatches";
+import AdminScoring from "@/pages/AdminScoring";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { AuthProvider } from "@/contexts/auth/AuthContext";
+import { MatchesProvider } from "@/contexts/MatchesContext";
+import "./App.css";
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+function App() {
+  return (
+    <AuthProvider>
+      <MatchesProvider>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/standings" element={<Standings />} />
+          <Route path="/matches" element={<Matches />} />
+          <Route
+            path="/guesses"
+            element={
+              <ProtectedRoute>
+                <Guesses />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/prizes" element={<Prizes />} />
+          <Route
+            path="/payments"
+            element={
+              <ProtectedRoute>
+                <Payments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/round-report"
+            element={
+              <ProtectedRoute>
+                <RoundReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/teams"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminTeams />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/matches"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminMatches />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/scoring"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminScoring />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </MatchesProvider>
+    </AuthProvider>
+  );
+}
 
-export const useCurrentRound = () => {
-  const [currentRound, setCurrentRound] = useState<number>(1);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const fetchCurrentRound = async () => {
-      setIsLoading(true);
-      try {
-        // Buscar todas as partidas ordenadas por rodada
-        const { data, error } = await supabase
-          .from("partidas")
-          .select("rodada, data")
-          .order("data", { ascending: true });
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-          // Se não houver partidas, a rodada atual é 1
-          setCurrentRound(1);
-          return;
-        }
-
-        // Agrupar partidas por rodada
-        const matchesByRound = data.reduce((acc, match) => {
-          const round = match.rodada;
-          if (!acc[round]) {
-            acc[round] = [];
-          }
-          acc[round].push(match);
-          return acc;
-        }, {});
-
-        // Obter a data atual
-        const now = new Date();
-
-        // Encontrar a próxima rodada que ainda não começou
-        let nextRound = 1;
-        let foundNextRound = false;
-
-        // Ordenar as rodadas numericamente
-        const sortedRounds = Object.keys(matchesByRound)
-          .map(Number)
-          .sort((a, b) => a - b);
-
-        for (const round of sortedRounds) {
-          const matches = matchesByRound[round];
-          // Verificar se todas as partidas da rodada já aconteceram
-          const allMatchesPlayed = matches.every(match => new Date(match.data) < now);
-
-          if (!allMatchesPlayed) {
-            // Se nem todas as partidas aconteceram, esta é a próxima rodada
-            nextRound = round;
-            foundNextRound = true;
-            break;
-          }
-        }
-
-        // Se todas as rodadas já aconteceram, a rodada atual é a última
-        if (!foundNextRound && sortedRounds.length > 0) {
-          nextRound = sortedRounds[sortedRounds.length - 1];
-        }
-
-        setCurrentRound(nextRound);
-      } catch (err) {
-        console.error("Erro ao determinar a rodada atual:", err);
-        // Em caso de erro, usar rodada 1 como fallback
-        setCurrentRound(1);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCurrentRound();
-  }, []);
-
-  return { currentRound, isLoading };
-};
+export default App;
