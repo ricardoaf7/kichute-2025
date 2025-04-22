@@ -12,8 +12,8 @@ import { useMatchesByRound } from '../hooks/useMatchesByRound';
 import { useCurrentRound } from '../hooks/useCurrentRound';
 import DynamicTable from '../components/DynamicTable';
 import StandingsTable from '../components/StandingsTable';
-import { KichuteTable } from '../components/KichuteTable';
-import { scoring as mockScoring } from '../utils/mockData';
+import KichuteTable from '../components/KichuteTable';
+import { SCORING_SYSTEM as mockScoring } from '../utils/mockData';
 import MatchesTable from '../components/MatchesTable';
 
 const Guesses = () => {

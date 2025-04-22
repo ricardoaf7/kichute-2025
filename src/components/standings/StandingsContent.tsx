@@ -26,9 +26,8 @@ const StandingsContent: React.FC<StandingsContentProps> = ({
         <DynamicTable />
       ) : viewMode === "table" ? (
         <StandingsTable 
-          players={sortedPlayers} 
-          showRoundPoints={true}
-          selectedRound={selectedRound}
+          selectedRodada={selectedRound ? selectedRound.toString() : "todas"} 
+          selectedJogador="todos"
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
