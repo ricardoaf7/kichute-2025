@@ -4,8 +4,8 @@ import { Button } from '../components/ui/button';
 import { Separator } from '../components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import GuessingFormNew from '../components/guesses/GuessingFormNew';
-import ParticipantSelector from '../components/guesses/ParticipantSelector';
-import RoundSelector from '../components/guesses/RoundSelector';
+import { ParticipantSelector } from '../components/guesses/ParticipantSelector';
+import { RoundSelector } from '../components/guesses/RoundSelector';
 import { useParams } from 'react-router-dom';
 import { useToast } from '../components/ui/use-toast';
 import { useMatchesByRound } from '../hooks/useMatchesByRound';
@@ -13,7 +13,7 @@ import { useCurrentRound } from '../hooks/useCurrentRound';
 import DynamicTable from '../components/DynamicTable';
 import StandingsTable from '../components/StandingsTable';
 import { KichuteTable } from '../components/KichuteTable';
-import { mockScoring } from '../utils/mockData';
+import { scoring as mockScoring } from '../utils/mockData';
 import MatchesTable from '../components/MatchesTable';
 
 const Guesses = () => {

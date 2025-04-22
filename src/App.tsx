@@ -1,6 +1,7 @@
+
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
-import { Navbar } from "@/components/navbar/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
