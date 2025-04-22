@@ -25989,7 +25989,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-BKbG1LFB.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-C-N58ycI.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -32920,9 +32920,8 @@ const StandingsContent = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`, children: viewMode === "dynamic" ? /* @__PURE__ */ jsxRuntimeExports.jsx(DynamicTable, {}) : viewMode === "table" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
     StandingsTable,
     {
-      players: sortedPlayers,
-      showRoundPoints: true,
-      selectedRound
+      selectedRodada: selectedRound ? selectedRound.toString() : "todas",
+      selectedJogador: "todos"
     }
   ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6", children: sortedPlayers.map((player, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
     PlayerCard,
@@ -51327,7 +51326,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-DJ_VPeTM.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Ctm-VYR2.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
