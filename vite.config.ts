@@ -4,7 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/kichute-2025/", // Nome do seu repositório
+  base: "./", // Nome do seu repositório
   server: {
     host: "::",
     port: 8080,
