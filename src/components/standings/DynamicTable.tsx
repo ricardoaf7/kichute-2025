@@ -22,7 +22,7 @@ const DynamicTable = () => {
   const { sortField, sortDirection, handleSort, sortPlayers } = useTableSort();
 
   // Explicitly type rodadas as string[]
-  const todasRodadas: string[] = rodadas;
+  const todasRodadas = rodadas;
 
   const calcularTotalPorRodada = () => {
     const totais: Record<string, number> = {};
@@ -52,7 +52,7 @@ const DynamicTable = () => {
   return (
     <div className="space-y-4">
       <TableFilters
-        rodadas={rodadas}
+        rodadas={rodadas.map(r => parseInt(r.replace('r', '')))}
         selectedRodada={selectedRodada}
         selectedMes={selectedMes}
         selectedAno={selectedAno}
