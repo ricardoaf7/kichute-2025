@@ -21,6 +21,7 @@ const DynamicTable = () => {
 
   const { sortField, sortDirection, handleSort, sortPlayers } = useTableSort();
 
+  // Fix the type issue by explicitly treating rodadas as string[]
   const todasRodadas: RodadaKey[] = rodadas;
 
   const calcularTotalPorRodada = () => {
