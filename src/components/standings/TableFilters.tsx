@@ -32,6 +32,21 @@ export const TableFilters = ({
   onMesChange,
   onAnoChange
 }: TableFiltersProps) => {
+  // Array com todos os meses do ano
+  const mesesAno = [
+    { value: "todos", label: "Todos os meses" },
+    { value: "3-2025", label: "Março de 2025" },
+    { value: "4-2025", label: "Abril de 2025" },
+    { value: "5-2025", label: "Maio de 2025" },
+    { value: "6-2025", label: "Junho de 2025" },
+    { value: "7-2025", label: "Julho de 2025" },
+    { value: "8-2025", label: "Agosto de 2025" },
+    { value: "9-2025", label: "Setembro de 2025" },
+    { value: "10-2025", label: "Outubro de 2025" },
+    { value: "11-2025", label: "Novembro de 2025" },
+    { value: "12-2025", label: "Dezembro de 2025" },
+  ];
+
   return (
     <div className="flex flex-wrap gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="flex flex-col gap-1">
@@ -62,8 +77,11 @@ export const TableFilters = ({
             <SelectValue placeholder="Selecionar mês" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="todos">Todos os meses</SelectItem>
-            <SelectItem value="4-2025">Abril de 2025</SelectItem>
+            {mesesAno.map((mes) => (
+              <SelectItem key={mes.value} value={mes.value}>
+                {mes.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

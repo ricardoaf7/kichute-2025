@@ -124,6 +124,16 @@ const Standings = () => {
           </p>
         </div>
 
+        {/* Pontuação da rodada vem antes do filtro */}
+        {selectedRound && (
+          <div className="mt-8 mb-8">
+            <h2 className="text-xl font-semibold mb-4">
+              Pontuação da Rodada {selectedRound}
+            </h2>
+            <RoundScoreTable selectedRound={selectedRound} />
+          </div>
+        )}
+
         <StandingsHeader
           viewMode={viewMode}
           setViewMode={setViewMode}
@@ -145,19 +155,9 @@ const Standings = () => {
             selectedRound={selectedRound}
             isLoaded={isLoaded}
           />
-
-          {selectedRound && (
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">
-                Pontuação da Rodada {selectedRound}
-              </h2>
-              <RoundScoreTable selectedRound={selectedRound} />
-            </div>
-          )}
         </div>
       </div>
     </div>
   );
 };
-
 export default Standings;

@@ -12,36 +12,64 @@ interface MatchesReportTableProps {
   kichutes: any[];
 }
 
-const getPointsIcon = (points: number) => {
-  if (points >= 7) return <Trophy className="h-4 w-4 text-yellow-500" />;
-  if (points >= 4) return <Medal className="h-4 w-4 text-blue-500" />;
-  if (points >= 2) return <Star className="h-4 w-4 text-green-500" />;
-  return null;
+// Função para calcular os top N indexes de pontuação para anual
+function getTopIndexes(pointsArr: number[], count: number = 3) {
+  const sorted = [...pointsArr].sort((a, b) => b - a).slice(0, count);
+  return sorted.map(score => pointsArr.indexOf(score));
+}
+
+// Para relatório: só vencedor (1º) recebe taça na rodada/mês e os 3 recebem na anual.
+const getReportIcons = (pointsArr: number[], visualMode: "rodada" | "mes" | "anual") => {
+  const max = Math.max(...pointsArr);
+  if (visualMode === "anual") {
+    // Top 3 recebem troféu, medalha, estrela
+    const topIndexes = getTopIndexes(pointsArr, 3);
+    return pointsArr.map((p, idx) =>
+      idx === topIndexes[0] ? <Trophy className="h-4 w-4 text-yellow-500" />
+      : idx === topIndexes[1] ? <Medal className="h-4 w-4 text-blue-500" />
+      : idx === topIndexes[2] ? <Star className="h-4 w-4 text-green-500" />
+      : null
+    );
+  } else {
+    // Só vencedor: taça
+    return pointsArr.map((p, idx) =>
+      p === max ? <Trophy className="h-4 w-4 text-yellow-500" /> : null
+    );
+  }
 };
 
+// Para esta tabela, vamos considerar o modo como "rodada" (relatório individual). Poderia fazer heurística para mensal/anual.
 export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesReportTableProps) => {
-  // Add safety checks for matches data
-  const validMatches = matches?.filter(match => 
-    match && match.time_casa && match.time_visitante && 
+  const validMatches = matches?.filter(match =>
+    match && match.time_casa && match.time_visitante &&
     match.time_casa.sigla && match.time_visitante.sigla
   ) || [];
-
-  console.log("Valid matches for report:", validMatches);
-  console.log("Participants:", participants);
-  console.log("Kichutes for report:", kichutes);
 
   // Função para calcular pontos do palpite
   const calculateGuessPoints = (guess: any, match: any) => {
     if (!guess || !match) return 0;
-    
-    // Se o jogo ainda não tem resultado, retorna 0
     if (match.placar_casa === null || match.placar_visitante === null) return 0;
-    
     return calculatePoints(
       { homeScore: guess.palpite_casa, awayScore: guess.palpite_visitante },
       { homeScore: match.placar_casa, awayScore: match.placar_visitante }
     );
   };
+
+  // Calcular pontos totais de cada participante (para anual ou rodada)
+  const totalPointsArr = participants.map(participant => {
+    let total = 0;
+    validMatches.forEach(match => {
+      const guess = kichutes.find(
+        k => k.partida_id === match.id && k.jogador_id === participant.id
+      );
+      total += calculateGuessPoints(guess, match);
+    });
+    return total;
+  });
+
+  // Por padrão, consideramos relatório por rodada: só um vencedor com taça.
+  const visualMode: "rodada" | "mes" | "anual" = "rodada";
+  const iconsByParticipant = getReportIcons(totalPointsArr, visualMode);
 
   return (
     <div className="rounded-lg border shadow-sm overflow-x-auto">
@@ -57,7 +85,6 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
             ))}
           </TableRow>
         </TableHeader>
-        
         <TableBody>
           {validMatches.length > 0 ? (
             validMatches.map((match) => (
@@ -66,20 +93,17 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
                   {match.time_casa.sigla} x {match.time_visitante.sigla}
                 </TableCell>
                 <TableCell className="sticky left-[200px] z-10 bg-inherit">
-                  <ScoreDisplay 
-                    homeScore={match.placar_casa} 
-                    awayScore={match.placar_visitante} 
-                    isMatchPlayed={match.placar_casa !== null && match.placar_visitante !== null} 
+                  <ScoreDisplay
+                    homeScore={match.placar_casa}
+                    awayScore={match.placar_visitante}
+                    isMatchPlayed={match.placar_casa !== null && match.placar_visitante !== null}
                   />
                 </TableCell>
-                
-                {participants.map(participant => {
+                {participants.map((participant, idx) => {
                   const guess = kichutes.find(
                     k => k.partida_id === match.id && k.jogador_id === participant.id
                   );
-                  
                   const points = calculateGuessPoints(guess, match);
-                  
                   return (
                     <TableCell key={`${match.id}-${participant.id}`} className="text-center">
                       <div className="flex flex-col items-center space-y-1">
@@ -90,7 +114,8 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
                             </div>
                             <div className={getPointsBadgeClass(points)}>
                               <span className="flex items-center gap-1">
-                                {getPointsIcon(points)}
+                                {/* Adiciona o ícone do relatório para esse participante (ex: taça) apenas na coluna do total */}
+                                {iconsByParticipant[idx]}
                                 <span>{points}</span>
                               </span>
                             </div>
@@ -112,7 +137,6 @@ export const MatchesReportTable = ({ matches, participants, kichutes }: MatchesR
             </TableRow>
           )}
         </TableBody>
-
         <TableFooter>
           <RoundTotalScore selectedRound={Number(validMatches[0]?.rodada || 0)} />
         </TableFooter>

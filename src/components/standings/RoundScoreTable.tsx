@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { usePontuacaoRodada } from "@/hooks/usePontuacaoRodada";
-import { Trophy, Medal, Star } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface RoundScoreTableProps {
@@ -18,17 +18,25 @@ interface RoundScoreTableProps {
 const RoundScoreTable = ({ selectedRound }: RoundScoreTableProps) => {
   const { pontuacoes, isLoading } = usePontuacaoRodada(selectedRound);
 
-  const getPontosIcon = (pontos: number) => {
-    if (pontos >= 7) return <Trophy className="h-4 w-4 text-yellow-500 inline mr-1" />;
-    if (pontos >= 4) return <Medal className="h-4 w-4 text-blue-500 inline mr-1" />;
-    if (pontos >= 2) return <Star className="h-4 w-4 text-green-500 inline mr-1" />;
+  // Definir o índice do vencedor (maior pontuação)
+  const getWinnerIndexes = (pontuacoes: any[]) => {
+    if (!pontuacoes || pontuacoes.length === 0) return [];
+    const max = Math.max(...pontuacoes.map((p) => p.pontos));
+    return pontuacoes
+      .map((p, idx) => (p.pontos === max ? idx : -1))
+      .filter(idx => idx !== -1);
+  };
+
+  const winnerIndexes = getWinnerIndexes(pontuacoes);
+
+  const getPontosIcon = (idx: number) => {
+    // Só o(s) primeiro(s) da rodada recebem a taça
+    if (winnerIndexes.includes(idx)) return <Trophy className="h-4 w-4 text-yellow-500 inline mr-1" />;
     return null;
   };
 
-  const getPontosClass = (pontos: number) => {
-    if (pontos >= 7) return "text-yellow-600 dark:text-yellow-400";
-    if (pontos >= 4) return "text-blue-600 dark:text-blue-400";
-    if (pontos >= 2) return "text-green-600 dark:text-green-400";
+  const getPontosClass = (idx: number) => {
+    if (winnerIndexes.includes(idx)) return "text-yellow-600 dark:text-yellow-400 font-bold";
     return "text-gray-600 dark:text-gray-400";
   };
 
@@ -55,12 +63,12 @@ const RoundScoreTable = ({ selectedRound }: RoundScoreTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {pontuacoes.map((pontuacao) => (
+          {pontuacoes.map((pontuacao, idx) => (
             <TableRow key={pontuacao.id}>
               <TableCell className="text-center">{pontuacao.rodada}</TableCell>
               <TableCell>{pontuacao.jogador.nome}</TableCell>
-              <TableCell className={cn("text-center font-medium", getPontosClass(pontuacao.pontos))}>
-                {getPontosIcon(pontuacao.pontos)}
+              <TableCell className={cn("text-center font-medium", getPontosClass(idx))}>
+                {getPontosIcon(idx)}
                 {pontuacao.pontos}
               </TableCell>
             </TableRow>
