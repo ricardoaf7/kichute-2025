@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from "react";
 import StandingsHeader from "../components/standings/StandingsHeader";
 import StandingsContent from "../components/standings/StandingsContent";
 import RoundScoreTable from "../components/standings/RoundScoreTable";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useCurrentRound } from "@/hooks/useCurrentRound";
 
 const Standings = () => {
   const [viewMode, setViewMode] =
@@ -16,6 +18,7 @@ const Standings = () => {
   const [useDynamicTable, setUseDynamicTable] = useState<boolean>(true);
   const [availableRounds, setAvailableRounds] = useState<number[]>([]);
   const { toast } = useToast();
+  const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
 
   // 1) Carregar rodadas disponíveis
   useEffect(() => {
@@ -31,6 +34,11 @@ const Standings = () => {
           ...new Set(data?.map((item) => item.rodada)),
         ].filter(Boolean) as number[];
         setAvailableRounds(uniqueRounds);
+
+        // Inicializa a rodada para classificação: usar última rodada FINALIZADA
+        if (!selectedRound && !isLoadingCurrentRound && uniqueRounds.length > 0 && currentRound > 1) {
+          setSelectedRound(currentRound - 1);
+        }
       } catch (err) {
         console.error("Erro ao buscar rodadas:", err);
         toast({
@@ -43,7 +51,8 @@ const Standings = () => {
       }
     };
     fetchRounds();
-  }, [toast]);
+    // eslint-disable-next-line
+  }, [toast, isLoadingCurrentRound, currentRound]);
 
   // 2) Auto-update ao mudar selectedRound (escolha A)
   useEffect(() => {

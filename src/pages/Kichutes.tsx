@@ -1,14 +1,24 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import GuessingFormNew from "@/components/guesses/GuessingFormNew";
 import KichuteTable from "@/components/KichuteTable";
 import { useToast } from "@/components/ui/use-toast";
+import { useCurrentRound } from "@/hooks/useCurrentRound";
 
 const Kichutes = () => {
   const { toast } = useToast();
+  // Novidade: usar rodada atual para tab inicial
+  const { currentRound, isLoading } = useCurrentRound();
   const [selectedTab, setSelectedTab] = useState('form');
+  const [initialRound, setInitialRound] = useState<string>("1");
+
+  useEffect(() => {
+    if (!isLoading && currentRound) {
+      setInitialRound(currentRound.toString());
+    }
+  }, [isLoading, currentRound]);
 
   const handleGuessSubmitSuccess = () => {
     toast({
@@ -16,7 +26,6 @@ const Kichutes = () => {
       description: "Seus kichutes foram registrados.",
       variant: "default",
     });
-    // Muda para a aba de visualização após salvar
     setSelectedTab('view');
   };
 
@@ -33,7 +42,8 @@ const Kichutes = () => {
 
         <TabsContent value="form" className="space-y-6">
           <div className="bg-card rounded-lg shadow">
-            <GuessingFormNew onSubmitSuccess={handleGuessSubmitSuccess} />
+            {/* Passa a rodada inicial como prop */}
+            <GuessingFormNew onSubmitSuccess={handleGuessSubmitSuccess} initialRound={initialRound} />
           </div>
         </TabsContent>
 

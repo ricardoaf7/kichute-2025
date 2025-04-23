@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,10 +9,11 @@ import { GuessingFormContent } from "./GuessingFormContent";
 
 interface GuessingFormNewProps {
   onSubmitSuccess: () => void;
+  initialRound?: string;
 }
 
-const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
-  const [selectedRound, setSelectedRound] = useState<string>("1");
+const GuessingFormNew = ({ onSubmitSuccess, initialRound = "1" }: GuessingFormNewProps) => {
+  const [selectedRound, setSelectedRound] = useState<string>(initialRound);
   const [selectedParticipant, setSelectedParticipant] = useState<string>("");
   const [isRoundClosed, setIsRoundClosed] = useState<boolean>(false);
   const { toast } = useToast();
@@ -27,13 +27,15 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     saveGuesses
   } = useGuesses(onSubmitSuccess);
 
-  // Load existing guesses when participant is selected
+  useEffect(() => {
+    setSelectedRound(initialRound);
+  }, [initialRound]);
+
   useEffect(() => {
     const fetchExistingGuesses = async () => {
       if (!selectedParticipant) return;
 
       try {
-        // Get partidas for the selected round
         const { data: matchesData, error: matchesError } = await supabase
           .from("partidas")
           .select("id")
@@ -41,7 +43,6 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
 
         if (matchesError) throw matchesError;
 
-        // Get existing kichutes
         const { data: existingGuesses, error: guessesError } = await supabase
           .from("kichutes")
           .select("*")
@@ -52,7 +53,6 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
 
         console.log("Palpites existentes:", existingGuesses);
 
-        // Crie um novo array em vez de modificar o existente
         const updatedGuesses = matches.map(match => {
           const existingGuess = existingGuesses.find(g => g.partida_id === match.id);
           return {
@@ -74,12 +74,10 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     };
 
     fetchExistingGuesses();
-  }, [selectedParticipant, selectedRound, matches, toast]); // Removido guesses e setGuesses
+  }, [selectedParticipant, selectedRound, matches, toast]);
 
-  // Check if current user is admin
   const isAdmin = user?.role === "Administrador";
 
-  // Set default participant to current user if not admin
   useEffect(() => {
     if (user && !isAdmin && user.id) {
       setSelectedParticipant(user.id);
@@ -107,7 +105,6 @@ const GuessingFormNew = ({ onSubmitSuccess }: GuessingFormNewProps) => {
     await saveGuesses(selectedParticipant);
   };
 
-  // Initialize guesses when matches change
   useEffect(() => {
     if (!matches || matches.length === 0) return;
 

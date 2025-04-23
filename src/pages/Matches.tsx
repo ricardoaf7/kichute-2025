@@ -6,14 +6,24 @@ import { supabase } from "@/integrations/supabase/client";
 import MatchCard from "@/components/MatchCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MatchesTable from "@/components/MatchesTable";
+import { useCurrentRound } from "@/hooks/useCurrentRound";
 
 const Matches = () => {
+  const { currentRound, isLoading: isLoadingRound } = useCurrentRound();
+  // Novo: inicializa a rodada com a atual
+  const [selectedRound, setSelectedRound] = useState<number>(1);
   const [activeTab, setActiveTab] = useState("cards");
-  const [selectedRound, setSelectedRound] = useState(1);
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const isAdmin = user?.role === "Administrador";
+
+  // Atualiza rodada inicial quando hook da rodada carrega
+  useEffect(() => {
+    if (!isLoadingRound && currentRound) {
+      setSelectedRound(currentRound);
+    }
+  }, [isLoadingRound, currentRound]);
 
   const fetchMatches = async () => {
     setIsLoading(true);

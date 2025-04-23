@@ -1,5 +1,5 @@
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useMatches, MatchesProvider } from "@/contexts/MatchesContext";
 import { RoundSelector } from "@/components/guesses/RoundSelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,17 +8,28 @@ import { ReportActions } from "@/components/round-report/ReportActions";
 import { useParticipants } from "@/hooks/useParticipants";
 import { useKichutes } from "@/hooks/useKichutes";
 import { useMatchesByRound } from "@/hooks/useMatchesByRound";
+import { useCurrentRound } from "@/hooks/useCurrentRound";
 
 const RoundReportContent = () => {
   const reportRef = useRef<HTMLDivElement>(null);
   const { rounds, selectedRound, setSelectedRound } = useMatches();
   const { participants, isLoading: isLoadingParticipants } = useParticipants();
+  const [initialReportRound, setInitialReportRound] = useState<number>(1);
+  const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
   const { kichutes, isLoading: isLoadingKichutes } = useKichutes(selectedRound);
   const { matches, isLoading: isLoadingMatches } = useMatchesByRound(selectedRound.toString());
   
+  // Ajusta para mostrar como padrão a última rodada FINALIZADA
+  useEffect(() => {
+    if (!isLoadingCurrentRound && currentRound > 1) {
+      setInitialReportRound(currentRound - 1);
+      setSelectedRound(currentRound - 1);
+    }
+    // eslint-disable-next-line
+  }, [isLoadingCurrentRound, currentRound]);
+
   const isLoading = isLoadingParticipants || isLoadingKichutes || isLoadingMatches;
 
-  // Formatação dos matches no formato esperado pela MatchesReportTable
   const formattedMatches = matches.map(match => ({
     id: match.id,
     rodada: match.rodada,
