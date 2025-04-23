@@ -5,7 +5,7 @@ import StandingsTable from "../StandingsTable";
 import DynamicTable from "./DynamicTable";
 
 interface StandingsContentProps {
-  viewMode: "table" | "cards" | "dynamic";
+  viewMode: "table" | "dynamic";
   sortedPlayers: Player[];
   selectedRound: number | undefined;
   isLoaded: boolean;
@@ -23,15 +23,11 @@ const StandingsContent: React.FC<StandingsContentProps> = ({
     }`}>
       {viewMode === "dynamic" ? (
         <DynamicTable />
-      ) : viewMode === "table" ? (
+      ) : (
         <StandingsTable 
           selectedRodada={selectedRound ? selectedRound.toString() : "todas"} 
           selectedJogador="todos"
         />
-      ) : (
-        <div className="text-center p-8 text-muted-foreground">
-          Modo de visualização de cards está desativado.
-        </div>
       )}
     </div>
   );

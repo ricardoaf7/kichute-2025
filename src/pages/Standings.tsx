@@ -9,7 +9,7 @@ import { useCurrentRound } from "@/hooks/useCurrentRound";
 
 const Standings = () => {
   const [viewMode, setViewMode] =
-    useState<"table" | "cards" | "dynamic">("dynamic");
+    useState<"table" | "dynamic">("dynamic");
   const [selectedRound, setSelectedRound] =
     useState<number | undefined>(undefined);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");

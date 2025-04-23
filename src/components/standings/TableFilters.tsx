@@ -9,44 +9,19 @@ interface TableFiltersProps {
   onRodadaChange: (value: string) => void;
   onMesChange: (value: string) => void;
   onAnoChange: (value: string) => void;
+  months?: { value: string; label: string }[];
 }
 
-const getNomeMes = (codigoMes: string) => {
-  if (codigoMes === "todos") return "Todos os meses";
-  
-  const [mes, ano] = codigoMes.split('-');
-  const nomesMeses = [
-    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", 
-    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-  ];
-  
-  return `${nomesMeses[parseInt(mes) - 1]} de ${ano}`;
-};
-
-export const TableFilters = ({
+export const TableFilters: React.FC<TableFiltersProps> = ({
   rodadas,
   selectedRodada,
   selectedMes,
   selectedAno,
   onRodadaChange,
   onMesChange,
-  onAnoChange
-}: TableFiltersProps) => {
-  // Array com todos os meses do ano
-  const mesesAno = [
-    { value: "todos", label: "Todos os meses" },
-    { value: "3-2025", label: "Março de 2025" },
-    { value: "4-2025", label: "Abril de 2025" },
-    { value: "5-2025", label: "Maio de 2025" },
-    { value: "6-2025", label: "Junho de 2025" },
-    { value: "7-2025", label: "Julho de 2025" },
-    { value: "8-2025", label: "Agosto de 2025" },
-    { value: "9-2025", label: "Setembro de 2025" },
-    { value: "10-2025", label: "Outubro de 2025" },
-    { value: "11-2025", label: "Novembro de 2025" },
-    { value: "12-2025", label: "Dezembro de 2025" },
-  ];
-
+  onAnoChange,
+  months = []
+}) => {
   return (
     <div className="flex flex-wrap gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="flex flex-col gap-1">
@@ -77,9 +52,10 @@ export const TableFilters = ({
             <SelectValue placeholder="Selecionar mês" />
           </SelectTrigger>
           <SelectContent>
-            {mesesAno.map((mes) => (
-              <SelectItem key={mes.value} value={mes.value}>
-                {mes.label}
+            <SelectItem value="todos">Todos os meses</SelectItem>
+            {months.map(month => (
+              <SelectItem key={`mes-${month.value}`} value={month.value}>
+                {month.label}
               </SelectItem>
             ))}
           </SelectContent>

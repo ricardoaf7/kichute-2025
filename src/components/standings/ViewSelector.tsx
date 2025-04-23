@@ -1,16 +1,16 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { LayoutGrid, TableProperties, LineChart } from "lucide-react";
+import { TableProperties, LineChart } from "lucide-react";
 
 interface ViewSelectorProps {
-  viewMode: "table" | "cards" | "dynamic";
-  setViewMode: (mode: "table" | "cards" | "dynamic") => void;
+  viewMode: "table" | "dynamic";
+  setViewMode: (mode: "table" | "dynamic") => void;
   setUseDynamicTable: (value: boolean) => void;
 }
 
 const ViewSelector: React.FC<ViewSelectorProps> = ({ viewMode, setViewMode, setUseDynamicTable }) => {
-  const handleModeChange = (mode: "table" | "cards" | "dynamic") => {
+  const handleModeChange = (mode: "table" | "dynamic") => {
     setViewMode(mode);
     setUseDynamicTable(mode === "dynamic");
   };
@@ -43,20 +43,6 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ viewMode, setViewMode, setU
       >
         <TableProperties className="h-4 w-4 mr-2" />
         <span className="hidden sm:inline">Tabela Resumida</span>
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        className={`${
-          viewMode === "cards"
-            ? "bg-muted/80 text-primary-foreground"
-            : "hover:bg-muted/40"
-        }`}
-        onClick={() => handleModeChange("cards")}
-      >
-        <LayoutGrid className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline">Cards</span>
       </Button>
     </div>
   );

@@ -4,8 +4,8 @@ import FilterSelector from "./FilterSelector";
 import ViewSelector from "./ViewSelector";
 
 interface StandingsHeaderProps {
-  viewMode: "table" | "cards" | "dynamic";
-  setViewMode: (mode: "table" | "cards" | "dynamic") => void;
+  viewMode: "table" | "dynamic";
+  setViewMode: (mode: "table" | "dynamic") => void;
   selectedRound: number | undefined;
   selectedMonth: string;
   selectedYear: string;

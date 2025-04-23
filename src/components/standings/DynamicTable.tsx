@@ -4,16 +4,14 @@ import { RotateCw, ChevronDown, ChevronUp } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
 import { TableFilters } from "./TableFilters";
 import { useTableSort, SortField } from "@/hooks/standings/useTableSort";
-import { useDynamicTableDataReal as useDynamicTableData } from "@/hooks/standings/useDynamicTableDataReal";
-
-type RodadaKey = string;
+import { useDynamicTableDataReal } from "@/hooks/useDynamicTableDataReal";
 
 const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = useState<string>("todas");
   const [selectedMes, setSelectedMes] = useState<string>("todos");
   const [selectedAno, setSelectedAno] = useState<string>("2025");
 
-  const { jogadores, rodadas, isLoading, error } = useDynamicTableData(
+  const { jogadores, rodadas, isLoading, error } = useDynamicTableDataReal(
     selectedRodada,
     selectedMes,
     selectedAno
@@ -49,6 +47,22 @@ const DynamicTable = () => {
 
   const sortedPlayers = sortPlayers(jogadores, selectedRodada);
 
+  // List of months in Portuguese
+  const months = [
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" },
+  ];
+
   return (
     <div className="space-y-4">
       <TableFilters
@@ -59,6 +73,7 @@ const DynamicTable = () => {
         onRodadaChange={setSelectedRodada}
         onMesChange={setSelectedMes}
         onAnoChange={setSelectedAno}
+        months={months}
       />
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
