@@ -25995,7 +25995,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-BrafXbNK.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-rIY-GhEK.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -32713,8 +32713,8 @@ const useTableSort = () => {
     sortPlayers
   };
 };
-const supabaseUrl = void 0;
-const supabaseAnonKey = void 0;
+const supabaseUrl = "https://nabcktytlytgrdwhdanx.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hYmNrdHl0bHl0Z3Jkd2hkYW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1NjU2NjgsImV4cCI6MjA2MDE0MTY2OH0.Pp7I0dVN0-Tp1bXbjwuXUvF78gH-tXey_a9TNO1Au5E";
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 function useDynamicTableDataReal(selectedRodada, selectedMes, selectedAno) {
   const [jogadores, setJogadores] = reactExports.useState([]);
@@ -51971,7 +51971,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-CaEdAhbf.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-ZZZ6nuG_.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
