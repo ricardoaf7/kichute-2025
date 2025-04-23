@@ -8999,26 +8999,6 @@ const MapPin = createLucideIcon("MapPin", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const Medal = createLucideIcon("Medal", [
-  [
-    "path",
-    {
-      d: "M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15",
-      key: "143lza"
-    }
-  ],
-  ["path", { d: "M11 12 5.12 2.2", key: "qhuxz6" }],
-  ["path", { d: "m13 12 5.88-9.8", key: "hbye0f" }],
-  ["path", { d: "M8 7h8", key: "i86dvs" }],
-  ["circle", { cx: "12", cy: "17", r: "5", key: "qbz8iq" }],
-  ["path", { d: "M12 18v-2h-.5", key: "fawc4q" }]
-]);
-/**
- * @license lucide-react v0.462.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
 const Menu$1 = createLucideIcon("Menu", [
   ["line", { x1: "4", x2: "20", y1: "12", y2: "12", key: "1e0a9i" }],
   ["line", { x1: "4", x2: "20", y1: "6", y2: "6", key: "1owob3" }],
@@ -9146,21 +9126,6 @@ const SquarePen = createLucideIcon("SquarePen", [
     {
       d: "M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z",
       key: "ohrbg2"
-    }
-  ]
-]);
-/**
- * @license lucide-react v0.462.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const Star = createLucideIcon("Star", [
-  [
-    "path",
-    {
-      d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
-      key: "r04s7s"
     }
   ]
 ]);
@@ -25996,7 +25961,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-D1f0u3Gp.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-CArtl3Or.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -32992,16 +32957,18 @@ const usePontuacaoRodada = (selectedRound) => {
 };
 const RoundScoreTable = ({ selectedRound }) => {
   const { pontuacoes, isLoading } = usePontuacaoRodada(selectedRound);
-  const getPontosIcon = (pontos) => {
-    if (pontos >= 7) return /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500 inline mr-1" });
-    if (pontos >= 4) return /* @__PURE__ */ jsxRuntimeExports.jsx(Medal, { className: "h-4 w-4 text-blue-500 inline mr-1" });
-    if (pontos >= 2) return /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "h-4 w-4 text-green-500 inline mr-1" });
+  const getWinnerIndexes = (pontuacoes2) => {
+    if (!pontuacoes2 || pontuacoes2.length === 0) return [];
+    const max2 = Math.max(...pontuacoes2.map((p2) => p2.pontos));
+    return pontuacoes2.map((p2, idx) => p2.pontos === max2 ? idx : -1).filter((idx) => idx !== -1);
+  };
+  const winnerIndexes = getWinnerIndexes(pontuacoes);
+  const getPontosIcon = (idx) => {
+    if (winnerIndexes.includes(idx)) return /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500 inline mr-1" });
     return null;
   };
-  const getPontosClass = (pontos) => {
-    if (pontos >= 7) return "text-yellow-600 dark:text-yellow-400";
-    if (pontos >= 4) return "text-blue-600 dark:text-blue-400";
-    if (pontos >= 2) return "text-green-600 dark:text-green-400";
+  const getPontosClass = (idx) => {
+    if (winnerIndexes.includes(idx)) return "text-yellow-600 dark:text-yellow-400 font-bold";
     return "text-gray-600 dark:text-gray-400";
   };
   if (isLoading) {
@@ -33016,11 +32983,11 @@ const RoundScoreTable = ({ selectedRound }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Jogador" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: "Pontos" })
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: pontuacoes.map((pontuacao) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: pontuacoes.map((pontuacao, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: pontuacao.rodada }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: pontuacao.jogador.nome }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { className: cn("text-center font-medium", getPontosClass(pontuacao.pontos)), children: [
-        getPontosIcon(pontuacao.pontos),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { className: cn("text-center font-medium", getPontosClass(idx)), children: [
+        getPontosIcon(idx),
         pontuacao.pontos
       ] })
     ] }, pontuacao.id)) })
@@ -33156,6 +33123,13 @@ const Standings = () => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold", children: "Classificação" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground mt-2", children: "Acompanhe a pontuação de cada jogador no bolão" })
     ] }),
+    selectedRound && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-8 mb-8", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-semibold mb-4", children: [
+        "Pontuação da Rodada ",
+        selectedRound
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(RoundScoreTable, { selectedRound })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       StandingsHeader,
       {
@@ -33172,24 +33146,15 @@ const Standings = () => {
         setUseDynamicTable
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        StandingsContent,
-        {
-          viewMode,
-          sortedPlayers: [],
-          selectedRound,
-          isLoaded
-        }
-      ),
-      selectedRound && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-8", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-semibold mb-4", children: [
-          "Pontuação da Rodada ",
-          selectedRound
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(RoundScoreTable, { selectedRound })
-      ] })
-    ] })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      StandingsContent,
+      {
+        viewMode,
+        sortedPlayers: [],
+        selectedRound,
+        isLoaded
+      }
+    ) })
   ] }) });
 };
 const getTeamImagePath = (name) => {
@@ -36684,20 +36649,19 @@ const RoundTotalScore = ({ selectedRound }) => {
     })
   ] });
 };
-const getPointsIcon = (points) => {
-  if (points >= 7) return /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500" });
-  if (points >= 4) return /* @__PURE__ */ jsxRuntimeExports.jsx(Medal, { className: "h-4 w-4 text-blue-500" });
-  if (points >= 2) return /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "h-4 w-4 text-green-500" });
-  return null;
+const getReportIcons = (pointsArr, visualMode) => {
+  const max2 = Math.max(...pointsArr);
+  {
+    return pointsArr.map(
+      (p2, idx) => p2 === max2 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500" }) : null
+    );
+  }
 };
 const MatchesReportTable = ({ matches, participants, kichutes }) => {
   var _a3;
   const validMatches = (matches == null ? void 0 : matches.filter(
     (match2) => match2 && match2.time_casa && match2.time_visitante && match2.time_casa.sigla && match2.time_visitante.sigla
   )) || [];
-  console.log("Valid matches for report:", validMatches);
-  console.log("Participants:", participants);
-  console.log("Kichutes for report:", kichutes);
   const calculateGuessPoints = (guess, match2) => {
     if (!guess || !match2) return 0;
     if (match2.placar_casa === null || match2.placar_visitante === null) return 0;
@@ -36706,6 +36670,17 @@ const MatchesReportTable = ({ matches, participants, kichutes }) => {
       { homeScore: match2.placar_casa, awayScore: match2.placar_visitante }
     );
   };
+  const totalPointsArr = participants.map((participant) => {
+    let total = 0;
+    validMatches.forEach((match2) => {
+      const guess = kichutes.find(
+        (k2) => k2.partida_id === match2.id && k2.jogador_id === participant.id
+      );
+      total += calculateGuessPoints(guess, match2);
+    });
+    return total;
+  });
+  const iconsByParticipant = getReportIcons(totalPointsArr);
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-lg border shadow-sm overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "sticky left-0 z-20 bg-muted w-[200px]", children: "Partida" }),
@@ -36726,7 +36701,7 @@ const MatchesReportTable = ({ matches, participants, kichutes }) => {
           isMatchPlayed: match2.placar_casa !== null && match2.placar_visitante !== null
         }
       ) }),
-      participants.map((participant) => {
+      participants.map((participant, idx) => {
         const guess = kichutes.find(
           (k2) => k2.partida_id === match2.id && k2.jogador_id === participant.id
         );
@@ -36738,7 +36713,7 @@ const MatchesReportTable = ({ matches, participants, kichutes }) => {
             guess.palpite_visitante
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: getPointsBadgeClass(points), children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
-            getPointsIcon(points),
+            iconsByParticipant[idx],
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: points })
           ] }) })
         ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "-" }) }) }, `${match2.id}-${participant.id}`);
@@ -52025,7 +52000,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-X5Q-9hiC.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-rM2nDNB0.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
