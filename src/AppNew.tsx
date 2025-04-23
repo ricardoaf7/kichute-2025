@@ -9,6 +9,7 @@ import NotFound from "@/pages/NotFound";
 import Standings from "@/pages/Standings";
 import Matches from "@/pages/Matches";
 import Guesses from "@/pages/Guesses";
+import Kichutes from "@/pages/Kichutes";
 import Prizes from "@/pages/Prizes";
 import Payments from "@/pages/Payments";
 import RoundReport from "@/pages/RoundReport";
@@ -37,6 +38,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Guesses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/kichutes"
+            element={
+              <ProtectedRoute>
+                <Kichutes />
               </ProtectedRoute>
             }
           />
