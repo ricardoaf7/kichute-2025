@@ -25996,7 +25996,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-BZ3Tx8-y.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-D1f0u3Gp.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -33026,6 +33026,55 @@ const RoundScoreTable = ({ selectedRound }) => {
     ] }, pontuacao.id)) })
   ] }) });
 };
+const useCurrentRound = () => {
+  const [currentRound, setCurrentRound] = reactExports.useState(1);
+  const [isLoading, setIsLoading] = reactExports.useState(true);
+  reactExports.useEffect(() => {
+    const fetchCurrentRound = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase.from("partidas").select("rodada, data").order("data", { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          setCurrentRound(1);
+          return;
+        }
+        const matchesByRound = data.reduce((acc, match2) => {
+          const round2 = match2.rodada;
+          if (!acc[round2]) {
+            acc[round2] = [];
+          }
+          acc[round2].push(match2);
+          return acc;
+        }, {});
+        const now = /* @__PURE__ */ new Date();
+        let nextRound = 1;
+        let foundNextRound = false;
+        const sortedRounds = Object.keys(matchesByRound).map(Number).sort((a2, b2) => a2 - b2);
+        for (const round2 of sortedRounds) {
+          const matches = matchesByRound[round2];
+          const allMatchesPlayed = matches.every((match2) => new Date(match2.data) < now);
+          if (!allMatchesPlayed) {
+            nextRound = round2;
+            foundNextRound = true;
+            break;
+          }
+        }
+        if (!foundNextRound && sortedRounds.length > 0) {
+          nextRound = sortedRounds[sortedRounds.length - 1];
+        }
+        setCurrentRound(nextRound);
+      } catch (err2) {
+        console.error("Erro ao determinar a rodada atual:", err2);
+        setCurrentRound(1);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCurrentRound();
+  }, []);
+  return { currentRound, isLoading };
+};
 const Standings = () => {
   const [viewMode, setViewMode] = reactExports.useState("dynamic");
   const [selectedRound, setSelectedRound] = reactExports.useState(void 0);
@@ -33035,6 +33084,7 @@ const Standings = () => {
   const [useDynamicTable, setUseDynamicTable] = reactExports.useState(true);
   const [availableRounds, setAvailableRounds] = reactExports.useState([]);
   const { toast: toast2 } = useToast();
+  const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
   reactExports.useEffect(() => {
     const fetchRounds = async () => {
       try {
@@ -33044,6 +33094,9 @@ const Standings = () => {
           ...new Set(data == null ? void 0 : data.map((item) => item.rodada))
         ].filter(Boolean);
         setAvailableRounds(uniqueRounds);
+        if (!selectedRound && !isLoadingCurrentRound && uniqueRounds.length > 0 && currentRound > 1) {
+          setSelectedRound(currentRound - 1);
+        }
       } catch (err2) {
         console.error("Erro ao buscar rodadas:", err2);
         toast2({
@@ -33056,7 +33109,7 @@ const Standings = () => {
       }
     };
     fetchRounds();
-  }, [toast2]);
+  }, [toast2, isLoadingCurrentRound, currentRound]);
   reactExports.useEffect(() => {
     if (selectedRound !== void 0) {
       fetch(
@@ -33936,12 +33989,18 @@ const MatchesTable = ({ className }) => {
   ] });
 };
 const Matches = () => {
-  const [activeTab, setActiveTab] = reactExports.useState("cards");
+  const { currentRound, isLoading: isLoadingRound } = useCurrentRound();
   const [selectedRound, setSelectedRound] = reactExports.useState(1);
+  const [activeTab, setActiveTab] = reactExports.useState("cards");
   const [matches, setMatches] = reactExports.useState([]);
   const [isLoading, setIsLoading] = reactExports.useState(true);
   const { user } = useAuth();
   const isAdmin = (user == null ? void 0 : user.role) === "Administrador";
+  reactExports.useEffect(() => {
+    if (!isLoadingRound && currentRound) {
+      setSelectedRound(currentRound);
+    }
+  }, [isLoadingRound, currentRound]);
   const fetchMatches = async () => {
     setIsLoading(true);
     try {
@@ -34041,55 +34100,6 @@ const Matches = () => {
       /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "table", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MatchesTable, {}) })
     ] })
   ] }) });
-};
-const useCurrentRound = () => {
-  const [currentRound, setCurrentRound] = reactExports.useState(1);
-  const [isLoading, setIsLoading] = reactExports.useState(true);
-  reactExports.useEffect(() => {
-    const fetchCurrentRound = async () => {
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase.from("partidas").select("rodada, data").order("data", { ascending: true });
-        if (error) throw error;
-        if (!data || data.length === 0) {
-          setCurrentRound(1);
-          return;
-        }
-        const matchesByRound = data.reduce((acc, match2) => {
-          const round2 = match2.rodada;
-          if (!acc[round2]) {
-            acc[round2] = [];
-          }
-          acc[round2].push(match2);
-          return acc;
-        }, {});
-        const now = /* @__PURE__ */ new Date();
-        let nextRound = 1;
-        let foundNextRound = false;
-        const sortedRounds = Object.keys(matchesByRound).map(Number).sort((a2, b2) => a2 - b2);
-        for (const round2 of sortedRounds) {
-          const matches = matchesByRound[round2];
-          const allMatchesPlayed = matches.every((match2) => new Date(match2.data) < now);
-          if (!allMatchesPlayed) {
-            nextRound = round2;
-            foundNextRound = true;
-            break;
-          }
-        }
-        if (!foundNextRound && sortedRounds.length > 0) {
-          nextRound = sortedRounds[sortedRounds.length - 1];
-        }
-        setCurrentRound(nextRound);
-      } catch (err2) {
-        console.error("Erro ao determinar a rodada atual:", err2);
-        setCurrentRound(1);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCurrentRound();
-  }, []);
-  return { currentRound, isLoading };
 };
 const Guesses = () => {
   useToast();
@@ -34650,8 +34660,8 @@ const GuessingFormContent = ({
     isRoundClosed && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center bg-yellow-50 border border-yellow-200 rounded-md dark:bg-yellow-900/20 dark:border-yellow-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-yellow-700 dark:text-yellow-300", children: "Kichutes encerrados para esta rodada." }) })
   ] });
 };
-const GuessingFormNew = ({ onSubmitSuccess }) => {
-  const [selectedRound, setSelectedRound] = reactExports.useState("1");
+const GuessingFormNew = ({ onSubmitSuccess, initialRound = "1" }) => {
+  const [selectedRound, setSelectedRound] = reactExports.useState(initialRound);
   const [selectedParticipant, setSelectedParticipant] = reactExports.useState("");
   const [isRoundClosed, setIsRoundClosed] = reactExports.useState(false);
   const { toast: toast2 } = useToast();
@@ -34664,6 +34674,9 @@ const GuessingFormNew = ({ onSubmitSuccess }) => {
     updateGuess,
     saveGuesses
   } = useGuesses(onSubmitSuccess);
+  reactExports.useEffect(() => {
+    setSelectedRound(initialRound);
+  }, [initialRound]);
   reactExports.useEffect(() => {
     const fetchExistingGuesses = async () => {
       if (!selectedParticipant) return;
@@ -34811,7 +34824,14 @@ const KichuteTable = () => {
 };
 const Kichutes = () => {
   const { toast: toast2 } = useToast();
+  const { currentRound, isLoading } = useCurrentRound();
   const [selectedTab, setSelectedTab] = reactExports.useState("form");
+  const [initialRound, setInitialRound] = reactExports.useState("1");
+  reactExports.useEffect(() => {
+    if (!isLoading && currentRound) {
+      setInitialRound(currentRound.toString());
+    }
+  }, [isLoading, currentRound]);
   const handleGuessSubmitSuccess = () => {
     toast2({
       title: "Palpites salvos com sucesso!",
@@ -34828,7 +34848,7 @@ const Kichutes = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "form", children: "Fazer Kichutes" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "view", children: "Ver Todos os Kichutes" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "form", className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-card rounded-lg shadow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(GuessingFormNew, { onSubmitSuccess: handleGuessSubmitSuccess }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "form", className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-card rounded-lg shadow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(GuessingFormNew, { onSubmitSuccess: handleGuessSubmitSuccess, initialRound }) }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "view", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-card rounded-lg shadow p-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "Todos os Kichutes" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(KichuteTable, {})
@@ -52005,7 +52025,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Bea_5tqu.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-X5Q-9hiC.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
@@ -52798,8 +52818,16 @@ const RoundReportContent = () => {
   const reportRef = reactExports.useRef(null);
   const { rounds, selectedRound, setSelectedRound } = useMatches$1();
   const { participants, isLoading: isLoadingParticipants } = useParticipants$1();
+  const [initialReportRound, setInitialReportRound] = reactExports.useState(1);
+  const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
   const { kichutes, isLoading: isLoadingKichutes } = useKichutes(selectedRound);
   const { matches, isLoading: isLoadingMatches } = useMatchesByRound(selectedRound.toString());
+  reactExports.useEffect(() => {
+    if (!isLoadingCurrentRound && currentRound > 1) {
+      setInitialReportRound(currentRound - 1);
+      setSelectedRound(currentRound - 1);
+    }
+  }, [isLoadingCurrentRound, currentRound]);
   const isLoading = isLoadingParticipants || isLoadingKichutes || isLoadingMatches;
   const formattedMatches = matches.map((match2) => ({
     id: match2.id,
