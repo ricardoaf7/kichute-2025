@@ -9030,6 +9030,13 @@ const Menu$1 = createLucideIcon("Menu", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
+const Minus = createLucideIcon("Minus", [["path", { d: "M5 12h14", key: "1ays0h" }]]);
+/**
+ * @license lucide-react v0.462.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
 const Pencil = createLucideIcon("Pencil", [
   [
     "path",
@@ -14480,7 +14487,7 @@ const arrow = (options, deps) => ({
   ...arrow$1(options),
   options: [options, deps]
 });
-var NAME$2 = "Arrow";
+var NAME$3 = "Arrow";
 var Arrow$1 = reactExports.forwardRef((props, forwardedRef) => {
   const { children, width = 10, height = 5, ...arrowProps } = props;
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -14496,8 +14503,8 @@ var Arrow$1 = reactExports.forwardRef((props, forwardedRef) => {
     }
   );
 });
-Arrow$1.displayName = NAME$2;
-var Root$5 = Arrow$1;
+Arrow$1.displayName = NAME$3;
+var Root$6 = Arrow$1;
 function createContextScope$1(scopeName, createContextScopeDeps = []) {
   let defaultContexts = [];
   function createContext3(rootComponentName, defaultContext) {
@@ -14796,7 +14803,7 @@ var PopperArrow = reactExports.forwardRef(function PopperArrow2(props, forwarded
           visibility: contentContext.shouldHideArrow ? "hidden" : void 0
         },
         children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Root$5,
+          Root$6,
           {
             ...arrowProps,
             ref: forwardedRef,
@@ -15249,7 +15256,7 @@ function focusFirst$1(candidates, preventScroll = false) {
 function wrapArray$2(array, startIndex) {
   return array.map((_2, index2) => array[(startIndex + index2) % array.length]);
 }
-var Root$4 = RovingFocusGroup;
+var Root$5 = RovingFocusGroup;
 var Item$1 = RovingFocusGroupItem;
 var getDefaultParent = function(originalTarget) {
   if (typeof document === "undefined") {
@@ -16275,7 +16282,7 @@ var MenuContentImpl = reactExports.forwardRef(
                 onInteractOutside,
                 onDismiss,
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Root$4,
+                  Root$5,
                   {
                     asChild: true,
                     ...rovingFocusGroupScope,
@@ -16807,7 +16814,7 @@ var CheckboxItem = MenuCheckboxItem;
 var RadioGroup = MenuRadioGroup;
 var RadioItem = MenuRadioItem;
 var ItemIndicator$1 = MenuItemIndicator;
-var Separator$1 = MenuSeparator;
+var Separator$3 = MenuSeparator;
 var Arrow2 = MenuArrow;
 var SubTrigger = MenuSubTrigger;
 var SubContent = MenuSubContent;
@@ -16996,7 +17003,7 @@ var SEPARATOR_NAME$1 = "DropdownMenuSeparator";
 var DropdownMenuSeparator$1 = reactExports.forwardRef((props, forwardedRef) => {
   const { __scopeDropdownMenu, ...separatorProps } = props;
   const menuScope = useMenuScope(__scopeDropdownMenu);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, { ...menuScope, ...separatorProps, ref: forwardedRef });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$3, { ...menuScope, ...separatorProps, ref: forwardedRef });
 });
 DropdownMenuSeparator$1.displayName = SEPARATOR_NAME$1;
 var ARROW_NAME$3 = "DropdownMenuArrow";
@@ -17460,7 +17467,7 @@ const Button$1 = reactExports.forwardRef(
   }
 );
 Button$1.displayName = "Button";
-var NAME$1 = "Label";
+var NAME$2 = "Label";
 var Label$2 = reactExports.forwardRef((props, forwardedRef) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     Primitive.label,
@@ -17477,20 +17484,20 @@ var Label$2 = reactExports.forwardRef((props, forwardedRef) => {
     }
   );
 });
-Label$2.displayName = NAME$1;
-var Root$3 = Label$2;
+Label$2.displayName = NAME$2;
+var Root$4 = Label$2;
 const labelVariants = cva(
   "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 );
 const Label$1 = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  Root$3,
+  Root$4,
   {
     ref,
     className: cn(labelVariants(), className),
     ...props
   }
 ));
-Label$1.displayName = Root$3.displayName;
+Label$1.displayName = Root$4.displayName;
 const mockUser = {
   id: "temp-admin",
   nome: "Administrador Temporário",
@@ -25989,7 +25996,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-C-N58ycI.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-BZ3Tx8-y.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -31396,7 +31403,7 @@ function usePrevious(value) {
     return ref.current.previous;
   }, [value]);
 }
-var NAME = "VisuallyHidden";
+var NAME$1 = "VisuallyHidden";
 var VisuallyHidden = reactExports.forwardRef(
   (props, forwardedRef) => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -31422,8 +31429,8 @@ var VisuallyHidden = reactExports.forwardRef(
     );
   }
 );
-VisuallyHidden.displayName = NAME;
-var Root$2 = VisuallyHidden;
+VisuallyHidden.displayName = NAME$1;
+var Root$3 = VisuallyHidden;
 var OPEN_KEYS = [" ", "Enter", "ArrowUp", "ArrowDown"];
 var SELECTION_KEYS = [" ", "Enter"];
 var SELECT_NAME = "Select";
@@ -32552,7 +32559,7 @@ var ItemText = SelectItemText;
 var ItemIndicator = SelectItemIndicator;
 var ScrollUpButton = SelectScrollUpButton$1;
 var ScrollDownButton = SelectScrollDownButton$1;
-var Separator = SelectSeparator$1;
+var Separator$2 = SelectSeparator$1;
 const Select = Root2$3;
 const SelectValue = Value;
 const SelectTrigger = reactExports.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -32651,14 +32658,14 @@ const SelectItem = reactExports.forwardRef(({ className, children, ...props }, r
 ));
 SelectItem.displayName = Item.displayName;
 const SelectSeparator = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  Separator,
+  Separator$2,
   {
     ref,
     className: cn("-mx-1 my-1 h-px bg-muted", className),
     ...props
   }
 ));
-SelectSeparator.displayName = Separator.displayName;
+SelectSeparator.displayName = Separator$2.displayName;
 const DynamicTable = () => {
   const [jogadores, setJogadores] = reactExports.useState([]);
   const [rodadas, setRodadas] = reactExports.useState([]);
@@ -33201,7 +33208,7 @@ const TeamDisplay = ({ team, alignment }) => {
     ) })
   ] });
 };
-const ScoreInput = ({ teamName, score, onChange, isDisabled }) => {
+const ScoreInput$1 = ({ teamName, score, onChange, isDisabled }) => {
   const [inputValue, setInputValue] = reactExports.useState((score == null ? void 0 : score.toString()) || "0");
   reactExports.useEffect(() => {
     setInputValue((score == null ? void 0 : score.toString()) || "0");
@@ -33327,7 +33334,7 @@ const ResultForm = ({ match: match2, onResultSaved }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium mb-2", children: match2.homeTeam.name }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
-          ScoreInput,
+          ScoreInput$1,
           {
             teamName: match2.homeTeam.name,
             score: homeScore,
@@ -33340,7 +33347,7 @@ const ResultForm = ({ match: match2, onResultSaved }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium mb-2", children: match2.awayTeam.name }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
-          ScoreInput,
+          ScoreInput$1,
           {
             teamName: match2.awayTeam.name,
             score: awayScore,
@@ -33549,7 +33556,7 @@ var TabsList$1 = reactExports.forwardRef(
     const context = useTabsContext(TAB_LIST_NAME, __scopeTabs);
     const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeTabs);
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Root$4,
+      Root$5,
       {
         asChild: true,
         ...rovingFocusGroupScope,
@@ -33776,7 +33783,7 @@ const MatchesTableContent = ({ matches, isLoading, error }) => {
       cidade: parts.slice(1).join(", ")
     };
   };
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     try {
       const date = new Date(dateString);
       return {
@@ -33820,7 +33827,7 @@ const MatchesTableContent = ({ matches, isLoading, error }) => {
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: matches.length > 0 ? matches.map((match2) => {
       const { estadio, cidade } = getLocationDetails(match2.local);
-      const { date, time: time2 } = formatDate(match2.data);
+      const { date, time: time2 } = formatDate2(match2.data);
       return /* @__PURE__ */ jsxRuntimeExports.jsxs(
         TableRow,
         {
@@ -34091,6 +34098,743 @@ const Guesses = () => {
   reactExports.useState(round2 ? parseInt(round2) : currentRound);
   reactExports.useState("guesses");
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container py-6" });
+};
+var NAME = "Separator";
+var DEFAULT_ORIENTATION = "horizontal";
+var ORIENTATIONS = ["horizontal", "vertical"];
+var Separator$1 = reactExports.forwardRef((props, forwardedRef) => {
+  const { decorative, orientation: orientationProp = DEFAULT_ORIENTATION, ...domProps } = props;
+  const orientation = isValidOrientation(orientationProp) ? orientationProp : DEFAULT_ORIENTATION;
+  const ariaOrientation = orientation === "vertical" ? orientation : void 0;
+  const semanticProps = decorative ? { role: "none" } : { "aria-orientation": ariaOrientation, role: "separator" };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Primitive.div,
+    {
+      "data-orientation": orientation,
+      ...semanticProps,
+      ...domProps,
+      ref: forwardedRef
+    }
+  );
+});
+Separator$1.displayName = NAME;
+function isValidOrientation(orientation) {
+  return ORIENTATIONS.includes(orientation);
+}
+var Root$2 = Separator$1;
+const Separator = reactExports.forwardRef(
+  ({ className, orientation = "horizontal", decorative = true, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Root$2,
+    {
+      ref,
+      decorative,
+      orientation,
+      className: cn(
+        "shrink-0 bg-border",
+        orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
+        className
+      ),
+      ...props
+    }
+  )
+);
+Separator.displayName = Root$2.displayName;
+const useGuesses = (onSubmitSuccess) => {
+  const [guesses, setGuesses] = reactExports.useState([]);
+  const [isSaving, setIsSaving] = reactExports.useState(false);
+  const { toast: toast2 } = useToast();
+  const updateGuess = (matchId, type, value) => {
+    setGuesses(
+      (prev) => prev.map(
+        (guess) => guess.matchId === matchId ? {
+          ...guess,
+          homeScore: type === "home" ? value : guess.homeScore,
+          awayScore: type === "away" ? value : guess.awayScore
+        } : guess
+      )
+    );
+  };
+  const validateGuesses = (participantId) => {
+    if (!participantId) {
+      toast2({
+        title: "Participante não selecionado",
+        description: "Por favor, selecione um participante antes de enviar os palpites.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    const emptyGuesses = guesses.filter(
+      (guess) => guess.homeScore === void 0 || guess.awayScore === void 0
+    );
+    if (emptyGuesses.length > 0) {
+      toast2({
+        title: "Palpites incompletos",
+        description: `Existem ${emptyGuesses.length} partidas sem palpites. Por favor, preencha todos os palpites.`,
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
+  const saveGuesses = async (participantId) => {
+    if (!validateGuesses(participantId)) return;
+    setIsSaving(true);
+    try {
+      const guessesData = guesses.map((guess) => ({
+        jogador_id: participantId,
+        partida_id: guess.matchId,
+        palpite_casa: guess.homeScore,
+        palpite_visitante: guess.awayScore
+      }));
+      console.log("Enviando palpites:", guessesData);
+      let saveSuccess = true;
+      for (const guess of guessesData) {
+        console.log(`Processando palpite: Jogador ${guess.jogador_id}, Partida ${guess.partida_id}`);
+        const { data: existingGuess, error: checkError } = await supabase.from("kichutes").select("*").eq("jogador_id", guess.jogador_id).eq("partida_id", guess.partida_id).maybeSingle();
+        console.log("Verificação de palpite existente:", { existingGuess, checkError });
+        let result;
+        if (existingGuess) {
+          console.log(`Atualizando palpite existente: ID ${existingGuess.id}`);
+          result = await supabase.from("kichutes").update({
+            palpite_casa: guess.palpite_casa,
+            palpite_visitante: guess.palpite_visitante
+          }).eq("id", existingGuess.id);
+        } else {
+          console.log("Inserindo novo palpite");
+          result = await supabase.from("kichutes").insert(guess);
+        }
+        console.log("Resultado da operação:", result);
+        if (result.error) {
+          console.error("Erro ao salvar palpite:", result.error);
+          saveSuccess = false;
+          throw result.error;
+        }
+      }
+      if (saveSuccess) {
+        console.log("Todos os palpites foram salvos com sucesso!");
+        toast2({
+          title: "Sucesso!",
+          description: "Seus palpites foram salvos com sucesso!"
+        });
+        onSubmitSuccess();
+      }
+    } catch (err2) {
+      console.error("Erro ao salvar palpites:", err2);
+      toast2({
+        title: "Erro",
+        description: "Não foi possível salvar seus palpites. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  return {
+    guesses,
+    setGuesses,
+    isSaving,
+    updateGuess,
+    saveGuesses
+  };
+};
+const useMatchesByRound = (selectedRound) => {
+  const [matches, setMatches] = reactExports.useState([]);
+  const [isLoading, setIsLoading] = reactExports.useState(true);
+  const { toast: toast2 } = useToast();
+  reactExports.useEffect(() => {
+    const fetchMatches = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase.from("partidas").select(`
+            id,
+            rodada,
+            data,
+            local,
+            placar_casa,
+            placar_visitante,
+            time_casa:times!time_casa_id(id, nome, sigla, escudo_url),
+            time_visitante:times!time_visitante_id(id, nome, sigla, escudo_url)
+          `).eq("rodada", parseInt(selectedRound)).order("data");
+        if (error) throw error;
+        console.log("Partidas encontradas para rodada", selectedRound, ":", data);
+        setMatches(data || []);
+      } catch (err2) {
+        console.error("Erro ao carregar partidas:", err2);
+        toast2({
+          title: "Erro",
+          description: "Não foi possível carregar as partidas para esta rodada.",
+          variant: "destructive"
+        });
+        setMatches([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (selectedRound) {
+      fetchMatches();
+    }
+  }, [selectedRound, toast2]);
+  return { matches, isLoading };
+};
+const RoundSelector$1 = ({ selectedRound, onRoundChange, isDisabled }) => {
+  const [rounds, setRounds] = reactExports.useState([]);
+  const { toast: toast2 } = useToast();
+  reactExports.useEffect(() => {
+    const fetchRounds = async () => {
+      try {
+        const { data, error } = await supabase.from("partidas").select("rodada").order("rodada");
+        if (error) throw error;
+        const uniqueRounds = [...new Set(data == null ? void 0 : data.map((item) => item.rodada))].filter(Boolean);
+        setRounds(uniqueRounds);
+      } catch (err2) {
+        console.error("Erro ao buscar rodadas:", err2);
+        toast2({
+          title: "Erro",
+          description: "Não foi possível carregar as rodadas",
+          variant: "destructive"
+        });
+      }
+    };
+    fetchRounds();
+  }, [toast2]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full md:w-48", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "round-select", children: "Rodada" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Select,
+      {
+        value: selectedRound,
+        onValueChange: onRoundChange,
+        disabled: isDisabled,
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "round-select", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Selecione a rodada" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: rounds.map((round2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: round2.toString(), children: [
+            "Rodada ",
+            round2
+          ] }, `round-${round2}`)) })
+        ]
+      }
+    )
+  ] });
+};
+const useParticipants$1 = () => {
+  const [participants, setParticipants] = reactExports.useState([]);
+  const [isLoading, setIsLoading] = reactExports.useState(true);
+  const { toast: toast2 } = useToast();
+  reactExports.useEffect(() => {
+    const fetchParticipants = async () => {
+      try {
+        const { data, error } = await supabase.from("jogadores").select("id, nome").order("nome");
+        if (error) throw error;
+        setParticipants(data || []);
+      } catch (err2) {
+        console.error("Erro ao buscar participantes:", err2);
+        toast2({
+          title: "Erro",
+          description: "Não foi possível carregar a lista de participantes",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchParticipants();
+  }, [toast2]);
+  return { participants, isLoading };
+};
+const ParticipantSelector = ({
+  selectedParticipant,
+  onParticipantChange,
+  isRequired = true,
+  showError = false
+}) => {
+  const { participants, isLoading } = useParticipants$1();
+  const handleChange = (value) => {
+    console.log("Participante selecionado:", value);
+    onParticipantChange(value);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full space-y-2", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "participant-select", children: "Participante" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
+        {
+          value: selectedParticipant,
+          onValueChange: handleChange,
+          required: isRequired,
+          disabled: isLoading,
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "participant-select", className: "w-full md:w-72", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Selecione o participante" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: participants.map((participant) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: participant.id, children: participant.nome }, participant.id)) })
+          ]
+        }
+      )
+    ] }),
+    showError && /* @__PURE__ */ jsxRuntimeExports.jsxs(Alert, { variant: "destructive", className: "mt-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TriangleAlert, { className: "h-4 w-4" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTitle, { children: "Atenção" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(AlertDescription, { children: "Você precisa selecionar o participante que está fazendo os palpites." })
+    ] })
+  ] });
+};
+const GuessingFormHeader = ({
+  selectedRound,
+  selectedParticipant,
+  onRoundChange,
+  onParticipantChange,
+  isAdmin
+}) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-6 md:grid-cols-2", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      RoundSelector$1,
+      {
+        selectedRound,
+        onRoundChange
+      }
+    ),
+    isAdmin && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ParticipantSelector,
+      {
+        selectedParticipant,
+        onParticipantChange
+      }
+    )
+  ] });
+};
+const LoadingMatches = () => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-center items-center h-40", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCw, { className: "h-8 w-8 animate-spin text-primary" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2", children: "Carregando partidas..." })
+  ] });
+};
+const formatDate = (dateString) => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "America/Sao_Paulo"
+    });
+  } catch (error) {
+    console.error("Erro ao formatar data:", error);
+    return "Data inválida";
+  }
+};
+const MatchHeader = ({ round: round2, date }) => {
+  const formattedDate = formatDate(date);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between text-sm text-muted-foreground", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+      "Rodada ",
+      round2
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formattedDate })
+  ] });
+};
+const ScoreInput = ({
+  teamName,
+  score,
+  onChange,
+  isDisabled = false
+}) => {
+  const [inputValue, setInputValue] = reactExports.useState(score.toString());
+  reactExports.useEffect(() => {
+    setInputValue(score.toString());
+  }, [score]);
+  const ariaLabel = `Score for ${teamName}`;
+  const increment = () => {
+    if (isDisabled) return;
+    const newValue = Math.min(20, score + 1);
+    onChange(newValue);
+  };
+  const decrement = () => {
+    if (isDisabled) return;
+    const newValue = Math.max(0, score - 1);
+    onChange(newValue);
+  };
+  const handleInputChange = (e2) => {
+    const value = e2.target.value;
+    if (!/^\d*$/.test(value)) return;
+    setInputValue(value);
+  };
+  const handleInputBlur = () => {
+    let numValue = parseInt(inputValue, 10);
+    if (isNaN(numValue)) {
+      setInputValue(score.toString());
+      return;
+    }
+    numValue = Math.max(0, Math.min(20, numValue));
+    setInputValue(numValue.toString());
+    onChange(numValue);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center flex-1", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-sm mb-2 text-center line-clamp-1 w-full", title: teamName, children: teamName }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button$1,
+        {
+          type: "button",
+          variant: "outline",
+          size: "icon",
+          className: "h-8 w-8",
+          onClick: decrement,
+          disabled: isDisabled || score <= 0,
+          "aria-label": `Decrease score for ${teamName}`,
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Minus, { className: "h-4 w-4" })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Input,
+        {
+          type: "text",
+          value: inputValue,
+          onChange: handleInputChange,
+          onBlur: handleInputBlur,
+          className: "w-12 mx-2 text-center text-xl font-bold h-8 p-0",
+          disabled: isDisabled,
+          "aria-label": ariaLabel,
+          maxLength: 2
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button$1,
+        {
+          type: "button",
+          variant: "outline",
+          size: "icon",
+          className: "h-8 w-8",
+          onClick: increment,
+          disabled: isDisabled || score >= 20,
+          "aria-label": `Increase score for ${teamName}`,
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "h-4 w-4" })
+        }
+      )
+    ] })
+  ] });
+};
+const MatchGuessCard = ({
+  match: match2,
+  homeScore,
+  awayScore,
+  onScoreChange,
+  isDisabled = false
+}) => {
+  var _a3, _b3, _c2, _d;
+  const handleScoreChange = (type, value) => {
+    onScoreChange(match2.id, type, value);
+  };
+  const homeTeamName = ((_a3 = match2.time_casa) == null ? void 0 : _a3.nome) || "Time da Casa";
+  const awayTeamName = ((_b3 = match2.time_visitante) == null ? void 0 : _b3.nome) || "Time Visitante";
+  const homeTeamShield = ((_c2 = match2.time_casa) == null ? void 0 : _c2.escudo_url) || getTeamImagePath(homeTeamName);
+  const awayTeamShield = ((_d = match2.time_visitante) == null ? void 0 : _d.escudo_url) || getTeamImagePath(awayTeamName);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col space-y-4", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(MatchHeader, { round: match2.rodada, date: match2.data }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "img",
+          {
+            src: homeTeamShield,
+            alt: `Escudo do ${homeTeamName}`,
+            className: "w-8 h-8 object-contain mb-2",
+            onError: (e2) => {
+              e2.currentTarget.src = "/placeholder.svg";
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ScoreInput,
+          {
+            teamName: homeTeamName,
+            score: homeScore,
+            onChange: (value) => handleScoreChange("home", value),
+            isDisabled
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0 text-center w-1/5", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xl font-bold", children: "X" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "img",
+          {
+            src: awayTeamShield,
+            alt: `Escudo do ${awayTeamName}`,
+            className: "w-8 h-8 object-contain mb-2",
+            onError: (e2) => {
+              e2.currentTarget.src = "/placeholder.svg";
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ScoreInput,
+          {
+            teamName: awayTeamName,
+            score: awayScore,
+            onChange: (value) => handleScoreChange("away", value),
+            isDisabled
+          }
+        )
+      ] })
+    ] })
+  ] }) }) });
+};
+const MatchesGrid = ({ matches, guesses, onGuessChange, isDisabled }) => {
+  if (matches.length === 0) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center p-8 border rounded-lg bg-muted/50", children: "Nenhuma partida encontrada para esta rodada." });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4 md:grid-cols-2", children: matches.map((match2) => {
+    const guess = guesses.find((g2) => g2.matchId === match2.id);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      MatchGuessCard,
+      {
+        match: match2,
+        homeScore: (guess == null ? void 0 : guess.homeScore) || 0,
+        awayScore: (guess == null ? void 0 : guess.awayScore) || 0,
+        onScoreChange: onGuessChange,
+        isDisabled
+      },
+      match2.id
+    );
+  }) });
+};
+const FormControls = ({ isLoading = false, isSaving, hasMatches = true, isValid: isValid2 = true, onSubmit }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("form", { onSubmit, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-end mt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Button$1,
+    {
+      type: "submit",
+      disabled: isLoading || isSaving || !hasMatches || !isValid2,
+      className: "w-full md:w-auto",
+      children: isSaving ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCw, { className: "mr-2 h-4 w-4 animate-spin" }),
+        "Salvando..."
+      ] }) : "Enviar Palpites"
+    }
+  ) }) });
+};
+const GuessingFormContent = ({
+  isLoading,
+  matches,
+  guesses,
+  isSaving,
+  isRoundClosed,
+  selectedParticipant,
+  onGuessChange,
+  onSubmit
+}) => {
+  if (isLoading) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(LoadingMatches, {});
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      MatchesGrid,
+      {
+        matches,
+        guesses,
+        onGuessChange,
+        isDisabled: isSaving || isRoundClosed
+      }
+    ),
+    !isRoundClosed && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      FormControls,
+      {
+        onSubmit: (e2) => {
+          e2.preventDefault();
+          onSubmit();
+        },
+        isSaving,
+        hasMatches: guesses.length > 0,
+        isValid: guesses.length > 0 && selectedParticipant !== ""
+      }
+    ),
+    isRoundClosed && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center bg-yellow-50 border border-yellow-200 rounded-md dark:bg-yellow-900/20 dark:border-yellow-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-yellow-700 dark:text-yellow-300", children: "Kichutes encerrados para esta rodada." }) })
+  ] });
+};
+const GuessingFormNew = ({ onSubmitSuccess }) => {
+  const [selectedRound, setSelectedRound] = reactExports.useState("1");
+  const [selectedParticipant, setSelectedParticipant] = reactExports.useState("");
+  const [isRoundClosed, setIsRoundClosed] = reactExports.useState(false);
+  const { toast: toast2 } = useToast();
+  const { user } = useAuth();
+  const { matches, isLoading } = useMatchesByRound(selectedRound);
+  const {
+    guesses,
+    setGuesses,
+    isSaving,
+    updateGuess,
+    saveGuesses
+  } = useGuesses(onSubmitSuccess);
+  reactExports.useEffect(() => {
+    const fetchExistingGuesses = async () => {
+      if (!selectedParticipant) return;
+      try {
+        const { data: matchesData, error: matchesError } = await supabase.from("partidas").select("id").eq("rodada", parseInt(selectedRound));
+        if (matchesError) throw matchesError;
+        const { data: existingGuesses, error: guessesError } = await supabase.from("kichutes").select("*").eq("jogador_id", selectedParticipant).in("partida_id", matchesData.map((m2) => m2.id));
+        if (guessesError) throw guessesError;
+        console.log("Palpites existentes:", existingGuesses);
+        const updatedGuesses = matches.map((match2) => {
+          const existingGuess = existingGuesses.find((g2) => g2.partida_id === match2.id);
+          return {
+            matchId: match2.id,
+            homeScore: existingGuess ? existingGuess.palpite_casa || 0 : 0,
+            awayScore: existingGuess ? existingGuess.palpite_visitante || 0 : 0
+          };
+        });
+        setGuesses(updatedGuesses);
+      } catch (err2) {
+        console.error("Erro ao carregar palpites existentes:", err2);
+        toast2({
+          title: "Erro",
+          description: "Não foi possível carregar os palpites existentes.",
+          variant: "destructive"
+        });
+      }
+    };
+    fetchExistingGuesses();
+  }, [selectedParticipant, selectedRound, matches, toast2]);
+  const isAdmin = (user == null ? void 0 : user.role) === "Administrador";
+  reactExports.useEffect(() => {
+    if (user && !isAdmin && user.id) {
+      setSelectedParticipant(user.id);
+    }
+  }, [user, isAdmin]);
+  const handleParticipantChange = (participantId) => {
+    setSelectedParticipant(participantId);
+  };
+  const handleRoundChange = (round2) => {
+    setSelectedRound(round2);
+  };
+  const handleSubmit = async () => {
+    if (!selectedParticipant) {
+      toast2({
+        title: "Selecione um participante",
+        description: "Por favor, selecione um participante antes de salvar os palpites.",
+        variant: "destructive"
+      });
+      return;
+    }
+    await saveGuesses(selectedParticipant);
+  };
+  reactExports.useEffect(() => {
+    if (!matches || matches.length === 0) return;
+    const initialGuesses = matches.map((match2) => ({
+      matchId: match2.id,
+      homeScore: 0,
+      awayScore: 0
+    }));
+    console.log("Inicializando palpites com valores padrão:", initialGuesses);
+    setGuesses(initialGuesses);
+  }, [matches, setGuesses]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6 animate-fadeIn", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 p-6 bg-white dark:bg-gray-800 rounded-lg border border-border/40 shadow-subtle", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      GuessingFormHeader,
+      {
+        selectedRound,
+        selectedParticipant,
+        onRoundChange: handleRoundChange,
+        onParticipantChange: handleParticipantChange,
+        isAdmin
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      GuessingFormContent,
+      {
+        isLoading,
+        matches,
+        guesses,
+        isSaving,
+        isRoundClosed,
+        selectedParticipant,
+        onGuessChange: updateGuess,
+        onSubmit: handleSubmit
+      }
+    )
+  ] }) });
+};
+const KichuteTable = () => {
+  const { kichutes, isLoading, error } = useKichuteData("1", "todos");
+  const pontosPorJogador = {};
+  kichutes.forEach((k2) => {
+    const nome = k2.jogador.nome;
+    if (!pontosPorJogador[nome]) {
+      pontosPorJogador[nome] = 0;
+    }
+    pontosPorJogador[nome] += k2.pontos;
+  });
+  if (isLoading) return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Carregando..." });
+  if (error) return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Erro ao carregar os dados" });
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-gray-50 dark:bg-gray-900 font-poppins", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: "Rodada" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: "Jogo" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: "Resultado" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: "Jogador" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: "Palpite" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center font-semibold", children: "Pontos" })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: kichutes.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      kichutes.map((kichute) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        TableRow,
+        {
+          className: "hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center font-medium", children: kichute.rodada }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { className: "text-center", children: [
+              kichute.partida.time_casa.sigla,
+              " x ",
+              kichute.partida.time_visitante.sigla
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: kichute.partida.placar_casa !== null && kichute.partida.placar_visitante !== null ? `${kichute.partida.placar_casa} x ${kichute.partida.placar_visitante}` : "-" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: kichute.jogador.nome }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { className: "text-center", children: [
+              kichute.palpite_casa,
+              " x ",
+              kichute.palpite_visitante
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: kichute.pontos })
+          ]
+        },
+        kichute.id
+      )),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { className: "bg-gray-100 dark:bg-gray-800 font-semibold", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { colSpan: 6, className: "text-center", children: [
+        "Total de Pontos por Jogador:",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap justify-center gap-4 mt-2", children: Object.entries(pontosPorJogador).map(([jogador, total]) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          jogador,
+          ": ",
+          total,
+          " pts"
+        ] }, jogador)) })
+      ] }) })
+    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 6, className: "text-center", children: "Nenhum palpite encontrado" }) }) })
+  ] });
+};
+const Kichutes = () => {
+  const { toast: toast2 } = useToast();
+  const [selectedTab, setSelectedTab] = reactExports.useState("form");
+  const handleGuessSubmitSuccess = () => {
+    toast2({
+      title: "Palpites salvos com sucesso!",
+      description: "Seus kichutes foram registrados.",
+      variant: "default"
+    });
+    setSelectedTab("view");
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "container py-6 pt-24", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold mb-6", children: "Kichutes" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Separator, { className: "mb-6" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: selectedTab, onValueChange: setSelectedTab, className: "w-full", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "mb-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "form", children: "Fazer Kichutes" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "view", children: "Ver Todos os Kichutes" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "form", className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-card rounded-lg shadow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(GuessingFormNew, { onSubmitSuccess: handleGuessSubmitSuccess }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "view", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-card rounded-lg shadow p-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "Todos os Kichutes" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(KichuteTable, {})
+      ] }) })
+    ] })
+  ] });
 };
 const Prizes = () => {
   const [isLoaded, setIsLoaded] = reactExports.useState(false);
@@ -35808,46 +36552,6 @@ const MatchesProvider$1 = ({ children }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx(MatchesContext$1.Provider, { value, children });
 };
-const RoundSelector$1 = ({ selectedRound, onRoundChange, isDisabled }) => {
-  const [rounds, setRounds] = reactExports.useState([]);
-  const { toast: toast2 } = useToast();
-  reactExports.useEffect(() => {
-    const fetchRounds = async () => {
-      try {
-        const { data, error } = await supabase.from("partidas").select("rodada").order("rodada");
-        if (error) throw error;
-        const uniqueRounds = [...new Set(data == null ? void 0 : data.map((item) => item.rodada))].filter(Boolean);
-        setRounds(uniqueRounds);
-      } catch (err2) {
-        console.error("Erro ao buscar rodadas:", err2);
-        toast2({
-          title: "Erro",
-          description: "Não foi possível carregar as rodadas",
-          variant: "destructive"
-        });
-      }
-    };
-    fetchRounds();
-  }, [toast2]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full md:w-48", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "round-select", children: "Rodada" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      Select,
-      {
-        value: selectedRound,
-        onValueChange: onRoundChange,
-        disabled: isDisabled,
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "round-select", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Selecione a rodada" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: rounds.map((round2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: round2.toString(), children: [
-            "Rodada ",
-            round2
-          ] }, `round-${round2}`)) })
-        ]
-      }
-    )
-  ] });
-};
 const ScoreDisplay = ({ homeScore, awayScore, isMatchPlayed }) => {
   if (isMatchPlayed) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center space-x-2", children: [
@@ -35857,31 +36561,6 @@ const ScoreDisplay = ({ homeScore, awayScore, isMatchPlayed }) => {
     ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-muted-foreground px-2 py-1 bg-muted rounded-md", children: "Aguardando" });
-};
-const useParticipants$1 = () => {
-  const [participants, setParticipants] = reactExports.useState([]);
-  const [isLoading, setIsLoading] = reactExports.useState(true);
-  const { toast: toast2 } = useToast();
-  reactExports.useEffect(() => {
-    const fetchParticipants = async () => {
-      try {
-        const { data, error } = await supabase.from("jogadores").select("id, nome").order("nome");
-        if (error) throw error;
-        setParticipants(data || []);
-      } catch (err2) {
-        console.error("Erro ao buscar participantes:", err2);
-        toast2({
-          title: "Erro",
-          description: "Não foi possível carregar a lista de participantes",
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchParticipants();
-  }, [toast2]);
-  return { participants, isLoading };
 };
 const useKichutes = (round2) => {
   const [kichutes, setKichutes] = reactExports.useState([]);
@@ -51326,7 +52005,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Ctm-VYR2.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Bea_5tqu.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
@@ -52115,45 +52794,6 @@ const ReportActions = ({ reportRef, selectedRound }) => {
     ] })
   ] });
 };
-const useMatchesByRound = (selectedRound) => {
-  const [matches, setMatches] = reactExports.useState([]);
-  const [isLoading, setIsLoading] = reactExports.useState(true);
-  const { toast: toast2 } = useToast();
-  reactExports.useEffect(() => {
-    const fetchMatches = async () => {
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase.from("partidas").select(`
-            id,
-            rodada,
-            data,
-            local,
-            placar_casa,
-            placar_visitante,
-            time_casa:times!time_casa_id(id, nome, sigla, escudo_url),
-            time_visitante:times!time_visitante_id(id, nome, sigla, escudo_url)
-          `).eq("rodada", parseInt(selectedRound)).order("data");
-        if (error) throw error;
-        console.log("Partidas encontradas para rodada", selectedRound, ":", data);
-        setMatches(data || []);
-      } catch (err2) {
-        console.error("Erro ao carregar partidas:", err2);
-        toast2({
-          title: "Erro",
-          description: "Não foi possível carregar as partidas para esta rodada.",
-          variant: "destructive"
-        });
-        setMatches([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    if (selectedRound) {
-      fetchMatches();
-    }
-  }, [selectedRound, toast2]);
-  return { matches, isLoading };
-};
 const RoundReportContent = () => {
   const reportRef = reactExports.useRef(null);
   const { rounds, selectedRound, setSelectedRound } = useMatches$1();
@@ -52637,7 +53277,7 @@ var TooltipContentImpl = reactExports.forwardRef(
             },
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(Slottable, { children }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(VisuallyHiddenContentContextProvider, { scope: __scopeTooltip, isInside: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Root$2, { id: context.contentId, role: "tooltip", children: ariaLabel || children }) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx(VisuallyHiddenContentContextProvider, { scope: __scopeTooltip, isInside: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Root$3, { id: context.contentId, role: "tooltip", children: ariaLabel || children }) })
             ]
           }
         )
@@ -59725,6 +60365,13 @@ function App() {
         {
           path: "/guesses",
           element: /* @__PURE__ */ jsxRuntimeExports.jsx(ProtectedRoute, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Guesses, {}) })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Route,
+        {
+          path: "/kichutes",
+          element: /* @__PURE__ */ jsxRuntimeExports.jsx(ProtectedRoute, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Kichutes, {}) })
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/prizes", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Prizes, {}) }),
