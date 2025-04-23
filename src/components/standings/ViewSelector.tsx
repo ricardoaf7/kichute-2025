@@ -1,5 +1,7 @@
 
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { LayoutGrid, TableProperties, LineChart } from "lucide-react";
 
 interface ViewSelectorProps {
   viewMode: "table" | "cards" | "dynamic";
@@ -7,43 +9,55 @@ interface ViewSelectorProps {
   setUseDynamicTable: (value: boolean) => void;
 }
 
-const ViewSelector: React.FC<ViewSelectorProps> = ({
-  viewMode,
-  setViewMode,
-  setUseDynamicTable,
-}) => {
+const ViewSelector: React.FC<ViewSelectorProps> = ({ viewMode, setViewMode, setUseDynamicTable }) => {
+  const handleModeChange = (mode: "table" | "cards" | "dynamic") => {
+    setViewMode(mode);
+    setUseDynamicTable(mode === "dynamic");
+  };
+
   return (
-    <div className="flex rounded-md overflow-hidden border border-border">
-      <button
-        onClick={() => { setViewMode("dynamic"); setUseDynamicTable(true); }}
-        className={`px-3 py-1.5 text-sm ${
+    <div className="flex space-x-2 border border-border/60 rounded-md p-0.5 bg-background">
+      <Button
+        variant="ghost"
+        size="sm"
+        className={`${
           viewMode === "dynamic"
-            ? "bg-primary text-primary-foreground"
-            : "bg-background hover:bg-muted/50"
+            ? "bg-muted/80 text-primary-foreground"
+            : "hover:bg-muted/40"
         }`}
+        onClick={() => handleModeChange("dynamic")}
       >
-        Supabase
-      </button>
-      <button
-        onClick={() => { setViewMode("table"); setUseDynamicTable(false); }}
-        className={`px-3 py-1.5 text-sm ${
+        <LineChart className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline">Tabela Detalhada</span>
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        className={`${
           viewMode === "table"
-            ? "bg-primary text-primary-foreground"
-            : "bg-background hover:bg-muted/50"
+            ? "bg-muted/80 text-primary-foreground"
+            : "hover:bg-muted/40"
         }`}
+        onClick={() => handleModeChange("table")}
       >
-        Tabela
-      </button>
-      <button
-        onClick={() => { setViewMode("cards"); setUseDynamicTable(false); }}
-        className={`px-3 py-1.5 text-sm ${
+        <TableProperties className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline">Tabela Resumida</span>
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        className={`${
           viewMode === "cards"
-            ? "bg-primary text-primary-foreground"
-            : "bg-background hover:bg-muted/50"
+            ? "bg-muted/80 text-primary-foreground"
+            : "hover:bg-muted/40"
         }`}
+        onClick={() => handleModeChange("cards")}
       >
-        Cards
-      </button>
+        <LayoutGrid className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline">Cards</span>
+      </Button>
     </div>
   );
 };

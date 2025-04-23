@@ -2,8 +2,7 @@
 import React from "react";
 import { Player } from "../../types";
 import StandingsTable from "../StandingsTable";
-import PlayerCard from "../PlayerCard";
-import DynamicTable from "../DynamicTable";
+import DynamicTable from "./DynamicTable";
 
 interface StandingsContentProps {
   viewMode: "table" | "cards" | "dynamic";
@@ -30,14 +29,8 @@ const StandingsContent: React.FC<StandingsContentProps> = ({
           selectedJogador="todos"
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedPlayers.map((player, index) => (
-            <PlayerCard 
-              key={player.id} 
-              player={player} 
-              position={index + 1} 
-            />
-          ))}
+        <div className="text-center p-8 text-muted-foreground">
+          Modo de visualização de cards está desativado.
         </div>
       )}
     </div>

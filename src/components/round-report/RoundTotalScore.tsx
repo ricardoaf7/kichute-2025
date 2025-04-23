@@ -13,6 +13,7 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
   const { participants } = useParticipants();
   const { kichutes, isLoading: isLoadingKichutes } = useKichutes(selectedRound);
   const [totaisPorJogador, setTotaisPorJogador] = useState<Record<string, number>>({});
+  const [topScorerId, setTopScorerId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoadingKichutes && kichutes && kichutes.length > 0) {
@@ -22,24 +23,18 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
         totais[p.id] = 0;
       });
       
-      // Debug para verificar os kichutes e seus pontos
-      console.log("Kichutes recebidos para cálculo:", kichutes);
-      
       // Para cada kichute, somar os pontos ao total do jogador
       kichutes.forEach(kichute => {
         if (kichute.jogador_id) {
           const jogadorId = String(kichute.jogador_id);
           
-          // Converter explicitamente para número, tratando valores nulos, undefined ou strings vazias
+          // Converter explicitamente para número
           let points = 0;
           if (kichute.pontos !== null && kichute.pontos !== undefined && String(kichute.pontos) !== '') {
             points = typeof kichute.pontos === 'number' 
               ? kichute.pontos 
               : parseInt(String(kichute.pontos), 10) || 0;
           }
-          
-          // Debug para verificar o valor que está sendo somado
-          console.log(`Somando ${points} pontos para jogador ${jogadorId}`);
           
           // Atualizar o total do jogador
           if (!totais[jogadorId]) {
@@ -49,7 +44,18 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
         }
       });
       
-      console.log("Totais calculados por jogador:", totais);
+      // Encontrar o jogador com maior pontuação
+      let maxPontos = -1;
+      let maxJogadorId = null;
+      
+      Object.entries(totais).forEach(([jogadorId, pontos]) => {
+        if (pontos > maxPontos) {
+          maxPontos = pontos;
+          maxJogadorId = jogadorId;
+        }
+      });
+      
+      setTopScorerId(maxJogadorId);
       setTotaisPorJogador(totais);
     }
   }, [kichutes, participants, isLoadingKichutes, selectedRound]);
@@ -80,13 +86,12 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
         // Converter o ID para string para garantir compatibilidade
         const participantId = String(participant.id);
         const totalPontos = totaisPorJogador[participantId] || 0;
-        
-        console.log(`Exibindo total para ${participantId}: ${totalPontos}`);
+        const isTopScorer = participantId === topScorerId && totalPontos > 0;
         
         return (
           <TableCell key={`total-${participantId}`} className="text-center">
             <div className="flex items-center justify-center space-x-1">
-              <Trophy className="h-4 w-4 text-amber-500" />
+              {isTopScorer && <Trophy className="h-4 w-4 text-amber-500" />}
               <span>{totalPontos}</span>
             </div>
           </TableCell>
