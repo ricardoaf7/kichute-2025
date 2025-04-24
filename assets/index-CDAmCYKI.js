@@ -25983,7 +25983,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-BQOOJvC6.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-CyBeYNJw.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -36509,6 +36509,52 @@ const MatchesProvider$1 = ({ children }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx(MatchesContext$1.Provider, { value, children });
 };
+const ReportFilters = ({
+  selectedRound,
+  setSelectedRound,
+  selectedMonth,
+  setSelectedMonth,
+  selectedYear,
+  setSelectedYear,
+  rounds
+}) => {
+  const months2 = [
+    { value: "all", label: "Todos os meses" },
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" }
+  ];
+  const years = [{ value: "2025", label: "2025" }];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-4 w-full", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedRound.toString(), onValueChange: (value) => setSelectedRound(Number(value)), children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full sm:w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Rodada" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "0", children: "Todas as rodadas" }),
+        rounds.map((round2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: round2.toString(), children: [
+          "Rodada ",
+          round2
+        ] }, `round-${round2}`))
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedMonth, onValueChange: setSelectedMonth, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full sm:w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Mês" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: months2.map((month) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: month.value, children: month.label }, month.value)) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedYear, onValueChange: setSelectedYear, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full sm:w-[120px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Ano" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: years.map((year) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: year.value, children: year.label }, year.value)) })
+    ] }) })
+  ] });
+};
 const MatchesReportTable = ({
   matches,
   participants,
@@ -36598,6 +36644,40 @@ const MatchesReportTable = ({
       ] }, match2.id))
     ] }, `rodada-${rodada}`)) })
   ] }) });
+};
+const ReportContent = ({
+  matches,
+  participants,
+  kichutes,
+  isLoading,
+  reportTitle
+}) => {
+  const formattedMatches = matches.map((match2) => ({
+    id: match2.id,
+    rodada: match2.rodada,
+    time_casa: match2.time_casa,
+    time_visitante: match2.time_visitante,
+    placar_casa: match2.placar_casa,
+    placar_visitante: match2.placar_visitante
+  }));
+  if (isLoading) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg text-muted-foreground", children: "Carregando dados..." }) });
+  }
+  if (formattedMatches.length === 0) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg text-muted-foreground", children: "Nenhuma partida disponível para os filtros selecionados." }) });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "bg-muted print:bg-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-xl", children: reportTitle }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      MatchesReportTable,
+      {
+        matches: formattedMatches,
+        participants,
+        kichutes,
+        fontSize: "sm"
+      }
+    ) })
+  ] });
 };
 /*!
  * html2canvas 1.4.1 <https://html2canvas.hertzen.com>
@@ -51877,7 +51957,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-DQxcWWCs.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Bn4p-9Dk.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
@@ -52691,62 +52771,7 @@ const ReportActions = ({
     ] })
   ] });
 };
-const ReportFilters = ({
-  selectedRound,
-  setSelectedRound,
-  selectedMonth,
-  setSelectedMonth,
-  selectedYear,
-  setSelectedYear
-}) => {
-  const { rounds } = useMatches$1();
-  const months2 = [
-    { value: "all", label: "Todos os meses" },
-    { value: "01", label: "Janeiro" },
-    { value: "02", label: "Fevereiro" },
-    { value: "03", label: "Março" },
-    { value: "04", label: "Abril" },
-    { value: "05", label: "Maio" },
-    { value: "06", label: "Junho" },
-    { value: "07", label: "Julho" },
-    { value: "08", label: "Agosto" },
-    { value: "09", label: "Setembro" },
-    { value: "10", label: "Outubro" },
-    { value: "11", label: "Novembro" },
-    { value: "12", label: "Dezembro" }
-  ];
-  const years = [
-    { value: "2025", label: "2025" }
-  ];
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-4 w-full", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedRound.toString(), onValueChange: (value) => setSelectedRound(Number(value)), children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full sm:w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Rodada" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "0", children: "Todas as rodadas" }),
-        rounds.map((round2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: round2.toString(), children: [
-          "Rodada ",
-          round2
-        ] }, `round-${round2}`))
-      ] })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedMonth, onValueChange: setSelectedMonth, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full sm:w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Mês" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: months2.map((month) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: month.value, children: month.label }, month.value)) })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedYear, onValueChange: setSelectedYear, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full sm:w-[120px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Ano" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: years.map((year) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: year.value, children: year.label }, year.value)) })
-    ] }) })
-  ] });
-};
-const RoundReportContent = () => {
-  const reportRef = reactExports.useRef(null);
-  const { rounds, selectedRound, setSelectedRound } = useMatches$1();
-  const { participants, isLoading: isLoadingParticipants } = useParticipants$1();
-  const [initialReportRound, setInitialReportRound] = reactExports.useState(1);
-  const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
-  const [selectedMonth, setSelectedMonth] = reactExports.useState("all");
-  const [selectedYear, setSelectedYear] = reactExports.useState("2025");
+const useReportData = (selectedRound, selectedMonth, selectedYear) => {
   const [matches, setMatches] = reactExports.useState([]);
   const [kichutes, setKichutes] = reactExports.useState([]);
   const [isLoading, setIsLoading] = reactExports.useState(true);
@@ -52777,12 +52802,6 @@ const RoundReportContent = () => {
     setReportTitle(title);
   }, [selectedRound, selectedMonth, selectedYear]);
   reactExports.useEffect(() => {
-    if (!isLoadingCurrentRound && currentRound > 1) {
-      setInitialReportRound(currentRound - 1);
-      setSelectedRound(currentRound - 1);
-    }
-  }, [isLoadingCurrentRound, currentRound]);
-  reactExports.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
@@ -52800,9 +52819,8 @@ const RoundReportContent = () => {
         }
         if (selectedMonth !== "all") {
           const startDate = `${selectedYear}-${selectedMonth}-01`;
-          let endDate;
           const lastDay = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate();
-          endDate = `${selectedYear}-${selectedMonth}-${lastDay}`;
+          const endDate = `${selectedYear}-${selectedMonth}-${lastDay}`;
           matchesQuery = matchesQuery.gte("data", startDate).lte("data", endDate);
         } else if (selectedYear) {
           matchesQuery = matchesQuery.gte("data", `${selectedYear}-01-01`).lte("data", `${selectedYear}-12-31`);
@@ -52835,14 +52853,25 @@ const RoundReportContent = () => {
     };
     fetchData();
   }, [selectedRound, selectedMonth, selectedYear]);
-  const formattedMatches = matches.map((match2) => ({
-    id: match2.id,
-    rodada: match2.rodada,
-    time_casa: match2.time_casa,
-    time_visitante: match2.time_visitante,
-    placar_casa: match2.placar_casa,
-    placar_visitante: match2.placar_visitante
-  }));
+  return { matches, kichutes, isLoading, reportTitle };
+};
+const RoundReportContent = () => {
+  const reportRef = reactExports.useRef(null);
+  const { rounds, selectedRound, setSelectedRound } = useMatches$1();
+  const { participants } = useParticipants$1();
+  const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
+  const [selectedMonth, setSelectedMonth] = reactExports.useState("all");
+  const [selectedYear, setSelectedYear] = reactExports.useState("2025");
+  React.useEffect(() => {
+    if (!isLoadingCurrentRound && currentRound > 1) {
+      setSelectedRound(currentRound - 1);
+    }
+  }, [isLoadingCurrentRound, currentRound, setSelectedRound]);
+  const { matches, kichutes, isLoading, reportTitle } = useReportData(
+    selectedRound,
+    selectedMonth,
+    selectedYear
+  );
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container mx-auto px-4 py-8 pt-20 print:pt-8 print:px-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-7xl mx-auto space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold", children: "Relatório de Palpites" }) }),
@@ -52855,7 +52884,8 @@ const RoundReportContent = () => {
             selectedMonth,
             setSelectedMonth,
             selectedYear,
-            setSelectedYear
+            setSelectedYear,
+            rounds
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -52870,18 +52900,16 @@ const RoundReportContent = () => {
         )
       ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: reportRef, className: "bg-background print:bg-white", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg text-muted-foreground", children: "Carregando dados..." }) }) : formattedMatches.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "bg-muted print:bg-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-xl", children: reportTitle }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        MatchesReportTable,
-        {
-          matches: formattedMatches,
-          participants,
-          kichutes,
-          fontSize: "sm"
-        }
-      ) })
-    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg text-muted-foreground", children: "Nenhuma partida disponível para os filtros selecionados." }) }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: reportRef, className: "bg-background print:bg-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ReportContent,
+      {
+        matches,
+        participants,
+        kichutes,
+        isLoading,
+        reportTitle
+      }
+    ) })
   ] }) });
 };
 const RoundReport = () => {
