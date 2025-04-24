@@ -25983,7 +25983,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-Dg9m70Q1.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-BQOOJvC6.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -32698,7 +32698,7 @@ const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
           partidasQuery = partidasQuery.gte("data", dataInicio).lte("data", dataFim);
         }
         if (selectedRodada !== "todas") {
-          partidasQuery = partidasQuery.eq("rodada", selectedRodada);
+          partidasQuery = partidasQuery.eq("rodada", parseInt(selectedRodada, 10));
         }
         const { data: partidas, error: partidasError } = await partidasQuery;
         if (partidasError) throw partidasError;
@@ -51877,7 +51877,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-B14ph-r3.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-DQxcWWCs.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
@@ -52726,7 +52726,7 @@ const ReportFilters = ({
         rounds.map((round2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: round2.toString(), children: [
           "Rodada ",
           round2
-        ] }, round2))
+        ] }, `round-${round2}`))
       ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedMonth, onValueChange: setSelectedMonth, children: [
