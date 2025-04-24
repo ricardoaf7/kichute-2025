@@ -22,6 +22,9 @@ const RoundReportContent = () => {
     }
   }, [isLoadingCurrentRound, currentRound, setSelectedRound]);
 
+  // Extract round numbers from the rounds array
+  const roundNumbers = rounds.map(round => round.number);
+
   const { matches, kichutes, isLoading, reportTitle } = useReportData(
     selectedRound,
     selectedMonth,
@@ -44,7 +47,7 @@ const RoundReportContent = () => {
               setSelectedMonth={setSelectedMonth}
               selectedYear={selectedYear}
               setSelectedYear={setSelectedYear}
-              rounds={rounds}
+              rounds={roundNumbers}
             />
             <ReportActions 
               reportRef={reportRef}
