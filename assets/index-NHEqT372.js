@@ -25983,7 +25983,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-Dz6mk8ye.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-Dg9m70Q1.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -31125,19 +31125,6 @@ const calculatePoints = (guess, match2, scoringSystem = SCORING_SYSTEM) => {
   }
   return 0;
 };
-const getPointsBadgeClass = (points, scoringSystem = SCORING_SYSTEM) => {
-  let baseClass = "inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-xs font-medium";
-  switch (points) {
-    case scoringSystem.exactScore:
-      return `${baseClass} bg-green-100 text-green-800`;
-    case scoringSystem.correctDifferenceOrDraw:
-      return `${baseClass} bg-blue-100 text-blue-800`;
-    case scoringSystem.correctWinner:
-      return `${baseClass} bg-yellow-100 text-yellow-800`;
-    default:
-      return `${baseClass} bg-gray-100 text-gray-800`;
-  }
-};
 const formatKichuteData = (data) => {
   return (data || []).map((item) => {
     var _a3, _b3, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
@@ -32612,6 +32599,23 @@ const TableFilters = ({
   onAnoChange,
   months: months2 = []
 }) => {
+  const defaultMonths = [
+    { value: "todos", label: "Todos os meses" },
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" },
+    { value: "01-02", label: "Janeiro/Fevereiro" }
+  ];
+  const monthsToUse = months2.length > 0 ? months2 : defaultMonths;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "rodada-select", className: "text-sm font-medium text-gray-700 dark:text-gray-300", children: "Rodada:" }),
@@ -32630,10 +32634,7 @@ const TableFilters = ({
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "mes-select", className: "text-sm font-medium text-gray-700 dark:text-gray-300", children: "Mês:" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedMes, onValueChange: onMesChange, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "mes-select", className: "w-[180px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Selecionar mês" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "todos", children: "Todos os meses" }),
-          months2.map((month) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: month.value, children: month.label }, `mes-${month.value}`))
-        ] })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: monthsToUse.map((month) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: month.value, children: month.label }, `mes-${month.value}`)) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
@@ -32680,12 +32681,55 @@ const useTableSort = () => {
   };
 };
 const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
-  const { kichutes, isLoading, error } = useKichuteData(selectedRodada, "todos");
+  const [kichutes, setKichutes] = reactExports.useState([]);
+  const [isLoading, setIsLoading] = reactExports.useState(true);
+  const [error, setError] = reactExports.useState(null);
+  reactExports.useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        let partidasQuery = supabase.from("partidas").select("id, rodada, data");
+        if (selectedMes !== "todos") {
+          const [mesInicio, mesFim] = selectedMes === "01-02" ? ["01", "02"] : [selectedMes, selectedMes];
+          const dataInicio = `${selectedAno}-${mesInicio}-01`;
+          const ultimoDia = mesFim === "02" ? "28" : ["04", "06", "09", "11"].includes(mesFim) ? "30" : "31";
+          const dataFim = `${selectedAno}-${mesFim}-${ultimoDia}`;
+          partidasQuery = partidasQuery.gte("data", dataInicio).lte("data", dataFim);
+        }
+        if (selectedRodada !== "todas") {
+          partidasQuery = partidasQuery.eq("rodada", selectedRodada);
+        }
+        const { data: partidas, error: partidasError } = await partidasQuery;
+        if (partidasError) throw partidasError;
+        const rodasDoMes = new Set((partidas == null ? void 0 : partidas.map((p2) => p2.rodada)) || []);
+        let kichutesData = [];
+        if (rodasDoMes.size > 0) {
+          const { data: kichutesResult, error: kichutesError } = await supabase.from("kichutes").select(`
+              id,
+              pontos,
+              jogador:jogadores(id, nome),
+              partida:partidas(rodada)
+            `).in("partida.rodada", Array.from(rodasDoMes));
+          if (kichutesError) throw kichutesError;
+          kichutesData = kichutesResult || [];
+        }
+        setKichutes(kichutesData);
+      } catch (err2) {
+        console.error("Erro ao buscar dados:", err2);
+        setError("Não foi possível carregar os dados");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [selectedRodada, selectedMes, selectedAno]);
   const jogadoresMap = {};
   kichutes.forEach((k2) => {
+    if (!k2.jogador || !k2.partida) return;
     const jogador = k2.jogador.nome;
     const jogadorId = k2.jogador.id || `jogador-${jogador}`;
-    const rodada = `r${k2.rodada}`;
+    const rodada = `r${k2.partida.rodada}`;
     if (!jogadoresMap[jogador]) {
       jogadoresMap[jogador] = {
         id: jogadorId,
@@ -32698,7 +32742,15 @@ const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
     jogadoresMap[jogador].pontos_total += k2.pontos;
   });
   const jogadores = Object.values(jogadoresMap);
-  const rodadas = Array.from(new Set(kichutes.map((k2) => `r${k2.rodada}`))).sort();
+  const rodadas = Array.from(
+    new Set(
+      kichutes.filter((k2) => k2.partida && k2.partida.rodada).map((k2) => `r${k2.partida.rodada}`)
+    )
+  ).sort((a2, b2) => {
+    const numA = parseInt(a2.substring(1));
+    const numB = parseInt(b2.substring(1));
+    return numA - numB;
+  });
   return { jogadores, rodadas, isLoading, error };
 };
 const DynamicTable = () => {
@@ -32706,7 +32758,9 @@ const DynamicTable = () => {
   const [selectedMes, setSelectedMes] = reactExports.useState("todos");
   const [selectedAno, setSelectedAno] = reactExports.useState("2025");
   const { jogadores, rodadas, isLoading, error } = useDynamicTableDataReal(
-    selectedRodada
+    selectedRodada,
+    selectedMes,
+    selectedAno
   );
   const { sortField, sortDirection, handleSort, sortPlayers } = useTableSort();
   const todasRodadas = rodadas;
@@ -36455,196 +36509,94 @@ const MatchesProvider$1 = ({ children }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx(MatchesContext$1.Provider, { value, children });
 };
-const ScoreDisplay = ({ homeScore, awayScore, isMatchPlayed }) => {
-  if (isMatchPlayed) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center space-x-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg font-bold", children: homeScore }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "x" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg font-bold", children: awayScore })
-    ] });
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-muted-foreground px-2 py-1 bg-muted rounded-md", children: "Aguardando" });
-};
-const useKichutes = (round2) => {
-  const [kichutes, setKichutes] = reactExports.useState([]);
-  const [isLoading, setIsLoading] = reactExports.useState(true);
-  const { toast: toast2 } = useToast();
-  reactExports.useEffect(() => {
-    const fetchKichutes = async () => {
-      setIsLoading(true);
-      try {
-        let query = supabase.from("kichutes").select(`
-            id,
-            jogador_id,
-            partida_id,
-            palpite_casa,
-            palpite_visitante,
-            pontos
-          `);
-        if (round2) {
-          const { data: matchesData, error: matchesError } = await supabase.from("partidas").select("id").eq("rodada", round2);
-          if (matchesError) {
-            console.error("Erro ao buscar partidas da rodada:", matchesError);
-            throw matchesError;
-          }
-          if (matchesData && matchesData.length > 0) {
-            const matchIds = matchesData.map((match2) => match2.id);
-            query = query.in("partida_id", matchIds);
-          }
-        }
-        const { data, error } = await query;
-        if (error) {
-          console.error("Erro na consulta de kichutes:", error);
-          throw error;
-        }
-        console.log("Dados brutos de kichutes carregados:", data);
-        const formattedData = (data == null ? void 0 : data.map((kichute) => ({
-          ...kichute,
-          pontos: kichute.pontos === null ? 0 : Number(kichute.pontos)
-        }))) || [];
-        console.log("Kichutes processados com pontos normalizados:", formattedData);
-        setKichutes(formattedData);
-      } catch (err2) {
-        console.error("Erro ao carregar kichutes:", err2);
-        toast2({
-          title: "Erro",
-          description: "Não foi possível carregar os palpites.",
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchKichutes();
-  }, [round2, toast2]);
-  return { kichutes, isLoading };
-};
-const RoundTotalScore = ({ selectedRound }) => {
-  const { participants } = useParticipants$1();
-  const { kichutes, isLoading: isLoadingKichutes } = useKichutes(selectedRound);
-  const [totaisPorJogador, setTotaisPorJogador] = reactExports.useState({});
-  const [topScorerId, setTopScorerId] = reactExports.useState(null);
-  reactExports.useEffect(() => {
-    if (!isLoadingKichutes && kichutes && kichutes.length > 0) {
-      const totais = {};
-      participants.forEach((p2) => {
-        totais[p2.id] = 0;
-      });
-      kichutes.forEach((kichute) => {
-        if (kichute.jogador_id) {
-          const jogadorId = String(kichute.jogador_id);
-          let points = 0;
-          if (kichute.pontos !== null && kichute.pontos !== void 0 && String(kichute.pontos) !== "") {
-            points = typeof kichute.pontos === "number" ? kichute.pontos : parseInt(String(kichute.pontos), 10) || 0;
-          }
-          if (!totais[jogadorId]) {
-            totais[jogadorId] = 0;
-          }
-          totais[jogadorId] += points;
-        }
-      });
-      let maxPontos = -1;
-      let maxJogadorId = null;
-      Object.entries(totais).forEach(([jogadorId, pontos]) => {
-        if (pontos > maxPontos) {
-          maxPontos = pontos;
-          maxJogadorId = jogadorId;
-        }
-      });
-      setTopScorerId(maxJogadorId);
-      setTotaisPorJogador(totais);
+const MatchesReportTable = ({
+  matches,
+  participants,
+  kichutes,
+  fontSize: fontSize2 = "base"
+}) => {
+  const fontSizeClasses = {
+    xs: "text-xs",
+    sm: "text-sm",
+    base: "text-base",
+    lg: "text-lg"
+  };
+  const fontClass = fontSizeClasses[fontSize2] || "text-sm";
+  const matchesByRound = matches.reduce((acc, match2) => {
+    if (!acc[match2.rodada]) {
+      acc[match2.rodada] = [];
     }
-  }, [kichutes, participants, isLoadingKichutes, selectedRound]);
-  if (isLoadingKichutes) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted/30 font-bold", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 2, className: "text-right", children: "Total de Pontos:" }),
-      participants.map((participant) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center space-x-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "..." }) }) }, participant.id))
-    ] });
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted/30 font-bold", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 2, className: "text-right", children: "Total de Pontos:" }),
-    participants.map((participant) => {
-      const participantId = String(participant.id);
-      const totalPontos = totaisPorJogador[participantId] || 0;
-      const isTopScorer = participantId === topScorerId && totalPontos > 0;
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center space-x-1", children: [
-        isTopScorer && /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-amber-500" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: totalPontos })
-      ] }) }, `total-${participantId}`);
-    })
-  ] });
-};
-const getReportIcons = (pointsArr, visualMode) => {
-  const max2 = Math.max(...pointsArr);
-  {
-    return pointsArr.map(
-      (p2, idx) => p2 === max2 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500" }) : null
-    );
-  }
-};
-const MatchesReportTable = ({ matches, participants, kichutes }) => {
-  var _a3;
-  const validMatches = (matches == null ? void 0 : matches.filter(
-    (match2) => match2 && match2.time_casa && match2.time_visitante && match2.time_casa.sigla && match2.time_visitante.sigla
-  )) || [];
-  const calculateGuessPoints = (guess, match2) => {
-    if (!guess || !match2) return 0;
-    if (match2.placar_casa === null || match2.placar_visitante === null) return 0;
-    return calculatePoints(
-      { homeScore: guess.palpite_casa, awayScore: guess.palpite_visitante },
-      { homeScore: match2.placar_casa, awayScore: match2.placar_visitante }
+    acc[match2.rodada].push(match2);
+    return acc;
+  }, {});
+  const sortedRounds = Object.keys(matchesByRound).map(Number).sort((a2, b2) => a2 - b2);
+  const getKichute = (participantId, matchId) => {
+    return kichutes.find(
+      (k2) => k2.jogador_id === participantId && k2.partida_id === matchId
     );
   };
-  const totalPointsArr = participants.map((participant) => {
-    let total = 0;
-    validMatches.forEach((match2) => {
-      const guess = kichutes.find(
-        (k2) => k2.partida_id === match2.id && k2.jogador_id === participant.id
-      );
-      total += calculateGuessPoints(guess, match2);
-    });
-    return total;
-  });
-  const iconsByParticipant = getReportIcons(totalPointsArr);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-lg border shadow-sm overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "sticky left-0 z-20 bg-muted w-[200px]", children: "Partida" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "sticky left-[200px] z-20 bg-muted", children: "Resultado" }),
-      participants.map((participant) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center min-w-[120px]", children: participant.nome }, participant.id))
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: validMatches.length > 0 ? validMatches.map((match2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { className: "sticky left-0 z-10 bg-inherit font-medium whitespace-nowrap", children: [
-        match2.time_casa.sigla,
-        " x ",
-        match2.time_visitante.sigla
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "sticky left-[200px] z-10 bg-inherit", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        ScoreDisplay,
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: cn("overflow-x-auto", fontClass), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { className: "min-w-full", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted/50", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-1/6 p-2 print:p-1", children: "Partida" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-1/6 p-2 print:p-1 text-center", children: "Resultado" }),
+      participants.map((participant) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        TableHead,
         {
-          homeScore: match2.placar_casa,
-          awayScore: match2.placar_visitante,
-          isMatchPlayed: match2.placar_casa !== null && match2.placar_visitante !== null
+          className: "p-2 print:p-1 text-center whitespace-nowrap",
+          children: participant.nome
+        },
+        participant.id
+      ))
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedRounds.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsxs(React.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { className: "bg-muted/30", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        TableCell,
+        {
+          colSpan: 2 + participants.length,
+          className: "font-bold py-1 print:py-0",
+          children: [
+            "Rodada ",
+            rodada
+          ]
         }
       ) }),
-      participants.map((participant, idx) => {
-        const guess = kichutes.find(
-          (k2) => k2.partida_id === match2.id && k2.jogador_id === participant.id
-        );
-        const points = calculateGuessPoints(guess, match2);
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col items-center space-y-1", children: guess ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm font-medium", children: [
-            guess.palpite_casa,
-            " x ",
-            guess.palpite_visitante
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: getPointsBadgeClass(points), children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
-            iconsByParticipant[idx],
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: points })
-          ] }) })
-        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "-" }) }) }, `${match2.id}-${participant.id}`);
-      })
-    ] }, match2.id)) : /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: participants.length + 2, className: "text-center py-4", children: "Nenhuma partida disponível para esta rodada." }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableFooter, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(RoundTotalScore, { selectedRound: Number(((_a3 = validMatches[0]) == null ? void 0 : _a3.rodada) || 0) }) })
+      matchesByRound[rodada].map((match2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "border-t border-border/30", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "p-2 print:p-1 whitespace-nowrap", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: match2.time_casa.nome }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "x" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: match2.time_visitante.nome })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "p-2 print:p-1 text-center", children: match2.placar_casa !== void 0 && match2.placar_visitante !== void 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold", children: [
+          match2.placar_casa,
+          " x ",
+          match2.placar_visitante
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground italic", children: "Não jogado" }) }),
+        participants.map((participant) => {
+          const kichute = getKichute(participant.id, match2.id);
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(
+            TableCell,
+            {
+              className: "p-2 print:p-1 text-center",
+              children: kichute ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                  kichute.palpite_casa,
+                  " x ",
+                  kichute.palpite_visitante
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: cn(
+                  "font-bold",
+                  kichute.pontos === 0 ? "text-red-500" : kichute.pontos <= 2 ? "text-yellow-500" : kichute.pontos <= 4 ? "text-blue-500" : "text-green-500"
+                ), children: [
+                  kichute.pontos,
+                  "pts"
+                ] })
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground print:text-gray-400", children: "-" })
+            },
+            `${match2.id}-${participant.id}`
+          );
+        })
+      ] }, match2.id))
+    ] }, `rodada-${rodada}`)) })
   ] }) });
 };
 /*!
@@ -51925,7 +51877,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-CXKMlR2_.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-B14ph-r3.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
@@ -52682,7 +52634,13 @@ E.API.PDFObject = function() {
     return "" + r2;
   }, e2;
 }();
-const ReportActions = ({ reportRef, selectedRound }) => {
+const ReportActions = ({
+  reportRef,
+  selectedRound,
+  selectedMonth = "all",
+  selectedYear = "2025",
+  title = ""
+}) => {
   const handlePrint = () => {
     window.print();
   };
@@ -52690,15 +52648,34 @@ const ReportActions = ({ reportRef, selectedRound }) => {
     if (!reportRef.current) return;
     try {
       const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
+        scale: 1.5,
+        // Reduzir a escala para caber mais conteúdo
         useCORS: true,
         logging: false
       });
-      const imgWidth = 210;
+      const orientation = "landscape";
+      const pdf = new E(orientation, "mm", "a4");
+      const imgWidth = orientation === "landscape" ? 277 : 190;
       const imgHeight = canvas.height * imgWidth / canvas.width;
-      const pdf = new E("p", "mm", "a4");
-      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, imgWidth, imgHeight);
-      pdf.save(`relatorio-rodada-${selectedRound}.pdf`);
+      pdf.addImage(
+        canvas.toDataURL("image/png"),
+        "PNG",
+        orientation === "landscape" ? 10 : 10,
+        // margem esquerda
+        10,
+        // margem superior
+        imgWidth,
+        imgHeight
+      );
+      let filename = "relatorio";
+      if (selectedRound > 0) {
+        filename += `-rodada-${selectedRound}`;
+      } else if (selectedMonth !== "all") {
+        filename += `-mes-${selectedMonth}-${selectedYear}`;
+      } else {
+        filename += `-anual-${selectedYear}`;
+      }
+      pdf.save(`${filename}.pdf`);
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
     }
@@ -52714,21 +52691,150 @@ const ReportActions = ({ reportRef, selectedRound }) => {
     ] })
   ] });
 };
+const ReportFilters = ({
+  selectedRound,
+  setSelectedRound,
+  selectedMonth,
+  setSelectedMonth,
+  selectedYear,
+  setSelectedYear
+}) => {
+  const { rounds } = useMatches$1();
+  const months2 = [
+    { value: "all", label: "Todos os meses" },
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" }
+  ];
+  const years = [
+    { value: "2025", label: "2025" }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-4 w-full", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedRound.toString(), onValueChange: (value) => setSelectedRound(Number(value)), children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full sm:w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Rodada" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "0", children: "Todas as rodadas" }),
+        rounds.map((round2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: round2.toString(), children: [
+          "Rodada ",
+          round2
+        ] }, round2))
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedMonth, onValueChange: setSelectedMonth, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full sm:w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Mês" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: months2.map((month) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: month.value, children: month.label }, month.value)) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedYear, onValueChange: setSelectedYear, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { className: "w-full sm:w-[120px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Ano" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: years.map((year) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: year.value, children: year.label }, year.value)) })
+    ] }) })
+  ] });
+};
 const RoundReportContent = () => {
   const reportRef = reactExports.useRef(null);
   const { rounds, selectedRound, setSelectedRound } = useMatches$1();
   const { participants, isLoading: isLoadingParticipants } = useParticipants$1();
   const [initialReportRound, setInitialReportRound] = reactExports.useState(1);
   const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
-  const { kichutes, isLoading: isLoadingKichutes } = useKichutes(selectedRound);
-  const { matches, isLoading: isLoadingMatches } = useMatchesByRound(selectedRound.toString());
+  const [selectedMonth, setSelectedMonth] = reactExports.useState("all");
+  const [selectedYear, setSelectedYear] = reactExports.useState("2025");
+  const [matches, setMatches] = reactExports.useState([]);
+  const [kichutes, setKichutes] = reactExports.useState([]);
+  const [isLoading, setIsLoading] = reactExports.useState(true);
+  const [reportTitle, setReportTitle] = reactExports.useState("");
+  reactExports.useEffect(() => {
+    let title = "";
+    if (selectedRound > 0) {
+      title = `Rodada ${selectedRound} - Relatório de Palpites`;
+    } else if (selectedMonth !== "all") {
+      const monthNames = {
+        "01": "Janeiro",
+        "02": "Fevereiro",
+        "03": "Março",
+        "04": "Abril",
+        "05": "Maio",
+        "06": "Junho",
+        "07": "Julho",
+        "08": "Agosto",
+        "09": "Setembro",
+        "10": "Outubro",
+        "11": "Novembro",
+        "12": "Dezembro"
+      };
+      title = `${monthNames[selectedMonth]} de ${selectedYear} - Relatório de Palpites`;
+    } else {
+      title = `Relatório Anual de Palpites - ${selectedYear}`;
+    }
+    setReportTitle(title);
+  }, [selectedRound, selectedMonth, selectedYear]);
   reactExports.useEffect(() => {
     if (!isLoadingCurrentRound && currentRound > 1) {
       setInitialReportRound(currentRound - 1);
       setSelectedRound(currentRound - 1);
     }
   }, [isLoadingCurrentRound, currentRound]);
-  const isLoading = isLoadingParticipants || isLoadingKichutes || isLoadingMatches;
+  reactExports.useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        let matchesQuery = supabase.from("partidas").select(`
+          id, 
+          rodada, 
+          time_casa:times!time_casa_id(nome, sigla), 
+          time_visitante:times!time_visitante_id(nome, sigla), 
+          placar_casa, 
+          placar_visitante,
+          data
+        `);
+        if (selectedRound > 0) {
+          matchesQuery = matchesQuery.eq("rodada", selectedRound);
+        }
+        if (selectedMonth !== "all") {
+          const startDate = `${selectedYear}-${selectedMonth}-01`;
+          let endDate;
+          const lastDay = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate();
+          endDate = `${selectedYear}-${selectedMonth}-${lastDay}`;
+          matchesQuery = matchesQuery.gte("data", startDate).lte("data", endDate);
+        } else if (selectedYear) {
+          matchesQuery = matchesQuery.gte("data", `${selectedYear}-01-01`).lte("data", `${selectedYear}-12-31`);
+        }
+        const { data: matchesData, error: matchesError } = await matchesQuery;
+        if (matchesError) throw matchesError;
+        if (matchesData && matchesData.length > 0) {
+          setMatches(matchesData);
+          const matchIds = matchesData.map((m2) => m2.id);
+          const { data: kichutesData, error: kichutesError } = await supabase.from("kichutes").select(`
+              id, 
+              palpite_casa, 
+              palpite_visitante, 
+              pontos, 
+              jogador_id,
+              jogador:jogadores(id, nome),
+              partida_id
+            `).in("partida_id", matchIds);
+          if (kichutesError) throw kichutesError;
+          setKichutes(kichutesData || []);
+        } else {
+          setMatches([]);
+          setKichutes([]);
+        }
+      } catch (err2) {
+        console.error("Erro ao buscar dados para o relatório:", err2);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [selectedRound, selectedMonth, selectedYear]);
   const formattedMatches = matches.map((match2) => ({
     id: match2.id,
     rodada: match2.rodada,
@@ -52737,50 +52843,45 @@ const RoundReportContent = () => {
     placar_casa: match2.placar_casa,
     placar_visitante: match2.placar_visitante
   }));
-  console.log("Matches from direct query:", matches);
-  console.log("Formatted matches for report:", formattedMatches);
-  console.log("Participants:", participants);
-  console.log("Kichutes for round:", kichutes);
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container mx-auto px-4 py-8 pt-20 print:pt-8 print:px-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-7xl mx-auto space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold", children: "Relatório da Rodada" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold", children: "Relatório de Palpites" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row gap-4 w-full md:w-auto", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full sm:w-48", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          RoundSelector$1,
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ReportFilters,
           {
-            selectedRound: selectedRound.toString(),
-            onRoundChange: (round2) => setSelectedRound(Number(round2)),
-            isDisabled: isLoading
+            selectedRound,
+            setSelectedRound,
+            selectedMonth,
+            setSelectedMonth,
+            selectedYear,
+            setSelectedYear
           }
-        ) }),
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           ReportActions,
           {
             reportRef,
-            selectedRound
+            selectedRound,
+            selectedMonth,
+            selectedYear,
+            title: reportTitle
           }
         )
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: reportRef, className: "bg-background print:bg-white", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg text-muted-foreground", children: "Carregando dados..." }) }) : formattedMatches.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "bg-muted print:bg-white", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-xl", children: [
-        "Rodada ",
-        selectedRound,
-        " - Relatório de Palpites"
-      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "bg-muted print:bg-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-xl", children: reportTitle }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         MatchesReportTable,
         {
           matches: formattedMatches,
           participants,
-          kichutes
+          kichutes,
+          fontSize: "sm"
         }
       ) })
-    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-lg text-muted-foreground", children: [
-      "Nenhuma partida disponível para a rodada ",
-      selectedRound,
-      "."
-    ] }) }) })
+    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg text-muted-foreground", children: "Nenhuma partida disponível para os filtros selecionados." }) }) })
   ] }) });
 };
 const RoundReport = () => {

@@ -853,10 +853,6 @@ body{
   left: 0.5rem;
 }
 
-.left-\[200px\]{
-  left: 200px;
-}
-
 .left-\[50\%\]{
   left: 50%;
 }
@@ -1271,6 +1267,10 @@ body{
   width: 20%;
 }
 
+.w-1\/6{
+  width: 16.666667%;
+}
+
 .w-10{
   width: 2.5rem;
 }
@@ -1416,10 +1416,6 @@ body{
   min-width: 1.25rem;
 }
 
-.min-w-\[120px\]{
-  min-width: 120px;
-}
-
 .min-w-\[12rem\]{
   min-width: 12rem;
 }
@@ -1430,6 +1426,10 @@ body{
 
 .min-w-\[var\(--radix-select-trigger-width\)\]{
   min-width: var(--radix-select-trigger-width);
+}
+
+.min-w-full{
+  min-width: 100%;
 }
 
 .max-w-3xl{
@@ -2111,10 +2111,6 @@ body{
 .bg-green-700{
   --tw-bg-opacity: 1;
   background-color: rgb(21 128 61 / var(--tw-bg-opacity, 1));
-}
-
-.bg-inherit{
-  background-color: inherit;
 }
 
 .bg-muted{
@@ -4213,8 +4209,16 @@ body{
     display: flex;
   }
 
-  .sm\:w-48{
-    width: 12rem;
+  .sm\:w-\[120px\]{
+    width: 120px;
+  }
+
+  .sm\:w-\[160px\]{
+    width: 160px;
+  }
+
+  .sm\:w-auto{
+    width: auto;
   }
 
   .sm\:max-w-\[425px\]{
@@ -4489,13 +4493,27 @@ body{
     background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
   }
 
+  .print\:p-1{
+    padding: 0.25rem;
+  }
+
   .print\:px-0{
     padding-left: 0px;
     padding-right: 0px;
   }
 
+  .print\:py-0{
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
   .print\:pt-8{
     padding-top: 2rem;
+  }
+
+  .print\:text-gray-400{
+    --tw-text-opacity: 1;
+    color: rgb(156 163 175 / var(--tw-text-opacity, 1));
   }
 }
 
