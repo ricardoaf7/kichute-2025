@@ -22,6 +22,25 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
   onAnoChange,
   months = []
 }) => {
+  const defaultMonths = [
+    { value: "todos", label: "Todos os meses" },
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" },
+    { value: "01-02", label: "Janeiro/Fevereiro" },
+  ];
+
+  const monthsToUse = months.length > 0 ? months : defaultMonths;
+
   return (
     <div className="flex flex-wrap gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="flex flex-col gap-1">
@@ -52,8 +71,7 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
             <SelectValue placeholder="Selecionar mês" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="todos">Todos os meses</SelectItem>
-            {months.map(month => (
+            {monthsToUse.map(month => (
               <SelectItem key={`mes-${month.value}`} value={month.value}>
                 {month.label}
               </SelectItem>
