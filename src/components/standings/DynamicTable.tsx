@@ -45,7 +45,13 @@ const DynamicTable = () => {
     </span>
   );
 
-  const sortedPlayers = sortPlayers(jogadores, selectedRodada);
+  // Add id field to each player object to match JogadorData interface
+  const jogadoresWithId = jogadores.map((jogador, index) => ({
+    ...jogador,
+    id: jogador.id || `player-${index}` // Use existing id if available, otherwise generate one
+  }));
+
+  const sortedPlayers = sortPlayers(jogadoresWithId, selectedRodada);
 
   // List of months in Portuguese
   const months = [

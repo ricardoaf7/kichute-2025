@@ -1,4 +1,12 @@
+
 import { useKichuteData } from "@/hooks/useKichuteData";
+
+export interface JogadorData {
+  id: string;
+  nome: string;
+  rodadas: Record<string, number>;
+  pontos_total: number;
+}
 
 export const useDynamicTableDataReal = (
   selectedRodada: string,
@@ -8,14 +16,16 @@ export const useDynamicTableDataReal = (
   const { kichutes, isLoading, error } = useKichuteData(selectedRodada, "todos");
 
   // Agrupar os pontos por jogador
-  const jogadoresMap: Record<string, { nome: string; rodadas: Record<string, number>; pontos_total: number }> = {};
+  const jogadoresMap: Record<string, JogadorData> = {};
 
   kichutes.forEach((k) => {
     const jogador = k.jogador.nome;
+    const jogadorId = k.jogador.id || `jogador-${jogador}`;
     const rodada = `r${k.rodada}`;
 
     if (!jogadoresMap[jogador]) {
       jogadoresMap[jogador] = {
+        id: jogadorId,
         nome: jogador,
         rodadas: {},
         pontos_total: 0,
