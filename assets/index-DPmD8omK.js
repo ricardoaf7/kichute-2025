@@ -25983,7 +25983,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-CyBeYNJw.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-CMoKfcwH.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -51957,7 +51957,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Bn4p-9Dk.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-DOg_A6EF.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
@@ -52867,6 +52867,7 @@ const RoundReportContent = () => {
       setSelectedRound(currentRound - 1);
     }
   }, [isLoadingCurrentRound, currentRound, setSelectedRound]);
+  const roundNumbers = rounds.map((round2) => round2.number);
   const { matches, kichutes, isLoading, reportTitle } = useReportData(
     selectedRound,
     selectedMonth,
@@ -52885,7 +52886,7 @@ const RoundReportContent = () => {
             setSelectedMonth,
             selectedYear,
             setSelectedYear,
-            rounds
+            rounds: roundNumbers
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
