@@ -25983,7 +25983,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-1iOkSaf6.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-Dz6mk8ye.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -32684,9 +32684,11 @@ const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
   const jogadoresMap = {};
   kichutes.forEach((k2) => {
     const jogador = k2.jogador.nome;
+    const jogadorId = k2.jogador.id || `jogador-${jogador}`;
     const rodada = `r${k2.rodada}`;
     if (!jogadoresMap[jogador]) {
       jogadoresMap[jogador] = {
+        id: jogadorId,
         nome: jogador,
         rodadas: {},
         pontos_total: 0
@@ -32720,7 +32722,12 @@ const DynamicTable = () => {
   const totaisPorRodada = calcularTotalPorRodada();
   const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
   const SortIcon = ({ field }) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex ml-1 text-muted-foreground", children: sortField === field ? sortDirection === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronUp, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4 opacity-30" }) });
-  const sortedPlayers = sortPlayers(jogadores, selectedRodada);
+  const jogadoresWithId = jogadores.map((jogador, index2) => ({
+    ...jogador,
+    id: jogador.id || `player-${index2}`
+    // Use existing id if available, otherwise generate one
+  }));
+  const sortedPlayers = sortPlayers(jogadoresWithId, selectedRodada);
   const months2 = [
     { value: "01", label: "Janeiro" },
     { value: "02", label: "Fevereiro" },
@@ -51918,7 +51925,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-jKY9kb3X.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-CXKMlR2_.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
