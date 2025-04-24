@@ -1,5 +1,4 @@
 
-import { useKichuteData } from "@/hooks/useKichuteData";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -47,7 +46,8 @@ export const useDynamicTableDataReal = (
         }
 
         if (selectedRodada !== "todas") {
-          partidasQuery = partidasQuery.eq("rodada", selectedRodada);
+          // Convert string to number for the rodada comparison
+          partidasQuery = partidasQuery.eq("rodada", parseInt(selectedRodada, 10));
         }
         
         // Executar a consulta de partidas

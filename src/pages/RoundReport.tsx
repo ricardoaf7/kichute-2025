@@ -1,12 +1,9 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import { useMatches, MatchesProvider } from "@/contexts/MatchesContext";
-import { RoundSelector } from "@/components/guesses/RoundSelector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MatchesReportTable } from "@/components/round-report/MatchesReportTable";
 import { ReportActions } from "@/components/round-report/ReportActions";
 import { useParticipants } from "@/hooks/useParticipants";
-import { useKichutes } from "@/hooks/useKichutes";
 import { useMatchesByRound } from "@/hooks/useMatchesByRound";
 import { useCurrentRound } from "@/hooks/useCurrentRound";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -52,7 +49,7 @@ const ReportFilters = ({
           <SelectContent>
             <SelectItem value="0">Todas as rodadas</SelectItem>
             {rounds.map((round) => (
-              <SelectItem key={round} value={round.toString()}>
+              <SelectItem key={`round-${round}`} value={round.toString()}>
                 Rodada {round}
               </SelectItem>
             ))}
@@ -106,7 +103,6 @@ const RoundReportContent = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [reportTitle, setReportTitle] = useState<string>("");
   
-  // Determinar o título do relatório baseado nos filtros
   useEffect(() => {
     let title = "";
     if (selectedRound > 0) {
@@ -124,16 +120,13 @@ const RoundReportContent = () => {
     setReportTitle(title);
   }, [selectedRound, selectedMonth, selectedYear]);
   
-  // Ajusta para mostrar como padrão a última rodada FINALIZADA
   useEffect(() => {
     if (!isLoadingCurrentRound && currentRound > 1) {
       setInitialReportRound(currentRound - 1);
       setSelectedRound(currentRound - 1);
     }
-    // eslint-disable-next-line
   }, [isLoadingCurrentRound, currentRound]);
 
-  // Buscar dados baseados nos filtros selecionados
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -149,7 +142,6 @@ const RoundReportContent = () => {
           data
         `);
         
-        // Filtros condicionais
         if (selectedRound > 0) {
           matchesQuery = matchesQuery.eq("rodada", selectedRound);
         }
@@ -158,7 +150,6 @@ const RoundReportContent = () => {
           const startDate = `${selectedYear}-${selectedMonth}-01`;
           let endDate;
           
-          // Determinar o último dia do mês
           const lastDay = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate();
           endDate = `${selectedYear}-${selectedMonth}-${lastDay}`;
           
@@ -166,7 +157,6 @@ const RoundReportContent = () => {
             .gte("data", startDate)
             .lte("data", endDate);
         } else if (selectedYear) {
-          // Filtrar apenas por ano
           matchesQuery = matchesQuery
             .gte("data", `${selectedYear}-01-01`)
             .lte("data", `${selectedYear}-12-31`);
@@ -179,7 +169,6 @@ const RoundReportContent = () => {
         if (matchesData && matchesData.length > 0) {
           setMatches(matchesData);
           
-          // Buscar palpites para as partidas encontradas
           const matchIds = matchesData.map(m => m.id);
           
           const { data: kichutesData, error: kichutesError } = await supabase
