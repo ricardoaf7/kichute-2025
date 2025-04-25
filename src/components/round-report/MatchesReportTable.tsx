@@ -2,6 +2,8 @@
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { SCORING_SYSTEM } from "@/utils/mockData";
+import { getPointsBadgeClass } from "@/utils/scoring";
 
 interface Match {
   id: string;
@@ -71,6 +73,14 @@ export const MatchesReportTable: React.FC<MatchesReportTableProps> = ({
     );
   };
 
+  // Obter classe de cor com base na pontuação usando a função do utility
+  const getPontosColorClass = (pontos: number) => {
+    if (pontos === SCORING_SYSTEM.exactScore) return "text-green-500";
+    if (pontos === SCORING_SYSTEM.correctDifferenceOrDraw) return "text-blue-500";
+    if (pontos === SCORING_SYSTEM.correctWinner) return "text-yellow-500";
+    return "text-red-500";
+  };
+
   return (
     <div className={cn("overflow-x-auto", fontClass)}>
       <Table className="min-w-full">
@@ -131,13 +141,7 @@ export const MatchesReportTable: React.FC<MatchesReportTableProps> = ({
                             <span>
                               {kichute.palpite_casa} x {kichute.palpite_visitante}
                             </span>
-                            <span className={cn(
-                              "font-bold",
-                              kichute.pontos === 0 ? "text-red-500" :
-                              kichute.pontos <= 2 ? "text-yellow-500" :
-                              kichute.pontos <= 4 ? "text-blue-500" :
-                              "text-green-500"
-                            )}>
+                            <span className={cn("font-bold", getPontosColorClass(kichute.pontos))}>
                               {kichute.pontos}pts
                             </span>
                           </div>

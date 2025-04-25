@@ -42,7 +42,10 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
   return (
     <div className="flex flex-wrap gap-4 w-full">
       <div className="w-full sm:w-auto">
-        <Select value={selectedRound.toString()} onValueChange={(value) => setSelectedRound(Number(value))}>
+        <Select 
+          value={selectedRound.toString()} 
+          onValueChange={(value) => setSelectedRound(Number(value))}
+        >
           <SelectTrigger className="w-full sm:w-[160px]">
             <SelectValue placeholder="Rodada" />
           </SelectTrigger>

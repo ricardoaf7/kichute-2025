@@ -39,6 +39,7 @@ export const useReportData = (
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      console.log("Buscando dados para", {selectedRound, selectedMonth, selectedYear});
       
       try {
         let matchesQuery = supabase.from("partidas").select(`
@@ -57,21 +58,26 @@ export const useReportData = (
         
         if (selectedMonth !== "all") {
           const startDate = `${selectedYear}-${selectedMonth}-01`;
-          const lastDay = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate();
-          const endDate = `${selectedYear}-${selectedMonth}-${lastDay}`;
+          const nextMonth = parseInt(selectedMonth) + 1;
+          const nextMonthStr = nextMonth > 12 ? "01" : nextMonth.toString().padStart(2, "0");
+          const nextYear = nextMonth > 12 ? parseInt(selectedYear) + 1 : parseInt(selectedYear);
+          const endDate = `${nextYear}-${nextMonthStr}-01`;
           
           matchesQuery = matchesQuery
             .gte("data", startDate)
-            .lte("data", endDate);
+            .lt("data", endDate);
         } else if (selectedYear) {
           matchesQuery = matchesQuery
             .gte("data", `${selectedYear}-01-01`)
-            .lte("data", `${selectedYear}-12-31`);
+            .lt("data", `${parseInt(selectedYear) + 1}-01-01`);
         }
         
+        matchesQuery = matchesQuery.order('rodada').order('data');
         const { data: matchesData, error: matchesError } = await matchesQuery;
         
         if (matchesError) throw matchesError;
+        
+        console.log("Partidas encontradas:", matchesData?.length || 0);
         
         if (matchesData && matchesData.length > 0) {
           setMatches(matchesData);
@@ -93,6 +99,7 @@ export const useReportData = (
           
           if (kichutesError) throw kichutesError;
           
+          console.log("Kichutes encontrados:", kichutesData?.length || 0);
           setKichutes(kichutesData || []);
         } else {
           setMatches([]);

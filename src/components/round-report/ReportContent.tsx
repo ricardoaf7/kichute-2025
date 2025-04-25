@@ -18,6 +18,13 @@ export const ReportContent: React.FC<ReportContentProps> = ({
   isLoading,
   reportTitle,
 }) => {
+  // Determinar o tamanho ideal da fonte baseado no número de participantes
+  const getFontSize = () => {
+    if (participants.length > 10) return "xs";
+    if (participants.length > 6) return "sm";
+    return "base";
+  };
+
   const formattedMatches = matches.map(match => ({
     id: match.id,
     rodada: match.rodada,
@@ -46,17 +53,19 @@ export const ReportContent: React.FC<ReportContentProps> = ({
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader className="bg-muted print:bg-white">
         <CardTitle className="text-xl">{reportTitle}</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <MatchesReportTable
-          matches={formattedMatches}
-          participants={participants}
-          kichutes={kichutes}
-          fontSize="sm"
-        />
+        <div className="overflow-x-auto">
+          <MatchesReportTable
+            matches={formattedMatches}
+            participants={participants}
+            kichutes={kichutes}
+            fontSize={getFontSize()}
+          />
+        </div>
       </CardContent>
     </Card>
   );

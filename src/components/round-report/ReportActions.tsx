@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { FileDown, Printer } from "lucide-react";
 import html2canvas from "html2canvas";
@@ -28,29 +29,28 @@ export const ReportActions = ({
 
     try {
       const canvas = await html2canvas(reportRef.current, {
-        scale: 1.5, // Reduzir a escala para caber mais conteúdo
+        scale: 1.5, // Aumentar a escala para melhor qualidade
         useCORS: true,
-        logging: false
+        logging: false,
+        windowWidth: 2000 // Aumentar a largura da janela virtual para capturar mais conteúdo
       });
 
-      // Determinar orientação baseada no número de colunas
-      const orientation = "landscape"; // Usar paisagem como padrão para relatórios
+      // Sempre usar paisagem para relatórios com muitos participantes
+      const pdf = new jsPDF('landscape', 'mm', 'a4');
       
-      // Criar PDF com orientação apropriada
-      const pdf = new jsPDF(orientation, 'mm', 'a4');
-      
-      // Calcular dimensões
-      const imgWidth = orientation === 'landscape' ? 277 : 190; // A4 width in mm
+      // Calcular dimensões preservando a proporção
+      const imgWidth = 277; // A4 landscape width in mm
+      const pageHeight = 190; // A4 landscape height in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      // Adicionar a imagem centrada
+      // Adicionar a imagem com margens adequadas
       pdf.addImage(
         canvas.toDataURL('image/png'), 
         'PNG', 
-        orientation === 'landscape' ? 10 : 10, // margem esquerda
+        10, // margem esquerda
         10, // margem superior
         imgWidth, 
-        imgHeight
+        imgHeight > pageHeight - 20 ? pageHeight - 20 : imgHeight
       );
       
       // Determinar nome do arquivo baseado nos filtros
