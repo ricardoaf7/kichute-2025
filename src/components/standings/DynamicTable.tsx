@@ -1,14 +1,11 @@
 
 import { useState } from "react";
-import { Table, TableBody } from "@/components/ui/table";
+import { useDynamicTableDataReal } from "@/hooks/standings/useDynamicTableDataReal";
+import { useSortedPlayers } from "@/hooks/standings/useSortedPlayers";
 import { TableFilters } from "./TableFilters";
-import { useDynamicTableDataReal } from "@/hooks/useDynamicTableDataReal";
-import { useDynamicTableSort } from "@/hooks/standings/useDynamicTableSort";
-import { DynamicTableHeader } from "./table/DynamicTableHeader";
-import { DynamicTableRow } from "./table/DynamicTableRow";
-import { DynamicTableFooter } from "./table/DynamicTableFooter";
 import { TableLoading } from "./table/TableLoading";
 import { TableError } from "./table/TableError";
+import { DynamicTableContent } from "./table/DynamicTableContent";
 
 const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = useState<string>("todas");
@@ -21,8 +18,6 @@ const DynamicTable = () => {
     selectedAno
   );
 
-  const { sortField, sortDirection, handleSort } = useDynamicTableSort();
-
   const todasRodadas = Array.from(
     new Set(jogadores.flatMap(jogador => Object.keys(jogador.rodadas)))
   ).sort((a, b) => {
@@ -30,6 +25,11 @@ const DynamicTable = () => {
     const numB = parseInt(b.substring(1));
     return numA - numB;
   });
+
+  const { sortField, sortDirection, handleSort, sortedPlayers } = useSortedPlayers(
+    jogadores,
+    selectedRodada
+  );
 
   const calcularTotalPorRodada = () => {
     const totais: Record<string, number> = {};
@@ -43,26 +43,6 @@ const DynamicTable = () => {
 
   const totaisPorRodada = calcularTotalPorRodada();
   const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
-
-  const sortedPlayers = [...jogadores].sort((a, b) => {
-    if (sortField === "nome") {
-      return sortDirection === "asc" 
-        ? a.nome.localeCompare(b.nome) 
-        : b.nome.localeCompare(a.nome);
-    } 
-    if (sortField === "pontos_total") {
-      return sortDirection === "asc" 
-        ? a.pontos_total - b.pontos_total 
-        : b.pontos_total - a.pontos_total;
-    } 
-    if (sortField === "rodada" && selectedRodada !== "todas") {
-      const rodadaKey = `r${selectedRodada}`;
-      const pontosA = a.rodadas[rodadaKey] || 0;
-      const pontosB = b.rodadas[rodadaKey] || 0;
-      return sortDirection === "asc" ? pontosA - pontosB : pontosB - pontosA;
-    }
-    return 0;
-  });
 
   return (
     <div className="space-y-4">
@@ -82,41 +62,16 @@ const DynamicTable = () => {
         ) : error ? (
           <TableError message={error} />
         ) : (
-          <div className="max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle">
-            <Table>
-              <DynamicTableHeader
-                handleSort={handleSort}
-                sortField={sortField}
-                sortDirection={sortDirection}
-                todasRodadas={todasRodadas}
-                selectedRodada={selectedRodada}
-              />
-              <TableBody>
-                {sortedPlayers.length === 0 ? (
-                  <tr>
-                    <td colSpan={3 + todasRodadas.length} className="text-center py-8 text-gray-500">
-                      Nenhum resultado encontrado
-                    </td>
-                  </tr>
-                ) : (
-                  sortedPlayers.map((jogador, index) => (
-                    <DynamicTableRow
-                      key={jogador.id}
-                      jogador={jogador}
-                      index={index}
-                      todasRodadas={todasRodadas}
-                    />
-                  ))
-                )}
-              </TableBody>
-              <DynamicTableFooter
-                jogadores={jogadores}
-                todasRodadas={todasRodadas}
-                totaisPorRodada={totaisPorRodada}
-                totalGeral={totalGeral}
-              />
-            </Table>
-          </div>
+          <DynamicTableContent
+            sortedPlayers={sortedPlayers}
+            todasRodadas={todasRodadas}
+            totaisPorRodada={totaisPorRodada}
+            totalGeral={totalGeral}
+            handleSort={handleSort}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            selectedRodada={selectedRodada}
+          />
         )}
       </div>
     </div>

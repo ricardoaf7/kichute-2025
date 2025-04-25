@@ -1,12 +1,12 @@
 
-import { useState, useMemo } from "react";
-import { Player } from "@/types";
+import { JogadorData } from "@/hooks/standings/useDynamicTableDataReal";
+import { useState } from "react";
 
 export type SortDirection = "asc" | "desc";
-export type SortField = "name" | "totalPoints" | "roundPoints";
+export type SortField = "nome" | "pontos_total" | "rodada";
 
-export const useSortedPlayers = (players: Player[], selectedRound?: number) => {
-  const [sortField, setSortField] = useState<SortField>("totalPoints");
+export const useSortedPlayers = (jogadores: JogadorData[], selectedRodada: string) => {
+  const [sortField, setSortField] = useState<SortField>("pontos_total");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const handleSort = (field: SortField) => {
@@ -18,24 +18,25 @@ export const useSortedPlayers = (players: Player[], selectedRound?: number) => {
     }
   };
 
-  const sortedPlayers = useMemo(() => {
-    return [...players].sort((a, b) => {
-      if (sortField === "name") {
-        return sortDirection === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name);
-      } else if (sortField === "totalPoints") {
-        return sortDirection === "asc"
-          ? a.totalPoints - b.totalPoints
-          : b.totalPoints - a.totalPoints;
-      } else if (sortField === "roundPoints" && selectedRound) {
-        const aPoints = a.roundPoints[selectedRound] || 0;
-        const bPoints = b.roundPoints[selectedRound] || 0;
-        return sortDirection === "asc" ? aPoints - bPoints : bPoints - aPoints;
-      }
-      return 0;
-    });
-  }, [players, sortField, sortDirection, selectedRound]);
+  const sortedPlayers = [...jogadores].sort((a, b) => {
+    if (sortField === "nome") {
+      return sortDirection === "asc" 
+        ? a.nome.localeCompare(b.nome) 
+        : b.nome.localeCompare(a.nome);
+    } 
+    if (sortField === "pontos_total") {
+      return sortDirection === "asc" 
+        ? a.pontos_total - b.pontos_total 
+        : b.pontos_total - a.pontos_total;
+    } 
+    if (sortField === "rodada" && selectedRodada !== "todas") {
+      const rodadaKey = `r${selectedRodada}`;
+      const pontosA = a.rodadas[rodadaKey] || 0;
+      const pontosB = b.rodadas[rodadaKey] || 0;
+      return sortDirection === "asc" ? pontosA - pontosB : pontosB - pontosA;
+    }
+    return 0;
+  });
 
   return {
     sortField,
