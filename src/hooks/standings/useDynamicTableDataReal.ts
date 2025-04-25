@@ -93,13 +93,24 @@ export function useDynamicTableDataReal(
         const jogadoresMap: Record<string, JogadorData> = {};
 
         kichutesData?.forEach(kichute => {
-          if (!kichute.jogador) return;
-
+          // Verificar se o jogador existe e é um objeto (não um array)
+          if (!kichute.jogador || Array.isArray(kichute.jogador)) {
+            console.warn("Jogador inválido encontrado:", kichute.jogador);
+            return;
+          }
+          
           const partida = partidas?.find(p => p.id === kichute.partida_id);
           if (!partida) return;
 
+          // Extração segura das propriedades do jogador
           const jogadorId = kichute.jogador.id;
           const jogadorNome = kichute.jogador.nome;
+          
+          if (!jogadorId || !jogadorNome) {
+            console.warn("Dados de jogador incompletos:", kichute.jogador);
+            return;
+          }
+
           const rodada = `r${partida.rodada}`;
           const pontos = kichute.pontos || 0;
 
@@ -155,4 +166,3 @@ export function useDynamicTableDataReal(
 
   return { jogadores, rodadas, isLoading, error };
 }
-
