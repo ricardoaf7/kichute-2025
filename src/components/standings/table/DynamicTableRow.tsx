@@ -6,9 +6,10 @@ interface DynamicTableRowProps {
   jogador: any;
   index: number;
   todasRodadas: string[];
+  viewMode: "table" | "dynamic";
 }
 
-export const DynamicTableRow = ({ jogador, index, todasRodadas }: DynamicTableRowProps) => (
+export const DynamicTableRow = ({ jogador, index, todasRodadas, viewMode }: DynamicTableRowProps) => (
   <TableRow className={index % 2 === 0 ? 'bg-white dark:bg-gray-950/50' : 'bg-gray-50 dark:bg-gray-900/30'}>
     <TableCell className="font-medium">{index + 1}</TableCell>
     <TableCell>{jogador.nome}</TableCell>
@@ -19,7 +20,8 @@ export const DynamicTableRow = ({ jogador, index, todasRodadas }: DynamicTableRo
         position={index <= 2 ? index : -1}
       />
     </TableCell>
-    {todasRodadas.map(rodada => (
+    
+    {viewMode === "dynamic" && todasRodadas.map(rodada => (
       <TableCell key={`${jogador.id}-${rodada}`} className="text-center">
         <KichutePoints 
           points={jogador.rodadas[rodada] || 0}

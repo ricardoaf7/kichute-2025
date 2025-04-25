@@ -15,6 +15,7 @@ interface DynamicTableFiltersProps {
   onRodadaChange: (value: string) => void;
   onMesChange: (value: string) => void;
   onAnoChange: (value: string) => void;
+  viewMode: "table" | "dynamic";
 }
 
 export const DynamicTableFilters = ({
@@ -24,20 +25,27 @@ export const DynamicTableFilters = ({
   selectedAno,
   onRodadaChange,
   onMesChange,
-  onAnoChange
+  onAnoChange,
+  viewMode
 }: DynamicTableFiltersProps) => {
-  // Mapear nomes dos meses
-  const getNomeMes = (codigoMes: string) => {
-    if (codigoMes === "todos") return "Todos os meses";
-    
-    const [mes, ano] = codigoMes.split('-');
-    const nomesMeses = [
-      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", 
-      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-    ];
-    
-    return `${nomesMeses[parseInt(mes) - 1]} de ${ano}`;
-  };
+  // Gerar todas as 38 rodadas para o seletor
+  const todasRodadas = Array.from({ length: 38 }, (_, i) => i + 1);
+  
+  // Meses do ano
+  const meses = [
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" }
+  ];
 
   return (
     <div className="flex flex-wrap gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -51,11 +59,20 @@ export const DynamicTableFilters = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todas">Todas as rodadas</SelectItem>
-            {rodadas.map(rodada => (
-              <SelectItem key={`rodada-${rodada}`} value={rodada.toString()}>
-                Rodada {rodada}
-              </SelectItem>
-            ))}
+            {todasRodadas.map(rodada => {
+              // Verificar se esta rodada tem dados
+              const temDados = rodadas.includes(rodada);
+              return (
+                <SelectItem 
+                  key={`rodada-${rodada}`} 
+                  value={rodada.toString()}
+                  // Destacar visualmente rodadas com dados
+                  className={temDados ? "font-medium" : "opacity-70"}
+                >
+                  {temDados ? `Rodada ${rodada} ✓` : `Rodada ${rodada}`}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
@@ -64,15 +81,25 @@ export const DynamicTableFilters = ({
         <label htmlFor="mes-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Mês:
         </label>
-        <Select value={selectedMes} onValueChange={onMesChange}>
+        <Select 
+          value={selectedMes} 
+          onValueChange={onMesChange}
+          disabled={selectedRodada !== "todas" && selectedRodada !== ""}
+        >
           <SelectTrigger id="mes-select" className="w-[180px]">
             <SelectValue placeholder="Selecionar mês" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todos">Todos os meses</SelectItem>
-            {/* Placeholder for months - will be implemented later */}
-            <SelectItem value="4-2025">Abril de 2025</SelectItem>
-            <SelectItem value="5-2025">Maio de 2025</SelectItem>
+            {meses.map(mes => (
+              <SelectItem key={`mes-${mes.value}`} value={`${mes.value}-${selectedAno}`}>
+                {mes.label} de {selectedAno}
+              </SelectItem>
+            ))}
+            {/* Opção especial para Jan-Jul (primeiro turno) */}
+            <SelectItem value="01-07-2025">1º Turno (Jan-Jul)</SelectItem>
+            {/* Opção especial para Ago-Dez (segundo turno) */}
+            <SelectItem value="08-12-2025">2º Turno (Ago-Dez)</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -9,6 +9,7 @@ interface DynamicTableHeaderProps {
   sortDirection: SortDirection;
   todasRodadas: string[];
   selectedRodada: string;
+  viewMode: "table" | "dynamic";
 }
 
 export const DynamicTableHeader = ({
@@ -16,7 +17,8 @@ export const DynamicTableHeader = ({
   sortField,
   sortDirection,
   todasRodadas,
-  selectedRodada
+  selectedRodada,
+  viewMode
 }: DynamicTableHeaderProps) => (
   <TableHeader>
     <TableRow className="bg-muted font-poppins">
@@ -33,7 +35,8 @@ export const DynamicTableHeader = ({
       >
         Total <SortIcon field="pontos_total" currentSortField={sortField} sortDirection={sortDirection} />
       </TableHead>
-      {todasRodadas.map(rodada => (
+      
+      {viewMode === "dynamic" && todasRodadas.map(rodada => (
         <TableHead 
           key={rodada} 
           className={`text-center font-medium text-muted-foreground ${

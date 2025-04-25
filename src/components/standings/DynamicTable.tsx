@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDynamicTableDataReal } from "@/hooks/standings/useDynamicTableDataReal";
 import { useSortedPlayers } from "@/hooks/standings/useSortedPlayers";
 import { useTotalsCalculation } from "@/hooks/standings/useTotalsCalculation";
@@ -8,10 +8,22 @@ import { TableLoading } from "./table/TableLoading";
 import { TableError } from "./table/TableError";
 import { DynamicTableContent } from "./table/DynamicTableContent";
 
-const DynamicTable = () => {
-  const [selectedRodada, setSelectedRodada] = useState<string>("todas");
+interface DynamicTableProps {
+  viewMode: "table" | "dynamic";
+  selectedRodada: string;
+}
+
+const DynamicTable: React.FC<DynamicTableProps> = ({ viewMode, selectedRodada: initialRodada }) => {
+  const [selectedRodada, setSelectedRodada] = useState<string>(initialRodada);
   const [selectedMes, setSelectedMes] = useState<string>("todos");
   const [selectedAno, setSelectedAno] = useState<string>("2025");
+  
+  // Quando o initialRodada mudar, atualizar o estado interno
+  useEffect(() => {
+    if (initialRodada !== selectedRodada) {
+      setSelectedRodada(initialRodada);
+    }
+  }, [initialRodada]);
 
   const { jogadores, rodadas, isLoading, error } = useDynamicTableDataReal(
     selectedRodada,
@@ -34,6 +46,22 @@ const DynamicTable = () => {
 
   const { totaisPorRodada, totalGeral } = useTotalsCalculation(jogadores, todasRodadas);
 
+  const handleRodadaChange = (value: string) => {
+    setSelectedRodada(value);
+    // Se estamos em modo "table", não permitir selecionar rodada específica
+    if (viewMode === "table") {
+      setSelectedMes("todos");
+    }
+  };
+
+  const handleMesChange = (value: string) => {
+    setSelectedMes(value);
+    // Quando selecionar um mês específico, resetar a rodada
+    if (value !== "todos") {
+      setSelectedRodada("todas");
+    }
+  };
+
   return (
     <div className="space-y-4">
       <DynamicTableFilters
@@ -41,9 +69,10 @@ const DynamicTable = () => {
         selectedRodada={selectedRodada}
         selectedMes={selectedMes}
         selectedAno={selectedAno}
-        onRodadaChange={setSelectedRodada}
-        onMesChange={setSelectedMes}
+        onRodadaChange={handleRodadaChange}
+        onMesChange={handleMesChange}
         onAnoChange={setSelectedAno}
+        viewMode={viewMode}
       />
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
@@ -54,13 +83,14 @@ const DynamicTable = () => {
         ) : (
           <DynamicTableContent
             sortedPlayers={sortedPlayers}
-            todasRodadas={todasRodadas}
+            todasRodadas={viewMode === "table" ? [] : todasRodadas}
             totaisPorRodada={totaisPorRodada}
             totalGeral={totalGeral}
             handleSort={handleSort}
             sortField={sortField}
             sortDirection={sortDirection}
             selectedRodada={selectedRodada}
+            viewMode={viewMode}
           />
         )}
       </div>

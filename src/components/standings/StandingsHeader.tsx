@@ -1,6 +1,5 @@
 
 import React from "react";
-import FilterSelector from "./FilterSelector";
 import ViewSelector from "./ViewSelector";
 
 interface StandingsHeaderProps {
@@ -13,8 +12,6 @@ interface StandingsHeaderProps {
   handleRoundChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleMonthChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleYearChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  useDynamicTable: boolean;
-  setUseDynamicTable: (value: boolean) => void;
 }
 
 const StandingsHeader: React.FC<StandingsHeaderProps> = ({
@@ -27,8 +24,6 @@ const StandingsHeader: React.FC<StandingsHeaderProps> = ({
   handleRoundChange,
   handleMonthChange,
   handleYearChange,
-  useDynamicTable,
-  setUseDynamicTable,
 }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-subtle border border-border/40 p-6 mb-8 animate-slide-up">
@@ -38,22 +33,9 @@ const StandingsHeader: React.FC<StandingsHeaderProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
-          {!useDynamicTable && (
-            <FilterSelector
-              selectedRound={selectedRound}
-              selectedMonth={selectedMonth}
-              selectedYear={selectedYear}
-              allRounds={allRounds}
-              handleRoundChange={handleRoundChange}
-              handleMonthChange={handleMonthChange}
-              handleYearChange={handleYearChange}
-            />
-          )}
-
           <ViewSelector
             viewMode={viewMode}
             setViewMode={setViewMode}
-            setUseDynamicTable={setUseDynamicTable}
           />
         </div>
       </div>

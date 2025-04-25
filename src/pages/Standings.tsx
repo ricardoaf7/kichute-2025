@@ -15,7 +15,6 @@ const Standings = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("2025");
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [useDynamicTable, setUseDynamicTable] = useState<boolean>(true);
   const [availableRounds, setAvailableRounds] = useState<number[]>([]);
   const { toast } = useToast();
   const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
@@ -144,14 +143,11 @@ const Standings = () => {
           handleRoundChange={handleRoundChange}
           handleMonthChange={handleMonthChange}
           handleYearChange={handleYearChange}
-          useDynamicTable={useDynamicTable}
-          setUseDynamicTable={setUseDynamicTable}
         />
 
         <div className="space-y-8">
           <StandingsContent
             viewMode={viewMode}
-            sortedPlayers={[]}
             selectedRound={selectedRound}
             isLoaded={isLoaded}
           />

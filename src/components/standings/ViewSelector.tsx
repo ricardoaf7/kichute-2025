@@ -6,15 +6,9 @@ import { TableProperties, LineChart } from "lucide-react";
 interface ViewSelectorProps {
   viewMode: "table" | "dynamic";
   setViewMode: (mode: "table" | "dynamic") => void;
-  setUseDynamicTable: (value: boolean) => void;
 }
 
-const ViewSelector: React.FC<ViewSelectorProps> = ({ viewMode, setViewMode, setUseDynamicTable }) => {
-  const handleModeChange = (mode: "table" | "dynamic") => {
-    setViewMode(mode);
-    setUseDynamicTable(mode === "dynamic");
-  };
-
+const ViewSelector: React.FC<ViewSelectorProps> = ({ viewMode, setViewMode }) => {
   return (
     <div className="flex space-x-2 border border-border/60 rounded-md p-0.5 bg-background">
       <Button
@@ -25,7 +19,7 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ viewMode, setViewMode, setU
             ? "bg-muted/80 text-primary-foreground"
             : "hover:bg-muted/40"
         }`}
-        onClick={() => handleModeChange("dynamic")}
+        onClick={() => setViewMode("dynamic")}
       >
         <LineChart className="h-4 w-4 mr-2" />
         <span className="hidden sm:inline">Tabela Detalhada</span>
@@ -39,7 +33,7 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ viewMode, setViewMode, setU
             ? "bg-muted/80 text-primary-foreground"
             : "hover:bg-muted/40"
         }`}
-        onClick={() => handleModeChange("table")}
+        onClick={() => setViewMode("table")}
       >
         <TableProperties className="h-4 w-4 mr-2" />
         <span className="hidden sm:inline">Tabela Resumida</span>

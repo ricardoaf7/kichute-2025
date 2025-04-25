@@ -16,6 +16,7 @@ interface DynamicTableContentProps {
   sortField: SortField;
   sortDirection: SortDirection;
   selectedRodada: string;
+  viewMode: "table" | "dynamic";
 }
 
 export const DynamicTableContent = ({
@@ -26,7 +27,8 @@ export const DynamicTableContent = ({
   handleSort,
   sortField,
   sortDirection,
-  selectedRodada
+  selectedRodada,
+  viewMode
 }: DynamicTableContentProps) => (
   <div className="max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle">
     <Table>
@@ -36,10 +38,11 @@ export const DynamicTableContent = ({
         sortDirection={sortDirection}
         todasRodadas={todasRodadas}
         selectedRodada={selectedRodada}
+        viewMode={viewMode}
       />
       <TableBody>
         {sortedPlayers.length === 0 ? (
-          <TableEmptyState colSpan={3 + todasRodadas.length} />
+          <TableEmptyState colSpan={viewMode === "table" ? 3 : 3 + todasRodadas.length} />
         ) : (
           sortedPlayers.map((jogador, index) => (
             <DynamicTableRow
@@ -47,6 +50,7 @@ export const DynamicTableContent = ({
               jogador={jogador}
               index={index}
               todasRodadas={todasRodadas}
+              viewMode={viewMode}
             />
           ))
         )}
@@ -57,6 +61,7 @@ export const DynamicTableContent = ({
           todasRodadas={todasRodadas}
           totaisPorRodada={totaisPorRodada}
           totalGeral={totalGeral}
+          viewMode={viewMode}
         />
       )}
     </Table>

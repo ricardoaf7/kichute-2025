@@ -6,13 +6,15 @@ interface DynamicTableFooterProps {
   todasRodadas: string[];
   totaisPorRodada: Record<string, number>;
   totalGeral: number;
+  viewMode: "table" | "dynamic";
 }
 
 export const DynamicTableFooter = ({
   jogadores,
   todasRodadas,
   totaisPorRodada,
-  totalGeral
+  totalGeral,
+  viewMode
 }: DynamicTableFooterProps) => {
   if (jogadores.length === 0) return null;
 
@@ -22,7 +24,8 @@ export const DynamicTableFooter = ({
         <TableCell>-</TableCell>
         <TableCell>Total</TableCell>
         <TableCell className="text-center">{totalGeral}</TableCell>
-        {todasRodadas.map(rodada => (
+        
+        {viewMode === "dynamic" && todasRodadas.map(rodada => (
           <TableCell key={`footer-${rodada}`} className="text-center">
             {totaisPorRodada[rodada] || 0}
           </TableCell>
