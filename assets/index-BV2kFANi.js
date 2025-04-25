@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-CunEAa92.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-DMuxJF4N.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -31422,13 +31422,14 @@ const useSortedPlayers = (jogadores, selectedRodada) => {
     }
   };
   const sortedPlayers = [...jogadores].sort((a2, b2) => {
-    if (sortField === "nome") {
+    const field = sortField === "name" ? "nome" : sortField === "totalPoints" ? "pontos_total" : sortField === "roundPoints" ? "rodada" : sortField;
+    if (field === "nome") {
       return sortDirection === "asc" ? a2.nome.localeCompare(b2.nome) : b2.nome.localeCompare(a2.nome);
     }
-    if (sortField === "pontos_total") {
+    if (field === "pontos_total") {
       return sortDirection === "asc" ? a2.pontos_total - b2.pontos_total : b2.pontos_total - a2.pontos_total;
     }
-    if (sortField === "rodada" && selectedRodada !== "todas") {
+    if (field === "rodada" && selectedRodada !== "todas") {
       const rodadaKey = `r${selectedRodada}`;
       const pontosA = a2.rodadas[rodadaKey] || 0;
       const pontosB = b2.rodadas[rodadaKey] || 0;
@@ -52332,7 +52333,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-D4BV0DY8.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-8xAQC5tN.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
