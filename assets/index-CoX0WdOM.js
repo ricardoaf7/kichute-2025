@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-CW04zAn3.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-DnRm7x_Q.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -32692,40 +32692,6 @@ const TableFilters = ({
     ] })
   ] });
 };
-const useTableSort = () => {
-  const [sortField, setSortField] = reactExports.useState("pontos_total");
-  const [sortDirection, setSortDirection] = reactExports.useState("desc");
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("desc");
-    }
-  };
-  const sortPlayers = (players, selectedRodada) => {
-    console.log("Ordenando jogadores:", players.map((p2) => `${p2.nome}: ${p2.pontos_total}pts`));
-    return [...players].sort((a2, b2) => {
-      if (sortField === "nome") {
-        return sortDirection === "asc" ? a2.nome.localeCompare(b2.nome) : b2.nome.localeCompare(a2.nome);
-      } else if (sortField === "pontos_total") {
-        return sortDirection === "asc" ? a2.pontos_total - b2.pontos_total : b2.pontos_total - a2.pontos_total;
-      } else if (sortField === "rodada" && selectedRodada !== "todas") {
-        const rodadaKey = `r${selectedRodada}`;
-        const pontosA = a2.rodadas[rodadaKey] || 0;
-        const pontosB = b2.rodadas[rodadaKey] || 0;
-        return sortDirection === "asc" ? pontosA - pontosB : pontosB - pontosA;
-      }
-      return 0;
-    });
-  };
-  return {
-    sortField,
-    sortDirection,
-    handleSort,
-    sortPlayers
-  };
-};
 const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
   const [jogadores, setJogadores] = reactExports.useState([]);
   const [rodadas, setRodadas] = reactExports.useState([]);
@@ -32818,6 +32784,67 @@ const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
   }, [selectedRodada, selectedMes, selectedAno]);
   return { jogadores, rodadas, isLoading, error };
 };
+const useDynamicTableSort = () => {
+  const [sortField, setSortField] = reactExports.useState("pontos_total");
+  const [sortDirection, setSortDirection] = reactExports.useState("desc");
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+  return {
+    sortField,
+    sortDirection,
+    handleSort
+  };
+};
+const SortIcon = ({ field, currentSortField, sortDirection }) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex ml-1 text-muted-foreground", children: currentSortField === field ? sortDirection === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronUp, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4 opacity-30" }) });
+const DynamicTableHeader = ({
+  handleSort,
+  sortField,
+  sortDirection,
+  todasRodadas,
+  selectedRodada
+}) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted font-poppins", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-10 text-left font-medium text-muted-foreground", children: "#" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    TableHead,
+    {
+      className: "text-left font-medium text-muted-foreground cursor-pointer hover:bg-muted/80",
+      onClick: () => handleSort("nome"),
+      children: [
+        "Jogador ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SortIcon, { field: "nome", currentSortField: sortField, sortDirection })
+      ]
+    }
+  ),
+  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    TableHead,
+    {
+      className: "text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80",
+      onClick: () => handleSort("pontos_total"),
+      children: [
+        "Total ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SortIcon, { field: "pontos_total", currentSortField: sortField, sortDirection })
+      ]
+    }
+  ),
+  todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    TableHead,
+    {
+      className: `text-center font-medium text-muted-foreground ${selectedRodada === rodada.substring(1) ? "cursor-pointer hover:bg-muted/80" : ""}`,
+      onClick: () => selectedRodada === rodada.substring(1) ? handleSort("rodada") : null,
+      children: [
+        rodada.toUpperCase(),
+        selectedRodada === rodada.substring(1) && /* @__PURE__ */ jsxRuntimeExports.jsx(SortIcon, { field: "rodada", currentSortField: sortField, sortDirection })
+      ]
+    },
+    rodada
+  ))
+] }) });
 const KichutePoints = ({ points, viewType, position: position2 = 0 }) => {
   const getPontosIcon = (points2, viewType2, position22) => {
     if (viewType2 === "annual") {
@@ -32852,6 +32879,40 @@ const KichutePoints = ({ points, viewType, position: position2 = 0 }) => {
     ] })
   ] });
 };
+const DynamicTableRow = ({ jogador, index: index2, todasRodadas }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: index2 % 2 === 0 ? "bg-white dark:bg-gray-950/50" : "bg-gray-50 dark:bg-gray-900/30", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: index2 + 1 }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: jogador.nome }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    KichutePoints,
+    {
+      points: jogador.pontos_total,
+      viewType: "annual",
+      position: index2 <= 2 ? index2 : -1
+    }
+  ) }),
+  todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    KichutePoints,
+    {
+      points: jogador.rodadas[rodada] || 0,
+      viewType: "round",
+      position: index2 === 0 ? 0 : -1
+    }
+  ) }, `${jogador.id}-${rodada}`))
+] });
+const DynamicTableFooter = ({
+  jogadores,
+  todasRodadas,
+  totaisPorRodada,
+  totalGeral
+}) => {
+  if (jogadores.length === 0) return null;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(TableFooter, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "border-t-2 border-border bg-muted/30 font-bold", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: "-" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: "Total" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: totalGeral }),
+    todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: totaisPorRodada[rodada] || 0 }, `footer-${rodada}`))
+  ] }) });
+};
 const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = reactExports.useState("todas");
   const [selectedMes, setSelectedMes] = reactExports.useState("todos");
@@ -32861,8 +32922,14 @@ const DynamicTable = () => {
     selectedMes,
     selectedAno
   );
-  const { sortField, sortDirection, handleSort, sortPlayers } = useTableSort();
-  const todasRodadas = rodadas;
+  const { sortField, sortDirection, handleSort } = useDynamicTableSort();
+  const todasRodadas = Array.from(
+    new Set(jogadores.flatMap((jogador) => Object.keys(jogador.rodadas)))
+  ).sort((a2, b2) => {
+    const numA = parseInt(a2.substring(1));
+    const numB = parseInt(b2.substring(1));
+    return numA - numB;
+  });
   const calcularTotalPorRodada = () => {
     const totais = {};
     todasRodadas.forEach((rodada) => {
@@ -32874,108 +32941,66 @@ const DynamicTable = () => {
   };
   const totaisPorRodada = calcularTotalPorRodada();
   const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
-  const SortIcon = ({ field }) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex ml-1 text-muted-foreground", children: sortField === field ? sortDirection === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronUp, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4 opacity-30" }) });
-  const jogadoresWithId = jogadores.map((jogador, index2) => ({
-    ...jogador,
-    id: jogador.id || `player-${index2}`
-  }));
-  const sortedPlayers = sortPlayers(jogadoresWithId, selectedRodada);
-  const months2 = [
-    { value: "01", label: "Janeiro" },
-    { value: "02", label: "Fevereiro" },
-    { value: "03", label: "Março" },
-    { value: "04", label: "Abril" },
-    { value: "05", label: "Maio" },
-    { value: "06", label: "Junho" },
-    { value: "07", label: "Julho" },
-    { value: "08", label: "Agosto" },
-    { value: "09", label: "Setembro" },
-    { value: "10", label: "Outubro" },
-    { value: "11", label: "Novembro" },
-    { value: "12", label: "Dezembro" }
-  ];
-  const getViewType = () => {
-    if (selectedRodada !== "todas") return "round";
-    if (selectedMes !== "todos") return "month";
-    return "annual";
-  };
+  const sortedPlayers = [...jogadores].sort((a2, b2) => {
+    if (sortField === "nome") {
+      return sortDirection === "asc" ? a2.nome.localeCompare(b2.nome) : b2.nome.localeCompare(a2.nome);
+    }
+    if (sortField === "pontos_total") {
+      return sortDirection === "asc" ? a2.pontos_total - b2.pontos_total : b2.pontos_total - a2.pontos_total;
+    }
+    if (sortField === "rodada" && selectedRodada !== "todas") {
+      const rodadaKey = `r${selectedRodada}`;
+      const pontosA = a2.rodadas[rodadaKey] || 0;
+      const pontosB = b2.rodadas[rodadaKey] || 0;
+      return sortDirection === "asc" ? pontosA - pontosB : pontosB - pontosA;
+    }
+    return 0;
+  });
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       TableFilters,
       {
-        rodadas: rodadas.map((r2) => parseInt(r2.replace("r", ""))),
+        rodadas,
         selectedRodada,
         selectedMes,
         selectedAno,
         onRodadaChange: setSelectedRodada,
         onMesChange: setSelectedMes,
-        onAnoChange: setSelectedAno,
-        months: months2
+        onAnoChange: setSelectedAno
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-center items-center p-8", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCw, { className: "h-8 w-8 animate-spin text-primary" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2", children: "Carregando dados..." })
     ] }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center text-red-500", children: error }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted font-poppins", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-10 text-left font-medium text-muted-foreground", children: "#" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          TableHead,
-          {
-            className: "text-left font-medium text-muted-foreground cursor-pointer hover:bg-muted/80",
-            onClick: () => handleSort("nome"),
-            children: [
-              "Jogador ",
-              /* @__PURE__ */ jsxRuntimeExports.jsx(SortIcon, { field: "nome" })
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          TableHead,
-          {
-            className: "text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80",
-            onClick: () => handleSort("pontos_total"),
-            children: [
-              "Total ",
-              /* @__PURE__ */ jsxRuntimeExports.jsx(SortIcon, { field: "pontos_total" })
-            ]
-          }
-        ),
-        todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-          TableHead,
-          {
-            className: "text-center font-medium text-muted-foreground",
-            children: rodada.toUpperCase()
-          },
-          rodada
-        ))
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedPlayers.map((jogador, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: index2 + 1 }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: jogador.nome }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          KichutePoints,
-          {
-            points: jogador.pontos_total,
-            viewType: getViewType(),
-            position: index2 <= 2 ? index2 : -1
-          }
-        ) }),
-        todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          KichutePoints,
-          {
-            points: jogador.rodadas[rodada] ?? 0,
-            viewType: "round",
-            position: index2 === 0 ? 0 : -1
-          }
-        ) }, `${jogador.id}-${rodada}`))
-      ] }, jogador.id)) }),
-      jogadores.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableFooter, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: "-" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: "Total" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: totalGeral }),
-        todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: totaisPorRodada[rodada] || 0 }, `footer-${rodada}`))
-      ] }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        DynamicTableHeader,
+        {
+          handleSort,
+          sortField,
+          sortDirection,
+          todasRodadas,
+          selectedRodada
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedPlayers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 3 + todasRodadas.length, className: "text-center py-8 text-gray-500", children: "Nenhum resultado encontrado" }) }) : sortedPlayers.map((jogador, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        DynamicTableRow,
+        {
+          jogador,
+          index: index2,
+          todasRodadas
+        },
+        jogador.id
+      )) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        DynamicTableFooter,
+        {
+          jogadores,
+          todasRodadas,
+          totaisPorRodada,
+          totalGeral
+        }
+      )
     ] }) }) })
   ] });
 };
@@ -52326,7 +52351,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Da4DBILr.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-jTe06RpV.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
