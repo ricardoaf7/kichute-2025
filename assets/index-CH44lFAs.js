@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-BH4m8Hv8.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-CunEAa92.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -31443,6 +31443,23 @@ const useSortedPlayers = (jogadores, selectedRodada) => {
     sortedPlayers
   };
 };
+const useTotalsCalculation = (jogadores, todasRodadas) => {
+  const calcularTotalPorRodada = () => {
+    const totais = {};
+    todasRodadas.forEach((rodada) => {
+      totais[rodada] = jogadores.reduce((sum, jogador) => {
+        return sum + (jogador.rodadas[rodada] || 0);
+      }, 0);
+    });
+    return totais;
+  };
+  const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
+  const totaisPorRodada = calcularTotalPorRodada();
+  return {
+    totaisPorRodada,
+    totalGeral
+  };
+};
 function clamp(value, [min2, max2]) {
   return Math.min(max2, Math.max(min2, value));
 }
@@ -32719,7 +32736,7 @@ const SelectSeparator = reactExports.forwardRef(({ className, ...props }, ref) =
   }
 ));
 SelectSeparator.displayName = Separator$2.displayName;
-const TableFilters = ({
+const DynamicTableFilters = ({
   rodadas,
   selectedRodada,
   selectedMes,
@@ -32939,20 +32956,10 @@ const DynamicTable = () => {
     jogadores,
     selectedRodada
   );
-  const calcularTotalPorRodada = () => {
-    const totais = {};
-    todasRodadas.forEach((rodada) => {
-      totais[rodada] = jogadores.reduce((sum, jogador) => {
-        return sum + (jogador.rodadas[rodada] || 0);
-      }, 0);
-    });
-    return totais;
-  };
-  const totaisPorRodada = calcularTotalPorRodada();
-  const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
+  const { totaisPorRodada, totalGeral } = useTotalsCalculation(jogadores, todasRodadas);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
-      TableFilters,
+      DynamicTableFilters,
       {
         rodadas,
         selectedRodada,
@@ -52325,7 +52332,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-DwKjLc7l.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-D4BV0DY8.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
