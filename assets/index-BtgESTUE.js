@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-CBghEoP6.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-C4NmKLMO.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -36733,87 +36733,92 @@ const MatchesReportTable = ({
     ] }, `rodada-${rodada}`)) })
   ] }) });
 };
+const ReportTableHeader = ({ monthNames: monthNames2, isMonthly }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted/50", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-48", children: "Participante" }),
+    isMonthly && monthNames2.map((month) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center w-24", children: month }, month)),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center w-32 font-bold", children: "Total" })
+  ] }) });
+};
+const PlayerRow = ({ playerName, monthlyPoints, totalPoints, position: position2, isMonthly }) => {
+  const getPositionIcon = (position22) => {
+    if (position22 === 0) return /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500 inline mr-1" });
+    if (position22 === 1) return /* @__PURE__ */ jsxRuntimeExports.jsx(Medal, { className: "h-4 w-4 text-blue-500 inline mr-1" });
+    if (position22 === 2) return /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "h-4 w-4 text-green-500 inline mr-1" });
+    return null;
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center", children: [
+      getPositionIcon(position2),
+      playerName
+    ] }) }),
+    isMonthly && Array.from({ length: 12 }, (_2, i2) => i2 + 1).map((month) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: monthlyPoints[month] || 0 }, `${playerName}-${month}`)),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center font-bold", children: totalPoints })
+  ] });
+};
+const useReportPoints = (kichutes, participants, selectedYear, isMonthly = true) => {
+  const pointsByPlayerAndMonth = reactExports.useMemo(() => {
+    const calculatedPoints = participants.map((participant) => ({
+      playerId: participant.id,
+      playerName: participant.nome,
+      monthlyPoints: {},
+      totalPoints: 0
+    }));
+    kichutes.forEach((kichute) => {
+      var _a3, _b3;
+      const month = new Date((_a3 = kichute.partida) == null ? void 0 : _a3.data).getMonth() + 1;
+      const year = new Date((_b3 = kichute.partida) == null ? void 0 : _b3.data).getFullYear().toString();
+      if (year === selectedYear && kichute.jogador_id) {
+        const playerIndex = calculatedPoints.findIndex((p2) => p2.playerId === kichute.jogador_id);
+        if (playerIndex !== -1) {
+          if (!calculatedPoints[playerIndex].monthlyPoints[month]) {
+            calculatedPoints[playerIndex].monthlyPoints[month] = 0;
+          }
+          calculatedPoints[playerIndex].monthlyPoints[month] += kichute.pontos || 0;
+          calculatedPoints[playerIndex].totalPoints += kichute.pontos || 0;
+        }
+      }
+    });
+    return calculatedPoints.sort((a2, b2) => b2.totalPoints - a2.totalPoints);
+  }, [kichutes, participants, selectedYear]);
+  return pointsByPlayerAndMonth;
+};
+const monthNames = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro"
+];
 const MonthlyAnnualReport = ({
   kichutes,
   participants,
   selectedYear,
   isMonthly = true
 }) => {
-  const monthNames = [
-    "Janeiro",
-    "Fevereiro",
-    "Março",
-    "Abril",
-    "Maio",
-    "Junho",
-    "Julho",
-    "Agosto",
-    "Setembro",
-    "Outubro",
-    "Novembro",
-    "Dezembro"
-  ];
-  const pointsByPlayerAndMonth = reactExports.useMemo(() => {
-    const points = {};
-    participants.forEach((participant) => {
-      points[participant.id] = {};
-      monthNames.forEach((_2, index2) => {
-        points[participant.id][index2 + 1] = 0;
-      });
-    });
-    kichutes.forEach((kichute) => {
-      var _a3, _b3;
-      const month = new Date((_a3 = kichute.partida) == null ? void 0 : _a3.data).getMonth() + 1;
-      const year = new Date((_b3 = kichute.partida) == null ? void 0 : _b3.data).getFullYear().toString();
-      if (year === selectedYear && kichute.jogador_id) {
-        if (!points[kichute.jogador_id]) {
-          points[kichute.jogador_id] = {};
-        }
-        if (!points[kichute.jogador_id][month]) {
-          points[kichute.jogador_id][month] = 0;
-        }
-        points[kichute.jogador_id][month] += kichute.pontos || 0;
-      }
-    });
-    return points;
-  }, [kichutes, participants, selectedYear]);
-  const totalPointsByPlayer = reactExports.useMemo(() => {
-    const totals = {};
-    Object.entries(pointsByPlayerAndMonth).forEach(([playerId, monthlyPoints]) => {
-      totals[playerId] = Object.values(monthlyPoints).reduce((sum, points) => sum + points, 0);
-    });
-    return totals;
-  }, [pointsByPlayerAndMonth]);
-  const sortedParticipants = reactExports.useMemo(() => {
-    return [...participants].sort(
-      (a2, b2) => (totalPointsByPlayer[b2.id] || 0) - (totalPointsByPlayer[a2.id] || 0)
-    );
-  }, [participants, totalPointsByPlayer]);
-  const getPositionIcon = (position2) => {
-    if (position2 === 0) return /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500 inline mr-1" });
-    if (position2 === 1) return /* @__PURE__ */ jsxRuntimeExports.jsx(Medal, { className: "h-4 w-4 text-blue-500 inline mr-1" });
-    if (position2 === 2) return /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "h-4 w-4 text-green-500 inline mr-1" });
-    return null;
-  };
+  const sortedPlayerPoints = useReportPoints(kichutes, participants, selectedYear, isMonthly);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "overflow-hidden", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "bg-muted print:bg-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-xl", children: isMonthly ? `Relatório Mensal - ${selectedYear}` : `Relatório Anual - ${selectedYear}` }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted/50", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-48", children: "Participante" }),
-        isMonthly && monthNames.map((month, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center w-24", children: month }, month)),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center w-32 font-bold", children: "Total" })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedParticipants.map((participant, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center", children: [
-          getPositionIcon(index2),
-          participant.nome
-        ] }) }),
-        isMonthly && Array.from({ length: 12 }, (_2, i2) => i2 + 1).map((month) => {
-          var _a3;
-          return /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: ((_a3 = pointsByPlayerAndMonth[participant.id]) == null ? void 0 : _a3[month]) || 0 }, `${participant.id}-${month}`);
-        }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center font-bold", children: totalPointsByPlayer[participant.id] || 0 })
-      ] }, participant.id)) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ReportTableHeader, { monthNames, isMonthly }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedPlayerPoints.map((player, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PlayerRow,
+        {
+          playerName: player.playerName,
+          monthlyPoints: player.monthlyPoints,
+          totalPoints: player.totalPoints,
+          position: index2,
+          isMonthly
+        },
+        player.playerId
+      )) })
     ] }) }) })
   ] });
 };
@@ -52156,7 +52161,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-DcAnzhfO.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-B_gIy2in.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
@@ -53000,7 +53005,7 @@ const useReportData = (selectedRound, selectedMonth, selectedYear) => {
     if (selectedRound > 0) {
       title = `Rodada ${selectedRound} - Relatório de Palpites`;
     } else if (selectedMonth !== "all") {
-      const monthNames = {
+      const monthNames2 = {
         "01": "Janeiro",
         "02": "Fevereiro",
         "03": "Março",
@@ -53014,7 +53019,7 @@ const useReportData = (selectedRound, selectedMonth, selectedYear) => {
         "11": "Novembro",
         "12": "Dezembro"
       };
-      title = `${monthNames[selectedMonth]} de ${selectedYear} - Relatório de Palpites`;
+      title = `${monthNames2[selectedMonth]} de ${selectedYear} - Relatório de Palpites`;
     } else {
       title = `Relatório Anual de Palpites - ${selectedYear}`;
     }
