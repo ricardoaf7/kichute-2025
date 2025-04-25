@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-T6p8kRO4.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-BYP3pacm.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -30912,40 +30912,93 @@ function useDynamicTableDataReal(selectedRodada, selectedMes, selectedAno) {
     async function fetchData() {
       setIsLoading(true);
       setError(null);
-      let query = supabase.from("kichutes").select(`
-        jogador_id,
-        jogador_nome,
-        rodada,
-        pontos
-      `);
-      if (selectedRodada !== "todas") {
-        query = query.eq("rodada", selectedRodada);
-      }
-      const { data, error: error2 } = await query;
-      if (error2) {
-        setError("Erro ao carregar dados dos jogadores");
-        setIsLoading(false);
-        return;
-      }
-      const agrupado = {};
-      for (const item of data) {
-        if (!agrupado[item.jogador_id]) {
-          agrupado[item.jogador_id] = {
-            id: item.jogador_id,
-            nome: item.jogador_nome,
-            pontos_total: 0,
-            rodadas: {}
-          };
+      try {
+        let startDate = null;
+        let endDate = null;
+        if (selectedMes !== "todos") {
+          if (selectedMes === "01-07-2025") {
+            startDate = `${selectedAno}-01-01`;
+            endDate = `${selectedAno}-07-31`;
+          } else if (selectedMes === "08-12-2025") {
+            startDate = `${selectedAno}-08-01`;
+            endDate = `${selectedAno}-12-31`;
+          } else {
+            const [mes] = selectedMes.split("-");
+            const ultimoDia = new Date(parseInt(selectedAno), parseInt(mes), 0).getDate();
+            startDate = `${selectedAno}-${mes}-01`;
+            endDate = `${selectedAno}-${mes}-${ultimoDia}`;
+          }
         }
-        agrupado[item.jogador_id].pontos_total += item.pontos;
-        agrupado[item.jogador_id].rodadas[`r${item.rodada}`] = item.pontos;
+        let query = supabase.from("partidas").select(`
+          id,
+          rodada,
+          data
+        `).order("rodada");
+        if (selectedRodada !== "todas") {
+          query = query.eq("rodada", parseInt(selectedRodada));
+        }
+        if (startDate && endDate) {
+          query = query.gte("data", startDate).lte("data", endDate);
+        }
+        const { data: partidas, error: partidasError } = await query;
+        if (partidasError) {
+          console.error("Erro ao buscar partidas:", partidasError);
+          throw new Error("Não foi possível carregar as partidas");
+        }
+        const { data: kichutesData, error: kichutesError } = await supabase.from("kichutes").select(`
+            id,
+            jogador:jogadores(id, nome),
+            partida_id,
+            pontos
+          `).in("partida_id", (partidas == null ? void 0 : partidas.map((p2) => p2.id)) || []);
+        if (kichutesError) {
+          console.error("Erro ao buscar kichutes:", kichutesError);
+          throw new Error("Não foi possível carregar os palpites");
+        }
+        const jogadoresMap = {};
+        kichutesData == null ? void 0 : kichutesData.forEach((kichute) => {
+          if (!kichute.jogador) return;
+          const partida = partidas == null ? void 0 : partidas.find((p2) => p2.id === kichute.partida_id);
+          if (!partida) return;
+          const jogadorId = kichute.jogador.id;
+          const jogadorNome = kichute.jogador.nome;
+          const rodada = `r${partida.rodada}`;
+          const pontos = kichute.pontos || 0;
+          if (!jogadoresMap[jogadorId]) {
+            jogadoresMap[jogadorId] = {
+              id: jogadorId,
+              nome: jogadorNome,
+              pontos_total: 0,
+              rodadas: {}
+            };
+          }
+          jogadoresMap[jogadorId].rodadas[rodada] = (jogadoresMap[jogadorId].rodadas[rodada] || 0) + pontos;
+          jogadoresMap[jogadorId].pontos_total += pontos;
+          console.log(`[Points Update] ${jogadorNome} - Rodada ${rodada}:`, {
+            pontos,
+            total: jogadoresMap[jogadorId].pontos_total
+          });
+        });
+        const jogadoresArray = Object.values(jogadoresMap);
+        const rodasUnicas = [...new Set(partidas == null ? void 0 : partidas.map((p2) => p2.rodada))].sort((a2, b2) => a2 - b2);
+        console.log("Dados processados:", {
+          jogadores: jogadoresArray.length,
+          rodadas: rodasUnicas.length,
+          filtros: {
+            rodada: selectedRodada,
+            mes: selectedMes,
+            ano: selectedAno,
+            periodo: startDate ? `${startDate} até ${endDate}` : "todos"
+          }
+        });
+        setJogadores(jogadoresArray);
+        setRodadas(rodasUnicas);
+      } catch (err2) {
+        console.error("Erro ao processar dados:", err2);
+        setError(err2 instanceof Error ? err2.message : "Erro desconhecido ao carregar dados");
+      } finally {
+        setIsLoading(false);
       }
-      const jogadoresArray = Object.values(agrupado);
-      const uniqueRodadas = [...new Set(data.map((item) => parseInt(item.rodada)))];
-      const sortedRodadas = uniqueRodadas.sort((a2, b2) => a2 - b2);
-      setJogadores(jogadoresArray);
-      setRodadas(sortedRodadas);
-      setIsLoading(false);
     }
     fetchData();
   }, [selectedRodada, selectedMes, selectedAno]);
@@ -52257,7 +52310,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-hpyVDD4x.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-BS2D4n7c.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
