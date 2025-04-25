@@ -1,6 +1,6 @@
 
-import { JogadorData } from "@/hooks/standings/useDynamicTableDataReal";
 import { useState } from "react";
+import { JogadorData } from "./useDynamicTableDataReal";
 
 export type SortDirection = "asc" | "desc";
 export type SortField = "nome" | "pontos_total" | "rodada";

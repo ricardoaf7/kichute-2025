@@ -1,6 +1,12 @@
-
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+
+export interface JogadorData {
+  id: string;
+  nome: string;
+  pontos_total: number;
+  rodadas: Record<string, number>;
+}
 
 type Kichute = {
   jogador_id: string;

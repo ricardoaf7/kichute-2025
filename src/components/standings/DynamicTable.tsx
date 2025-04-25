@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { useDynamicTableDataReal } from "@/hooks/standings/useDynamicTableDataReal";
 import { useSortedPlayers } from "@/hooks/standings/useSortedPlayers";
-import { TableFilters } from "./TableFilters";
+import { useTotalsCalculation } from "@/hooks/standings/useTotalsCalculation";
+import { DynamicTableFilters } from "./table/DynamicTableFilters";
 import { TableLoading } from "./table/TableLoading";
 import { TableError } from "./table/TableError";
 import { DynamicTableContent } from "./table/DynamicTableContent";
@@ -31,22 +32,11 @@ const DynamicTable = () => {
     selectedRodada
   );
 
-  const calcularTotalPorRodada = () => {
-    const totais: Record<string, number> = {};
-    todasRodadas.forEach(rodada => {
-      totais[rodada] = jogadores.reduce((sum, jogador) => {
-        return sum + (jogador.rodadas[rodada] || 0);
-      }, 0);
-    });
-    return totais;
-  };
-
-  const totaisPorRodada = calcularTotalPorRodada();
-  const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
+  const { totaisPorRodada, totalGeral } = useTotalsCalculation(jogadores, todasRodadas);
 
   return (
     <div className="space-y-4">
-      <TableFilters
+      <DynamicTableFilters
         rodadas={rodadas}
         selectedRodada={selectedRodada}
         selectedMes={selectedMes}
