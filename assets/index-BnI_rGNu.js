@@ -8532,8 +8532,7 @@ var ct$1 = 1, ut$1 = class ut {
 }, v$1 = new ut$1(), Vt$1 = (s2, o2) => {
   let t3 = (o2 == null ? void 0 : o2.id) || ct$1++;
   return v$1.addToast({ title: s2, ...o2, id: t3 }), t3;
-}, Ot$1 = (s2) => s2 && typeof s2 == "object" && "ok" in s2 && typeof s2.ok == "boolean" && "status" in s2 && typeof s2.status == "number", Kt$1 = Vt$1, Xt$1 = () => v$1.toasts;
-Object.assign(Kt$1, { success: v$1.success, info: v$1.info, warning: v$1.warning, error: v$1.error, custom: v$1.custom, message: v$1.message, promise: v$1.promise, dismiss: v$1.dismiss, loading: v$1.loading }, { getHistory: Xt$1 });
+}, Ot$1 = (s2) => s2 && typeof s2 == "object" && "ok" in s2 && typeof s2.ok == "boolean" && "status" in s2 && typeof s2.status == "number", Kt$1 = Vt$1, Xt$1 = () => v$1.toasts, Jt$1 = Object.assign(Kt$1, { success: v$1.success, info: v$1.info, warning: v$1.warning, error: v$1.error, custom: v$1.custom, message: v$1.message, promise: v$1.promise, dismiss: v$1.dismiss, loading: v$1.loading }, { getHistory: Xt$1 });
 function ft$1(s2, { insertAt: o2 } = {}) {
   if (typeof document == "undefined") return;
   let t3 = document.head || document.getElementsByTagName("head")[0], n2 = document.createElement("style");
@@ -9009,6 +9008,26 @@ const MapPin = createLucideIcon("MapPin", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
+const Medal = createLucideIcon("Medal", [
+  [
+    "path",
+    {
+      d: "M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15",
+      key: "143lza"
+    }
+  ],
+  ["path", { d: "M11 12 5.12 2.2", key: "qhuxz6" }],
+  ["path", { d: "m13 12 5.88-9.8", key: "hbye0f" }],
+  ["path", { d: "M8 7h8", key: "i86dvs" }],
+  ["circle", { cx: "12", cy: "17", r: "5", key: "qbz8iq" }],
+  ["path", { d: "M12 18v-2h-.5", key: "fawc4q" }]
+]);
+/**
+ * @license lucide-react v0.462.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
 const Menu$1 = createLucideIcon("Menu", [
   ["line", { x1: "4", x2: "20", y1: "12", y2: "12", key: "1e0a9i" }],
   ["line", { x1: "4", x2: "20", y1: "6", y2: "6", key: "1owob3" }],
@@ -9136,6 +9155,21 @@ const SquarePen = createLucideIcon("SquarePen", [
     {
       d: "M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z",
       key: "ohrbg2"
+    }
+  ]
+]);
+/**
+ * @license lucide-react v0.462.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const Star = createLucideIcon("Star", [
+  [
+    "path",
+    {
+      d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
+      key: "r04s7s"
     }
   ]
 ]);
@@ -25983,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-C6EicuhD.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-D65nGYtB.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -36575,23 +36609,50 @@ const MatchesReportTable = ({
     lg: "text-lg"
   };
   const fontClass = fontSizeClasses[fontSize2] || "text-sm";
-  const matchesByRound = matches.reduce((acc, match2) => {
-    if (!acc[match2.rodada]) {
-      acc[match2.rodada] = [];
-    }
-    acc[match2.rodada].push(match2);
-    return acc;
-  }, {});
-  const sortedRounds = Object.keys(matchesByRound).map(Number).sort((a2, b2) => a2 - b2);
+  const matchesByRound = reactExports.useMemo(() => {
+    const grouped = matches.reduce((acc, match2) => {
+      if (!acc[match2.rodada]) {
+        acc[match2.rodada] = [];
+      }
+      acc[match2.rodada].push(match2);
+      return acc;
+    }, {});
+    return grouped;
+  }, [matches]);
+  const sortedRounds = reactExports.useMemo(() => {
+    return Object.keys(matchesByRound).map(Number).sort((a2, b2) => a2 - b2);
+  }, [matchesByRound]);
+  const totalPointsByRoundAndParticipant = reactExports.useMemo(() => {
+    const totals = {};
+    kichutes.forEach((kichute) => {
+      const match2 = matches.find((m2) => m2.id === kichute.partida_id);
+      if (!match2) return;
+      const rodada = match2.rodada;
+      if (!totals[rodada]) {
+        totals[rodada] = {};
+      }
+      if (!totals[rodada][kichute.jogador_id]) {
+        totals[rodada][kichute.jogador_id] = 0;
+      }
+      totals[rodada][kichute.jogador_id] += kichute.pontos || 0;
+    });
+    return totals;
+  }, [kichutes, matches]);
   const getKichute = (participantId, matchId) => {
     return kichutes.find(
       (k2) => k2.jogador_id === participantId && k2.partida_id === matchId
     );
   };
+  const getPontosIcon = (pontos) => {
+    if (pontos === SCORING_SYSTEM.exactScore) return /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500 inline mr-1" });
+    if (pontos === SCORING_SYSTEM.correctDifferenceOrDraw) return /* @__PURE__ */ jsxRuntimeExports.jsx(Medal, { className: "h-4 w-4 text-blue-500 inline mr-1" });
+    if (pontos === SCORING_SYSTEM.correctWinner) return /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "h-4 w-4 text-green-500 inline mr-1" });
+    return null;
+  };
   const getPontosColorClass = (pontos) => {
-    if (pontos === SCORING_SYSTEM.exactScore) return "text-green-500";
-    if (pontos === SCORING_SYSTEM.correctDifferenceOrDraw) return "text-blue-500";
-    if (pontos === SCORING_SYSTEM.correctWinner) return "text-yellow-500";
+    if (pontos === SCORING_SYSTEM.exactScore) return "text-green-600 font-bold";
+    if (pontos === SCORING_SYSTEM.correctDifferenceOrDraw) return "text-blue-600 font-bold";
+    if (pontos === SCORING_SYSTEM.correctWinner) return "text-yellow-600 font-bold";
     return "text-red-500";
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: cn("overflow-x-auto", fontClass), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { className: "min-w-full", children: [
@@ -36608,17 +36669,33 @@ const MatchesReportTable = ({
       ))
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedRounds.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsxs(React.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { className: "bg-muted/30", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        TableCell,
-        {
-          colSpan: 2 + participants.length,
-          className: "font-bold py-1 print:py-0",
-          children: [
-            "Rodada ",
-            rodada
-          ]
-        }
-      ) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted/30", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          TableCell,
+          {
+            colSpan: 2,
+            className: "font-bold py-1 print:py-0",
+            children: [
+              "Rodada ",
+              rodada
+            ]
+          }
+        ),
+        participants.map((participant) => {
+          var _a3;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            TableCell,
+            {
+              className: "py-1 print:py-0 text-center font-bold",
+              children: [
+                ((_a3 = totalPointsByRoundAndParticipant[rodada]) == null ? void 0 : _a3[participant.id]) || 0,
+                " pts"
+              ]
+            },
+            `total-${rodada}-${participant.id}`
+          );
+        })
+      ] }),
       matchesByRound[rodada].map((match2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "border-t border-border/30", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "p-2 print:p-1 whitespace-nowrap", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: match2.time_casa.nome }),
@@ -36642,7 +36719,8 @@ const MatchesReportTable = ({
                   " x ",
                   kichute.palpite_visitante
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: cn("font-bold", getPontosColorClass(kichute.pontos)), children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: cn("font-medium", getPontosColorClass(kichute.pontos)), children: [
+                  getPontosIcon(kichute.pontos),
                   kichute.pontos,
                   "pts"
                 ] })
@@ -36660,9 +36738,11 @@ const ReportContent = ({
   participants,
   kichutes,
   isLoading,
-  reportTitle
+  reportTitle,
+  error
 }) => {
   const getFontSize = () => {
+    if (participants.length > 15) return "xs";
     if (participants.length > 10) return "xs";
     if (participants.length > 6) return "sm";
     return "base";
@@ -36677,6 +36757,12 @@ const ReportContent = ({
   }));
   if (isLoading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg text-muted-foreground", children: "Carregando dados..." }) });
+  }
+  if (error) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(Alert, { variant: "destructive", className: "mb-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { className: "h-4 w-4" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(AlertDescription, { children: error })
+    ] });
   }
   if (formattedMatches.length === 0) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg text-muted-foreground", children: "Nenhuma partida disponível para os filtros selecionados." }) });
@@ -51972,7 +52058,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-DEDtGNm-.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Dxc8wihY.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
@@ -52740,19 +52826,34 @@ const ReportActions = ({
     window.print();
   };
   const handleExportPDF = async () => {
-    if (!reportRef.current) return;
+    if (!reportRef.current) {
+      Jt$1.error("Não foi possível criar o PDF. Tente novamente.");
+      return;
+    }
+    Jt$1.info("Gerando PDF. Isso pode levar alguns segundos...");
     try {
       const canvas = await html2canvas(reportRef.current, {
-        scale: 1.5,
-        // Aumentar a escala para melhor qualidade
+        scale: 2,
         useCORS: true,
         logging: false,
-        windowWidth: 2e3
-        // Aumentar a largura da janela virtual para capturar mais conteúdo
+        windowWidth: 2500,
+        // Aumentar para capturar mais conteúdo
+        onclone: (document2, element) => {
+          const clone = element;
+          const styles = document2.createElement("style");
+          styles.innerHTML = `
+            .table-cell { padding: 4px !important; }
+            body { background: white; }
+            * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+          `;
+          document2.head.appendChild(styles);
+          return clone;
+        }
       });
       const pdf = new E("landscape", "mm", "a4");
-      const imgWidth = 277;
-      const pageHeight = 190;
+      const pdfWidth = 297;
+      const pdfHeight = 210;
+      const imgWidth = pdfWidth - 20;
       const imgHeight = canvas.height * imgWidth / canvas.width;
       pdf.addImage(
         canvas.toDataURL("image/png"),
@@ -52762,7 +52863,7 @@ const ReportActions = ({
         10,
         // margem superior
         imgWidth,
-        imgHeight > pageHeight - 20 ? pageHeight - 20 : imgHeight
+        imgHeight > pdfHeight - 20 ? pdfHeight - 20 : imgHeight
       );
       let filename = "relatorio";
       if (selectedRound > 0) {
@@ -52773,8 +52874,10 @@ const ReportActions = ({
         filename += `-anual-${selectedYear}`;
       }
       pdf.save(`${filename}.pdf`);
+      Jt$1.success("PDF gerado com sucesso!");
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
+      Jt$1.error("Ocorreu um erro ao gerar o PDF. Tente novamente.");
     }
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 print:hidden", children: [
@@ -52793,6 +52896,7 @@ const useReportData = (selectedRound, selectedMonth, selectedYear) => {
   const [kichutes, setKichutes] = reactExports.useState([]);
   const [isLoading, setIsLoading] = reactExports.useState(true);
   const [reportTitle, setReportTitle] = reactExports.useState("");
+  const [error, setError] = reactExports.useState(null);
   reactExports.useEffect(() => {
     let title = "";
     if (selectedRound > 0) {
@@ -52821,6 +52925,7 @@ const useReportData = (selectedRound, selectedMonth, selectedYear) => {
   reactExports.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setError(null);
       console.log("Buscando dados para", { selectedRound, selectedMonth, selectedYear });
       try {
         let matchesQuery = supabase.from("partidas").select(`
@@ -52863,20 +52968,37 @@ const useReportData = (selectedRound, selectedMonth, selectedYear) => {
             `).in("partida_id", matchIds);
           if (kichutesError) throw kichutesError;
           console.log("Kichutes encontrados:", (kichutesData == null ? void 0 : kichutesData.length) || 0);
-          setKichutes(kichutesData || []);
+          const processedKichutes = (kichutesData || []).map((kichute) => {
+            const match2 = matchesData.find((m2) => m2.id === kichute.partida_id);
+            let pontos = kichute.pontos;
+            if (match2 && match2.placar_casa !== null && match2.placar_visitante !== null && kichute.palpite_casa !== null && kichute.palpite_visitante !== null) {
+              pontos = calculatePoints(
+                { homeScore: kichute.palpite_casa, awayScore: kichute.palpite_visitante },
+                { homeScore: match2.placar_casa, awayScore: match2.placar_visitante },
+                SCORING_SYSTEM
+              );
+              console.log(`Recalculando pontos para kichute ${kichute.id}: ${pontos} pts`);
+            }
+            return {
+              ...kichute,
+              pontos
+            };
+          });
+          setKichutes(processedKichutes);
         } else {
           setMatches([]);
           setKichutes([]);
         }
       } catch (err2) {
         console.error("Erro ao buscar dados para o relatório:", err2);
+        setError("Não foi possível carregar os dados do relatório");
       } finally {
         setIsLoading(false);
       }
     };
     fetchData();
   }, [selectedRound, selectedMonth, selectedYear]);
-  return { matches, kichutes, isLoading, reportTitle };
+  return { matches, kichutes, isLoading, reportTitle, error };
 };
 const RoundReportContent = () => {
   const reportRef = reactExports.useRef(null);
@@ -52885,22 +53007,25 @@ const RoundReportContent = () => {
   const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
   const [selectedMonth, setSelectedMonth] = reactExports.useState("all");
   const [selectedYear, setSelectedYear] = reactExports.useState("2025");
-  React.useEffect(() => {
+  reactExports.useEffect(() => {
     if (!isLoadingCurrentRound && currentRound > 1) {
       setSelectedRound(currentRound - 1);
     }
   }, [isLoadingCurrentRound, currentRound, setSelectedRound]);
   const roundNumbers = rounds.map((round2) => round2.number);
-  const { matches, kichutes, isLoading, reportTitle } = useReportData(
+  const { matches, kichutes, isLoading, reportTitle, error } = useReportData(
     selectedRound,
     selectedMonth,
     selectedYear
   );
+  const sortedParticipants = React.useMemo(() => {
+    return [...participants].sort((a2, b2) => a2.nome.localeCompare(b2.nome));
+  }, [participants]);
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container mx-auto px-4 py-8 pt-20 print:pt-8 print:px-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-7xl mx-auto space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold", children: "Relatório de Palpites" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row gap-4 w-full md:w-auto", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-4 w-full md:w-auto", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "p-4 w-full lg:w-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           ReportFilters,
           {
             selectedRound,
@@ -52911,7 +53036,7 @@ const RoundReportContent = () => {
             setSelectedYear,
             rounds: roundNumbers
           }
-        ),
+        ) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           ReportActions,
           {
@@ -52928,10 +53053,11 @@ const RoundReportContent = () => {
       ReportContent,
       {
         matches,
-        participants,
+        participants: sortedParticipants,
         kichutes,
         isLoading,
-        reportTitle
+        reportTitle,
+        error
       }
     ) })
   ] }) });

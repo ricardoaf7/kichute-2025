@@ -1106,6 +1106,10 @@ body{
   display: table;
 }
 
+.table-cell{
+  display: table-cell;
+}
+
 .grid{
   display: grid;
 }
@@ -4473,8 +4477,16 @@ body{
     grid-column: span 2 / span 2;
   }
 
+  .lg\:w-auto{
+    width: auto;
+  }
+
   .lg\:grid-cols-3{
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lg\:flex-row{
+    flex-direction: row;
   }
 }
 
