@@ -1,6 +1,6 @@
 
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { SortDirection, SortField } from "@/hooks/standings/useDynamicTableSort";
+import { SortDirection, SortField } from "@/hooks/standings/useSortedPlayers";
 
 interface SortIconProps {
   field: SortField;

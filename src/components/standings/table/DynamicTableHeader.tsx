@@ -1,7 +1,7 @@
 
 import { TableHeader, TableRow, TableHead } from "@/components/ui/table";
 import { SortIcon } from "./SortIcon";
-import { SortDirection, SortField } from "@/hooks/standings/useDynamicTableSort";
+import { SortDirection, SortField } from "@/hooks/standings/useSortedPlayers";
 
 interface DynamicTableHeaderProps {
   handleSort: (field: SortField) => void;
