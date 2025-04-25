@@ -1,8 +1,8 @@
 import { useParticipants } from "@/hooks/useParticipants";
 import { TableRow, TableCell } from "@/components/ui/table";
-import { Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useKichutes } from "@/hooks/useKichutes";
+import { KichutePoints } from "@/components/kichutes/KichutePoints";
 
 interface RoundTotalScoreProps {
   selectedRound: number;
@@ -12,7 +12,6 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
   const { participants } = useParticipants();
   const { kichutes, isLoading: isLoadingKichutes } = useKichutes(selectedRound);
   const [totaisPorJogador, setTotaisPorJogador] = useState<Record<string, number>>({});
-  const [maxScore, setMaxScore] = useState<number>(0);
 
   useEffect(() => {
     if (!isLoadingKichutes && kichutes && kichutes.length > 0) {
@@ -38,9 +37,6 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
         }
       });
       
-      // Find maximum score
-      const maxPoints = Math.max(...Object.values(totais));
-      setMaxScore(maxPoints);
       setTotaisPorJogador(totais);
     }
   }, [kichutes, participants, isLoadingKichutes, selectedRound]);
@@ -70,16 +66,14 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
       {participants.map((participant) => {
         const participantId = String(participant.id);
         const totalPontos = totaisPorJogador[participantId] || 0;
-        const isTopScorer = totalPontos === maxScore && maxScore > 0;
         
         return (
           <TableCell key={`total-${participantId}`} className="text-center">
-            <div className="flex items-center justify-center space-x-1">
-              {isTopScorer && (
-                <Trophy className="h-4 w-4 text-yellow-500" />
-              )}
-              <span>{totalPontos}</span>
-            </div>
+            <KichutePoints 
+              points={totalPontos}
+              viewType="round"
+              position={Object.values(totaisPorJogador).every(p => p <= totalPontos) ? 0 : -1}
+            />
           </TableCell>
         );
       })}

@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { RotateCw, ChevronDown, ChevronUp } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
 import { TableFilters } from "./TableFilters";
 import { useTableSort, SortField } from "@/hooks/standings/useTableSort";
 import { useDynamicTableDataReal } from "@/hooks/useDynamicTableDataReal";
+import { KichutePoints } from "@/components/kichutes/KichutePoints";
 
 const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = useState<string>("todas");
@@ -19,7 +19,6 @@ const DynamicTable = () => {
 
   const { sortField, sortDirection, handleSort, sortPlayers } = useTableSort();
 
-  // Explicitly type rodadas as string[]
   const todasRodadas = rodadas;
 
   const calcularTotalPorRodada = () => {
@@ -45,15 +44,13 @@ const DynamicTable = () => {
     </span>
   );
 
-  // Add id field to each player object to match JogadorData interface
   const jogadoresWithId = jogadores.map((jogador, index) => ({
     ...jogador,
-    id: jogador.id || `player-${index}` // Use existing id if available, otherwise generate one
+    id: jogador.id || `player-${index}`
   }));
 
   const sortedPlayers = sortPlayers(jogadoresWithId, selectedRodada);
 
-  // List of months in Portuguese
   const months = [
     { value: "01", label: "Janeiro" },
     { value: "02", label: "Fevereiro" },
@@ -68,6 +65,12 @@ const DynamicTable = () => {
     { value: "11", label: "Novembro" },
     { value: "12", label: "Dezembro" },
   ];
+
+  const getViewType = () => {
+    if (selectedRodada !== "todas") return "round";
+    if (selectedMes !== "todos") return "month";
+    return "annual";
+  };
 
   return (
     <div className="space-y-4">
@@ -125,10 +128,20 @@ const DynamicTable = () => {
                   <TableRow key={jogador.id}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{jogador.nome}</TableCell>
-                    <TableCell className="text-center">{jogador.pontos_total}</TableCell>
+                    <TableCell className="text-center">
+                      <KichutePoints 
+                        points={jogador.pontos_total}
+                        viewType={getViewType()}
+                        position={index <= 2 ? index : -1}
+                      />
+                    </TableCell>
                     {todasRodadas.map((rodada) => (
                       <TableCell key={`${jogador.id}-${rodada}`} className="text-center">
-                        {jogador.rodadas[rodada] ?? "-"}
+                        <KichutePoints 
+                          points={jogador.rodadas[rodada] ?? 0}
+                          viewType="round"
+                          position={index === 0 ? 0 : -1}
+                        />
                       </TableCell>
                     ))}
                   </TableRow>
