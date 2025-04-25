@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { RotateCw } from "lucide-react";
 import { Table, TableBody } from "@/components/ui/table";
 import { TableFilters } from "./TableFilters";
 import { useDynamicTableDataReal } from "@/hooks/useDynamicTableDataReal";
@@ -8,6 +7,8 @@ import { useDynamicTableSort } from "@/hooks/standings/useDynamicTableSort";
 import { DynamicTableHeader } from "./table/DynamicTableHeader";
 import { DynamicTableRow } from "./table/DynamicTableRow";
 import { DynamicTableFooter } from "./table/DynamicTableFooter";
+import { TableLoading } from "./table/TableLoading";
+import { TableError } from "./table/TableError";
 
 const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = useState<string>("todas");
@@ -77,12 +78,9 @@ const DynamicTable = () => {
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="flex justify-center items-center p-8">
-            <RotateCw className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2">Carregando dados...</span>
-          </div>
+          <TableLoading />
         ) : error ? (
-          <div className="p-4 text-center text-red-500">{error}</div>
+          <TableError message={error} />
         ) : (
           <div className="max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle">
             <Table>

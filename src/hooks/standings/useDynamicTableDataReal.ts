@@ -63,7 +63,7 @@ export function useDynamicTableDataReal(
         }
 
         agrupado[item.jogador_id].pontos_total += item.pontos;
-        agrupado[item.jogador_id].rodadas["r" + item.rodada] = item.pontos;
+        agrupado[item.jogador_id].rodadas[`r${item.rodada}`] = item.pontos;
       }
 
       const jogadoresArray = Object.values(agrupado);
