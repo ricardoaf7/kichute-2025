@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MatchesReportTable } from "./MatchesReportTable";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { MonthlyAnnualReport } from "./MonthlyAnnualReport";
 
 interface ReportContentProps {
   matches: any[];
@@ -12,6 +13,9 @@ interface ReportContentProps {
   isLoading: boolean;
   reportTitle: string;
   error?: string | null;
+  selectedRound: number;
+  selectedMonth: string;
+  selectedYear: string;
 }
 
 export const ReportContent: React.FC<ReportContentProps> = ({
@@ -20,7 +24,10 @@ export const ReportContent: React.FC<ReportContentProps> = ({
   kichutes,
   isLoading,
   reportTitle,
-  error
+  error,
+  selectedRound,
+  selectedMonth,
+  selectedYear
 }) => {
   // Determinar o tamanho ideal da fonte baseado no número de participantes
   const getFontSize = () => {
@@ -58,6 +65,19 @@ export const ReportContent: React.FC<ReportContentProps> = ({
     );
   }
 
+  // If viewing all rounds (monthly or annual report)
+  if (selectedRound === 0) {
+    return (
+      <MonthlyAnnualReport
+        kichutes={kichutes}
+        participants={participants}
+        selectedYear={selectedYear}
+        isMonthly={selectedMonth === "all"}
+      />
+    );
+  }
+
+  // For single round view
   if (formattedMatches.length === 0) {
     return (
       <div className="text-center p-8">

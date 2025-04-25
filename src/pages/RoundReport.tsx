@@ -77,6 +77,9 @@ const RoundReportContent = () => {
             isLoading={isLoading}
             reportTitle={reportTitle}
             error={error}
+            selectedRound={selectedRound}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
           />
         </div>
       </div>
