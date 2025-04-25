@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-Cl2ALvGx.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-B5JyUWKg.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -32899,6 +32899,11 @@ const DynamicTableFooter = ({
     todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: totaisPorRodada[rodada] || 0 }, `footer-${rodada}`))
   ] }) });
 };
+const TableLoading = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-center items-center p-8", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCw, { className: "h-8 w-8 animate-spin text-primary" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2", children: "Carregando dados..." })
+] });
+const TableError = ({ message: message2 }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center text-red-500", children: message2 });
 const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = reactExports.useState("todas");
   const [selectedMes, setSelectedMes] = reactExports.useState("todos");
@@ -32955,10 +32960,7 @@ const DynamicTable = () => {
         onAnoChange: setSelectedAno
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-center items-center p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCw, { className: "h-8 w-8 animate-spin text-primary" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2", children: "Carregando dados..." })
-    ] }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center text-red-500", children: error }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableLoading, {}) : error ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableError, { message: error }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         DynamicTableHeader,
         {
@@ -52337,7 +52339,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Bso2NIBU.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Ds97QmQK.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
