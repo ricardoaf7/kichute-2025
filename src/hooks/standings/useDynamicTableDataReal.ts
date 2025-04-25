@@ -22,7 +22,7 @@ export function useDynamicTableDataReal(
   selectedAno: string
 ) {
   const [jogadores, setJogadores] = useState<JogadorAgrupado[]>([]);
-  const [rodadas, setRodadas] = useState<string[]>([]);
+  const [rodadas, setRodadas] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,12 +67,13 @@ export function useDynamicTableDataReal(
       }
 
       const jogadoresArray = Object.values(agrupado);
-      const rodadasUnicas = [
-        ...new Set(jogadoresArray.flatMap((j) => Object.keys(j.rodadas))),
-      ].sort();
+      
+      // Extract unique rodadas and convert them to numbers
+      const uniqueRodadas = [...new Set(data.map((item: Kichute) => parseInt(item.rodada)))];
+      const sortedRodadas = uniqueRodadas.sort((a, b) => a - b);
 
       setJogadores(jogadoresArray);
-      setRodadas(rodadasUnicas);
+      setRodadas(sortedRodadas);
       setIsLoading(false);
     }
 
