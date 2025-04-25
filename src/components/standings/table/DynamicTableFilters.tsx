@@ -26,6 +26,7 @@ export const DynamicTableFilters = ({
   onMesChange,
   onAnoChange
 }: DynamicTableFiltersProps) => {
+  // Mapear nomes dos meses
   const getNomeMes = (codigoMes: string) => {
     if (codigoMes === "todos") return "Todos os meses";
     
@@ -69,6 +70,7 @@ export const DynamicTableFilters = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todos">Todos os meses</SelectItem>
+            {/* Placeholder for months - will be implemented later */}
             <SelectItem value="4-2025">Abril de 2025</SelectItem>
             <SelectItem value="5-2025">Maio de 2025</SelectItem>
           </SelectContent>
