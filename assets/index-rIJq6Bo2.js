@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-DnRm7x_Q.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-Cl2ALvGx.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -32642,26 +32642,8 @@ const TableFilters = ({
   selectedAno,
   onRodadaChange,
   onMesChange,
-  onAnoChange,
-  months: months2 = []
+  onAnoChange
 }) => {
-  const defaultMonths = [
-    { value: "todos", label: "Todos os meses" },
-    { value: "01", label: "Janeiro" },
-    { value: "02", label: "Fevereiro" },
-    { value: "03", label: "Março" },
-    { value: "04", label: "Abril" },
-    { value: "05", label: "Maio" },
-    { value: "06", label: "Junho" },
-    { value: "07", label: "Julho" },
-    { value: "08", label: "Agosto" },
-    { value: "09", label: "Setembro" },
-    { value: "10", label: "Outubro" },
-    { value: "11", label: "Novembro" },
-    { value: "12", label: "Dezembro" },
-    { value: "01-02", label: "Janeiro/Fevereiro" }
-  ];
-  const monthsToUse = months2.length > 0 ? months2 : defaultMonths;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "rodada-select", className: "text-sm font-medium text-gray-700 dark:text-gray-300", children: "Rodada:" }),
@@ -32680,7 +32662,11 @@ const TableFilters = ({
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "mes-select", className: "text-sm font-medium text-gray-700 dark:text-gray-300", children: "Mês:" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedMes, onValueChange: onMesChange, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "mes-select", className: "w-[180px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Selecionar mês" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectContent, { children: monthsToUse.map((month) => /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: month.value, children: month.label }, `mes-${month.value}`)) })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "todos", children: "Todos os meses" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "4-2025", children: "Abril de 2025" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "5-2025", children: "Maio de 2025" })
+        ] })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
@@ -52351,7 +52337,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-jTe06RpV.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Bso2NIBU.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
