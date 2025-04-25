@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-D3AlXl6H.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-UBEprYRd.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -32715,7 +32715,8 @@ const useTableSort = () => {
   };
 };
 const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
-  const [kichutes, setKichutes] = reactExports.useState([]);
+  const [jogadores, setJogadores] = reactExports.useState([]);
+  const [rodadas, setRodadas] = reactExports.useState([]);
   const [isLoading, setIsLoading] = reactExports.useState(true);
   const [error, setError] = reactExports.useState(null);
   reactExports.useEffect(() => {
@@ -32723,7 +32724,16 @@ const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
       setIsLoading(true);
       setError(null);
       try {
-        let partidasQuery = supabase.from("partidas").select("id, rodada, data");
+        let partidasQuery = supabase.from("partidas").select(`
+          id,
+          rodada,
+          data,
+          placar_casa,
+          placar_visitante
+        `);
+        if (selectedRodada !== "todas") {
+          partidasQuery = partidasQuery.eq("rodada", parseInt(selectedRodada));
+        }
         if (selectedMes !== "todos") {
           const [mesInicio, mesFim] = selectedMes === "01-02" ? ["01", "02"] : [selectedMes, selectedMes];
           const dataInicio = `${selectedAno}-${mesInicio}-01`;
@@ -32731,24 +32741,60 @@ const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
           const dataFim = `${selectedAno}-${mesFim}-${ultimoDia}`;
           partidasQuery = partidasQuery.gte("data", dataInicio).lte("data", dataFim);
         }
-        if (selectedRodada !== "todas") {
-          partidasQuery = partidasQuery.eq("rodada", parseInt(selectedRodada, 10));
-        }
         const { data: partidas, error: partidasError } = await partidasQuery;
         if (partidasError) throw partidasError;
-        const rodasDoMes = new Set((partidas == null ? void 0 : partidas.map((p2) => p2.rodada)) || []);
-        let kichutesData = [];
-        if (rodasDoMes.size > 0) {
-          const { data: kichutesResult, error: kichutesError } = await supabase.from("kichutes").select(`
-              id,
-              pontos,
-              jogador:jogadores(id, nome),
-              partida:partidas(rodada)
-            `).in("partida.rodada", Array.from(rodasDoMes));
-          if (kichutesError) throw kichutesError;
-          kichutesData = kichutesResult || [];
-        }
-        setKichutes(kichutesData);
+        const { data: kichutesData, error: kichutesError } = await supabase.from("kichutes").select(`
+            id,
+            palpite_casa,
+            palpite_visitante,
+            jogador:jogadores(id, nome),
+            partida_id
+          `).in("partida_id", (partidas == null ? void 0 : partidas.map((p2) => p2.id)) || []);
+        if (kichutesError) throw kichutesError;
+        const jogadoresMap = {};
+        kichutesData == null ? void 0 : kichutesData.forEach((kichute) => {
+          if (!kichute.jogador) return;
+          const partida = partidas == null ? void 0 : partidas.find((p2) => p2.id === kichute.partida_id);
+          if (!partida) return;
+          const jogadorId = kichute.jogador.id;
+          const jogadorNome = kichute.jogador.nome;
+          const rodada = `r${partida.rodada}`;
+          if (!jogadoresMap[jogadorId]) {
+            jogadoresMap[jogadorId] = {
+              id: jogadorId,
+              nome: jogadorNome,
+              rodadas: {},
+              pontos_total: 0
+            };
+          }
+          let pontos = 0;
+          if (partida.placar_casa !== null && partida.placar_visitante !== null && kichute.palpite_casa !== null && kichute.palpite_visitante !== null) {
+            pontos = calculatePoints(
+              { homeScore: kichute.palpite_casa, awayScore: kichute.palpite_visitante },
+              { homeScore: partida.placar_casa, awayScore: partida.placar_visitante },
+              SCORING_SYSTEM
+            );
+          }
+          jogadoresMap[jogadorId].rodadas[rodada] = (jogadoresMap[jogadorId].rodadas[rodada] || 0) + pontos;
+          jogadoresMap[jogadorId].pontos_total += pontos;
+          console.log(`[Points Calculation] ${jogadorNome} - Rodada ${rodada}:`, {
+            palpite: `${kichute.palpite_casa}x${kichute.palpite_visitante}`,
+            resultado: `${partida.placar_casa}x${partida.placar_visitante}`,
+            pontos
+          });
+        });
+        const jogadoresArray = Object.values(jogadoresMap);
+        const rodasUnicas = [...new Set(partidas == null ? void 0 : partidas.map((p2) => `r${p2.rodada}`))].sort((a2, b2) => {
+          const numA = parseInt(a2.substring(1));
+          const numB = parseInt(b2.substring(1));
+          return numA - numB;
+        });
+        console.log("Processed data:", {
+          jogadores: jogadoresArray,
+          rodadas: rodasUnicas
+        });
+        setJogadores(jogadoresArray);
+        setRodadas(rodasUnicas);
       } catch (err2) {
         console.error("Erro ao buscar dados:", err2);
         setError("Não foi possível carregar os dados");
@@ -32758,33 +32804,6 @@ const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
     };
     fetchData();
   }, [selectedRodada, selectedMes, selectedAno]);
-  const jogadoresMap = {};
-  kichutes.forEach((k2) => {
-    if (!k2.jogador || !k2.partida) return;
-    const jogador = k2.jogador.nome;
-    const jogadorId = k2.jogador.id || `jogador-${jogador}`;
-    const rodada = `r${k2.partida.rodada}`;
-    if (!jogadoresMap[jogador]) {
-      jogadoresMap[jogador] = {
-        id: jogadorId,
-        nome: jogador,
-        rodadas: {},
-        pontos_total: 0
-      };
-    }
-    jogadoresMap[jogador].rodadas[rodada] = (jogadoresMap[jogador].rodadas[rodada] || 0) + k2.pontos;
-    jogadoresMap[jogador].pontos_total += k2.pontos;
-  });
-  const jogadores = Object.values(jogadoresMap);
-  const rodadas = Array.from(
-    new Set(
-      kichutes.filter((k2) => k2.partida && k2.partida.rodada).map((k2) => `r${k2.partida.rodada}`)
-    )
-  ).sort((a2, b2) => {
-    const numA = parseInt(a2.substring(1));
-    const numB = parseInt(b2.substring(1));
-    return numA - numB;
-  });
   return { jogadores, rodadas, isLoading, error };
 };
 const DynamicTable = () => {
@@ -36803,6 +36822,12 @@ const PlayerRow = ({ playerName, monthlyPoints, totalPoints, position: position2
 };
 const useReportPoints = (kichutes, participants, selectedYear, isMonthly = true) => {
   const pointsByPlayerAndMonth = reactExports.useMemo(() => {
+    console.log("Processing points calculation with:", {
+      kichutesCount: kichutes.length,
+      participantsCount: participants.length,
+      selectedYear,
+      isMonthly
+    });
     const calculatedPoints = participants.map((participant) => ({
       playerId: participant.id,
       playerName: participant.nome,
@@ -36810,18 +36835,38 @@ const useReportPoints = (kichutes, participants, selectedYear, isMonthly = true)
       totalPoints: 0
     }));
     kichutes.forEach((kichute) => {
-      var _a3, _b3;
-      const month = new Date((_a3 = kichute.partida) == null ? void 0 : _a3.data).getMonth() + 1;
-      const year = new Date((_b3 = kichute.partida) == null ? void 0 : _b3.data).getFullYear().toString();
+      var _a3, _b3, _c2, _d, _e;
+      const matchDate = ((_a3 = kichute.partida) == null ? void 0 : _a3.data) ? new Date(kichute.partida.data) : null;
+      if (!matchDate) return;
+      const month = matchDate.getMonth() + 1;
+      const year = matchDate.getFullYear().toString();
       if (year === selectedYear && kichute.jogador_id) {
         const playerIndex = calculatedPoints.findIndex((p2) => p2.playerId === kichute.jogador_id);
-        if (playerIndex !== -1) {
-          if (!calculatedPoints[playerIndex].monthlyPoints[month]) {
-            calculatedPoints[playerIndex].monthlyPoints[month] = 0;
-          }
-          calculatedPoints[playerIndex].monthlyPoints[month] += kichute.pontos || 0;
-          calculatedPoints[playerIndex].totalPoints += kichute.pontos || 0;
+        if (playerIndex === -1) return;
+        let points = 0;
+        if (((_b3 = kichute.partida) == null ? void 0 : _b3.placar_casa) !== null && ((_c2 = kichute.partida) == null ? void 0 : _c2.placar_visitante) !== null && kichute.palpite_casa !== null && kichute.palpite_visitante !== null) {
+          points = calculatePoints(
+            {
+              homeScore: kichute.palpite_casa,
+              awayScore: kichute.palpite_visitante
+            },
+            {
+              homeScore: kichute.partida.placar_casa,
+              awayScore: kichute.partida.placar_visitante
+            },
+            SCORING_SYSTEM
+          );
         }
+        if (!calculatedPoints[playerIndex].monthlyPoints[month]) {
+          calculatedPoints[playerIndex].monthlyPoints[month] = 0;
+        }
+        calculatedPoints[playerIndex].monthlyPoints[month] += points;
+        calculatedPoints[playerIndex].totalPoints += points;
+        console.log(`[Monthly Points] ${calculatedPoints[playerIndex].playerName} - Month ${month}:`, {
+          palpite: `${kichute.palpite_casa}x${kichute.palpite_visitante}`,
+          resultado: `${(_d = kichute.partida) == null ? void 0 : _d.placar_casa}x${(_e = kichute.partida) == null ? void 0 : _e.placar_visitante}`,
+          points
+        });
       }
     });
     return calculatedPoints.sort((a2, b2) => b2.totalPoints - a2.totalPoints);
@@ -52206,7 +52251,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-BMeI91dd.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-BOS45S7K.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
