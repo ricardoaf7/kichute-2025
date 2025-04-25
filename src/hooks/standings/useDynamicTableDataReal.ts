@@ -9,6 +9,17 @@ export interface JogadorData {
   rodadas: Record<string, number>;
 }
 
+// Define a stronger type for the kichute response from Supabase
+interface KichuteResponse {
+  id: string;
+  jogador?: {
+    id: string;
+    nome: string;
+  } | null;
+  partida_id: string;
+  pontos: number | null;
+}
+
 export function useDynamicTableDataReal(
   selectedRodada: string,
   selectedMes: string,
@@ -92,7 +103,8 @@ export function useDynamicTableDataReal(
         // 5. Processar e organizar os dados
         const jogadoresMap: Record<string, JogadorData> = {};
 
-        kichutesData?.forEach(kichute => {
+        // Tratar kichutesData como um array de KichuteResponse
+        (kichutesData as KichuteResponse[] || []).forEach(kichute => {
           // Verificar se o jogador existe e é um objeto (não um array)
           if (!kichute.jogador || Array.isArray(kichute.jogador)) {
             console.warn("Jogador inválido encontrado:", kichute.jogador);
@@ -102,7 +114,7 @@ export function useDynamicTableDataReal(
           const partida = partidas?.find(p => p.id === kichute.partida_id);
           if (!partida) return;
 
-          // Extração segura das propriedades do jogador
+          // Extração segura das propriedades do jogador com type assertion
           const jogadorId = kichute.jogador.id;
           const jogadorNome = kichute.jogador.nome;
           
