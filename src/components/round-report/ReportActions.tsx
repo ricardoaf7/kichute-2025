@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FileDown, Printer } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { toast } from "sonner";
 
 interface ReportActionsProps {
   reportRef: React.RefObject<HTMLDivElement>;
@@ -25,22 +26,43 @@ export const ReportActions = ({
   };
 
   const handleExportPDF = async () => {
-    if (!reportRef.current) return;
+    if (!reportRef.current) {
+      toast.error("Não foi possível criar o PDF. Tente novamente.");
+      return;
+    }
+
+    toast.info("Gerando PDF. Isso pode levar alguns segundos...");
 
     try {
+      // Aumentar escala para melhor qualidade
       const canvas = await html2canvas(reportRef.current, {
-        scale: 1.5, // Aumentar a escala para melhor qualidade
+        scale: 2, 
         useCORS: true,
         logging: false,
-        windowWidth: 2000 // Aumentar a largura da janela virtual para capturar mais conteúdo
+        windowWidth: 2500, // Aumentar para capturar mais conteúdo
+        onclone: (document, element) => {
+          // Ajustar estilos para melhorar a renderização do PDF
+          const clone = element;
+          const styles = document.createElement('style');
+          styles.innerHTML = `
+            .table-cell { padding: 4px !important; }
+            body { background: white; }
+            * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+          `;
+          document.head.appendChild(styles);
+          return clone;
+        }
       });
 
-      // Sempre usar paisagem para relatórios com muitos participantes
+      // Sempre usar paisagem para relatórios
       const pdf = new jsPDF('landscape', 'mm', 'a4');
       
+      // Dimensões de uma página A4 em paisagem
+      const pdfWidth = 297; 
+      const pdfHeight = 210;
+      
       // Calcular dimensões preservando a proporção
-      const imgWidth = 277; // A4 landscape width in mm
-      const pageHeight = 190; // A4 landscape height in mm
+      const imgWidth = pdfWidth - 20; // 10mm de margem em cada lado
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
       // Adicionar a imagem com margens adequadas
@@ -50,7 +72,7 @@ export const ReportActions = ({
         10, // margem esquerda
         10, // margem superior
         imgWidth, 
-        imgHeight > pageHeight - 20 ? pageHeight - 20 : imgHeight
+        imgHeight > pdfHeight - 20 ? pdfHeight - 20 : imgHeight
       );
       
       // Determinar nome do arquivo baseado nos filtros
@@ -64,8 +86,10 @@ export const ReportActions = ({
       }
       
       pdf.save(`${filename}.pdf`);
+      toast.success("PDF gerado com sucesso!");
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
+      toast.error("Ocorreu um erro ao gerar o PDF. Tente novamente.");
     }
   };
 

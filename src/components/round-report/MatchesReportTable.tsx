@@ -1,9 +1,9 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { SCORING_SYSTEM } from "@/utils/mockData";
-import { getPointsBadgeClass } from "@/utils/scoring";
+import { Trophy, Medal, Star } from "lucide-react";
 
 interface Match {
   id: string;
@@ -53,18 +53,48 @@ export const MatchesReportTable: React.FC<MatchesReportTableProps> = ({
   const fontClass = fontSizeClasses[fontSize] || "text-sm";
 
   // Agrupar partidas por rodada
-  const matchesByRound = matches.reduce((acc, match) => {
-    if (!acc[match.rodada]) {
-      acc[match.rodada] = [];
-    }
-    acc[match.rodada].push(match);
-    return acc;
-  }, {} as Record<number, Match[]>);
+  const matchesByRound = useMemo(() => {
+    const grouped = matches.reduce((acc, match) => {
+      if (!acc[match.rodada]) {
+        acc[match.rodada] = [];
+      }
+      acc[match.rodada].push(match);
+      return acc;
+    }, {} as Record<number, Match[]>);
+
+    return grouped;
+  }, [matches]);
 
   // Ordenar rodadas
-  const sortedRounds = Object.keys(matchesByRound)
-    .map(Number)
-    .sort((a, b) => a - b);
+  const sortedRounds = useMemo(() => {
+    return Object.keys(matchesByRound)
+      .map(Number)
+      .sort((a, b) => a - b);
+  }, [matchesByRound]);
+
+  // Calcular total de pontos por participante por rodada
+  const totalPointsByRoundAndParticipant = useMemo(() => {
+    const totals: Record<number, Record<string, number>> = {};
+    
+    kichutes.forEach(kichute => {
+      const match = matches.find(m => m.id === kichute.partida_id);
+      if (!match) return;
+      
+      const rodada = match.rodada;
+      
+      if (!totals[rodada]) {
+        totals[rodada] = {};
+      }
+      
+      if (!totals[rodada][kichute.jogador_id]) {
+        totals[rodada][kichute.jogador_id] = 0;
+      }
+      
+      totals[rodada][kichute.jogador_id] += kichute.pontos || 0;
+    });
+    
+    return totals;
+  }, [kichutes, matches]);
 
   // Obter palpite para um participante e partida específica
   const getKichute = (participantId: string, matchId: string) => {
@@ -73,11 +103,19 @@ export const MatchesReportTable: React.FC<MatchesReportTableProps> = ({
     );
   };
 
-  // Obter classe de cor com base na pontuação usando a função do utility
+  // Obter ícone baseado na pontuação
+  const getPontosIcon = (pontos: number) => {
+    if (pontos === SCORING_SYSTEM.exactScore) return <Trophy className="h-4 w-4 text-yellow-500 inline mr-1" />;
+    if (pontos === SCORING_SYSTEM.correctDifferenceOrDraw) return <Medal className="h-4 w-4 text-blue-500 inline mr-1" />;
+    if (pontos === SCORING_SYSTEM.correctWinner) return <Star className="h-4 w-4 text-green-500 inline mr-1" />;
+    return null;
+  };
+
+  // Obter classe de cor com base na pontuação
   const getPontosColorClass = (pontos: number) => {
-    if (pontos === SCORING_SYSTEM.exactScore) return "text-green-500";
-    if (pontos === SCORING_SYSTEM.correctDifferenceOrDraw) return "text-blue-500";
-    if (pontos === SCORING_SYSTEM.correctWinner) return "text-yellow-500";
+    if (pontos === SCORING_SYSTEM.exactScore) return "text-green-600 font-bold";
+    if (pontos === SCORING_SYSTEM.correctDifferenceOrDraw) return "text-blue-600 font-bold";
+    if (pontos === SCORING_SYSTEM.correctWinner) return "text-yellow-600 font-bold";
     return "text-red-500";
   };
 
@@ -103,11 +141,19 @@ export const MatchesReportTable: React.FC<MatchesReportTableProps> = ({
             <React.Fragment key={`rodada-${rodada}`}>
               <TableRow className="bg-muted/30">
                 <TableCell 
-                  colSpan={2 + participants.length} 
+                  colSpan={2} 
                   className="font-bold py-1 print:py-0"
                 >
                   Rodada {rodada}
                 </TableCell>
+                {participants.map(participant => (
+                  <TableCell 
+                    key={`total-${rodada}-${participant.id}`}
+                    className="py-1 print:py-0 text-center font-bold"
+                  >
+                    {totalPointsByRoundAndParticipant[rodada]?.[participant.id] || 0} pts
+                  </TableCell>
+                ))}
               </TableRow>
               {matchesByRound[rodada].map((match) => (
                 <TableRow key={match.id} className="border-t border-border/30">
@@ -141,7 +187,8 @@ export const MatchesReportTable: React.FC<MatchesReportTableProps> = ({
                             <span>
                               {kichute.palpite_casa} x {kichute.palpite_visitante}
                             </span>
-                            <span className={cn("font-bold", getPontosColorClass(kichute.pontos))}>
+                            <span className={cn("font-medium", getPontosColorClass(kichute.pontos))}>
+                              {getPontosIcon(kichute.pontos)}
                               {kichute.pontos}pts
                             </span>
                           </div>

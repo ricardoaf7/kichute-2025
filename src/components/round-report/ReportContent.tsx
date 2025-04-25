@@ -2,6 +2,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MatchesReportTable } from "./MatchesReportTable";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface ReportContentProps {
   matches: any[];
@@ -9,6 +11,7 @@ interface ReportContentProps {
   kichutes: any[];
   isLoading: boolean;
   reportTitle: string;
+  error?: string | null;
 }
 
 export const ReportContent: React.FC<ReportContentProps> = ({
@@ -17,9 +20,11 @@ export const ReportContent: React.FC<ReportContentProps> = ({
   kichutes,
   isLoading,
   reportTitle,
+  error
 }) => {
   // Determinar o tamanho ideal da fonte baseado no número de participantes
   const getFontSize = () => {
+    if (participants.length > 15) return "xs";
     if (participants.length > 10) return "xs";
     if (participants.length > 6) return "sm";
     return "base";
@@ -39,6 +44,17 @@ export const ReportContent: React.FC<ReportContentProps> = ({
       <div className="p-8 text-center">
         <p className="text-lg text-muted-foreground">Carregando dados...</p>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive" className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          {error}
+        </AlertDescription>
+      </Alert>
     );
   }
 

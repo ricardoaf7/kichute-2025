@@ -1,12 +1,15 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { SCORING_SYSTEM } from "@/utils/mockData";
+import { calculatePoints } from "@/utils/scoring";
 
 interface ReportData {
   matches: any[];
   kichutes: any[];
   isLoading: boolean;
   reportTitle: string;
+  error: string | null;
 }
 
 export const useReportData = (
@@ -18,6 +21,7 @@ export const useReportData = (
   const [kichutes, setKichutes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [reportTitle, setReportTitle] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let title = "";
@@ -39,6 +43,8 @@ export const useReportData = (
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setError(null);
+      
       console.log("Buscando dados para", {selectedRound, selectedMonth, selectedYear});
       
       try {
@@ -100,13 +106,40 @@ export const useReportData = (
           if (kichutesError) throw kichutesError;
           
           console.log("Kichutes encontrados:", kichutesData?.length || 0);
-          setKichutes(kichutesData || []);
+
+          // Processar kichutes para garantir que a pontuação esteja correta
+          const processedKichutes = (kichutesData || []).map(kichute => {
+            const match = matchesData.find(m => m.id === kichute.partida_id);
+            let pontos = kichute.pontos;
+            
+            // Se a partida tem resultado e o kichute tem valores, recalcular pontos
+            if (match && 
+                match.placar_casa !== null && match.placar_visitante !== null &&
+                kichute.palpite_casa !== null && kichute.palpite_visitante !== null) {
+              
+              pontos = calculatePoints(
+                { homeScore: kichute.palpite_casa, awayScore: kichute.palpite_visitante },
+                { homeScore: match.placar_casa, awayScore: match.placar_visitante },
+                SCORING_SYSTEM
+              );
+              
+              console.log(`Recalculando pontos para kichute ${kichute.id}: ${pontos} pts`);
+            }
+            
+            return {
+              ...kichute,
+              pontos: pontos
+            };
+          });
+          
+          setKichutes(processedKichutes);
         } else {
           setMatches([]);
           setKichutes([]);
         }
       } catch (err) {
         console.error("Erro ao buscar dados para o relatório:", err);
+        setError("Não foi possível carregar os dados do relatório");
       } finally {
         setIsLoading(false);
       }
@@ -115,5 +148,5 @@ export const useReportData = (
     fetchData();
   }, [selectedRound, selectedMonth, selectedYear]);
 
-  return { matches, kichutes, isLoading, reportTitle };
+  return { matches, kichutes, isLoading, reportTitle, error };
 };
