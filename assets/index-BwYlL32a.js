@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-DMuxJF4N.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-T6p8kRO4.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -30848,84 +30848,7 @@ const NotFound = () => {
     /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "/", className: "text-blue-500 hover:text-blue-700 underline", children: "Return to Home" })
   ] }) });
 };
-const FilterSelector = ({
-  selectedRound,
-  selectedMonth,
-  selectedYear,
-  allRounds,
-  handleRoundChange,
-  handleMonthChange,
-  handleYearChange
-}) => {
-  const months2 = [
-    { value: "all", label: "Todos" },
-    { value: "mar-apr", label: "Março/Abril" },
-    { value: "may", label: "Maio" },
-    { value: "jun", label: "Junho" },
-    { value: "jul", label: "Julho" },
-    { value: "aug", label: "Agosto" },
-    { value: "sep", label: "Setembro" },
-    { value: "oct", label: "Outubro" },
-    { value: "nov", label: "Novembro" },
-    { value: "dec", label: "Dezembro" }
-  ];
-  const years = [
-    { value: "2025", label: "2025" }
-  ];
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center space-x-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "round-select", className: "text-sm font-medium", children: "Rodada:" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "select",
-        {
-          id: "round-select",
-          value: selectedRound ? selectedRound.toString() : "total",
-          onChange: handleRoundChange,
-          className: "form-input",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "total", children: "Todas" }),
-            allRounds.map((round2) => /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: round2.toString(), children: [
-              "Rodada ",
-              round2
-            ] }, round2))
-          ]
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center space-x-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "month-select", className: "text-sm font-medium", children: "Mês:" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "select",
-        {
-          id: "month-select",
-          value: selectedMonth,
-          onChange: handleMonthChange,
-          className: "form-input",
-          disabled: selectedRound !== void 0,
-          children: months2.map((month) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: month.value, children: month.label }, month.value))
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center space-x-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "year-select", className: "text-sm font-medium", children: "Ano:" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "select",
-        {
-          id: "year-select",
-          value: selectedYear,
-          onChange: handleYearChange,
-          className: "form-input",
-          children: years.map((year) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: year.value, children: year.label }, year.value))
-        }
-      )
-    ] })
-  ] });
-};
-const ViewSelector = ({ viewMode, setViewMode, setUseDynamicTable }) => {
-  const handleModeChange = (mode) => {
-    setViewMode(mode);
-    setUseDynamicTable(mode === "dynamic");
-  };
+const ViewSelector = ({ viewMode, setViewMode }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex space-x-2 border border-border/60 rounded-md p-0.5 bg-background", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(
       Button$1,
@@ -30933,7 +30856,7 @@ const ViewSelector = ({ viewMode, setViewMode, setUseDynamicTable }) => {
         variant: "ghost",
         size: "sm",
         className: `${viewMode === "dynamic" ? "bg-muted/80 text-primary-foreground" : "hover:bg-muted/40"}`,
-        onClick: () => handleModeChange("dynamic"),
+        onClick: () => setViewMode("dynamic"),
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ChartLine, { className: "h-4 w-4 mr-2" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Tabela Detalhada" })
@@ -30946,7 +30869,7 @@ const ViewSelector = ({ viewMode, setViewMode, setUseDynamicTable }) => {
         variant: "ghost",
         size: "sm",
         className: `${viewMode === "table" ? "bg-muted/80 text-primary-foreground" : "hover:bg-muted/40"}`,
-        onClick: () => handleModeChange("table"),
+        onClick: () => setViewMode("table"),
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableProperties, { className: "h-4 w-4 mr-2" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Tabela Resumida" })
@@ -30964,401 +30887,19 @@ const StandingsHeader = ({
   allRounds,
   handleRoundChange,
   handleMonthChange,
-  handleYearChange,
-  useDynamicTable,
-  setUseDynamicTable
+  handleYearChange
 }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg shadow-subtle border border-border/40 p-6 mb-8 animate-slide-up", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row justify-between items-center gap-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-semibold", children: "Tabela de Classificação" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-4", children: [
-      !useDynamicTable && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        FilterSelector,
-        {
-          selectedRound,
-          selectedMonth,
-          selectedYear,
-          allRounds,
-          handleRoundChange,
-          handleMonthChange,
-          handleYearChange
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        ViewSelector,
-        {
-          viewMode,
-          setViewMode,
-          setUseDynamicTable
-        }
-      )
-    ] })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap items-center gap-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ViewSelector,
+      {
+        viewMode,
+        setViewMode
+      }
+    ) })
   ] }) });
 };
-const useKichuteQuery = () => {
-  const fetchKichutes = reactExports.useCallback(
-    async (selectedRodada, selectedJogador) => {
-      let query = supabase$1.from("kichutes").select(`
-          id,
-          palpite_casa,
-          palpite_visitante,
-          pontos,
-          jogador_id,
-          partida_id,
-          jogador:jogadores(id, nome),
-          partida:partidas(
-            id,
-            rodada,
-            placar_casa,
-            placar_visitante,
-            time_casa:times!time_casa_id(nome, sigla),
-            time_visitante:times!time_visitante_id(nome, sigla)
-          )
-        `);
-      if (selectedRodada !== "todas") {
-        query = query.eq("partida.rodada", parseInt(selectedRodada, 10));
-      }
-      if (selectedJogador !== "todos") {
-        query = query.eq("jogador_id", selectedJogador);
-      }
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-    []
-  );
-  return { fetchKichutes };
-};
-const PLAYERS = [
-  {
-    id: "1",
-    name: "Álvaro",
-    paid: true,
-    paidAmount: 40,
-    totalPoints: 28,
-    roundPoints: {
-      1: 11,
-      2: 17
-    }
-  },
-  {
-    id: "2",
-    name: "Bruno",
-    paid: false,
-    paidAmount: 0,
-    totalPoints: 22,
-    roundPoints: {
-      1: 9,
-      2: 13
-    }
-  },
-  {
-    id: "3",
-    name: "Cortez",
-    paid: true,
-    paidAmount: 90,
-    totalPoints: 32,
-    roundPoints: {
-      1: 15,
-      2: 17
-    }
-  },
-  {
-    id: "4",
-    name: "Fugivara",
-    paid: false,
-    paidAmount: 0,
-    totalPoints: 20,
-    roundPoints: {
-      1: 11,
-      2: 9
-    }
-  },
-  {
-    id: "5",
-    name: "Pezão",
-    paid: true,
-    paidAmount: 60,
-    totalPoints: 26,
-    roundPoints: {
-      1: 12,
-      2: 14
-    }
-  },
-  {
-    id: "6",
-    name: "Uemura",
-    paid: true,
-    paidAmount: 30,
-    totalPoints: 24,
-    roundPoints: {
-      1: 13,
-      2: 11
-    }
-  },
-  {
-    id: "7",
-    name: "Ricardo",
-    paid: true,
-    paidAmount: 70,
-    totalPoints: 21,
-    roundPoints: {
-      1: 10,
-      2: 11
-    }
-  }
-];
-const PRIZES = [
-  {
-    id: "1",
-    month: "Janeiro 2023",
-    player: PLAYERS[2],
-    // Cortez
-    amount: 150,
-    paid: true
-  },
-  {
-    id: "2",
-    month: "Fevereiro 2023",
-    player: PLAYERS[0],
-    // Álvaro
-    amount: 150,
-    paid: true
-  },
-  {
-    id: "3",
-    month: "Março 2023",
-    player: PLAYERS[5],
-    // Uemura
-    amount: 150,
-    paid: false
-  }
-];
-const SCORING_SYSTEM = {
-  exactScore: 7,
-  correctDifferenceOrDraw: 4,
-  correctWinner: 2
-};
-const calculatePoints = (guess, match2, scoringSystem = SCORING_SYSTEM) => {
-  if (match2.homeScore === null || match2.awayScore === null || match2.homeScore === void 0 || match2.awayScore === void 0) {
-    return 0;
-  }
-  if (guess.homeScore === match2.homeScore && guess.awayScore === match2.awayScore) {
-    return scoringSystem.exactScore;
-  }
-  const guessHomeWins = guess.homeScore > guess.awayScore;
-  const guessAwayWins = guess.homeScore < guess.awayScore;
-  const guessDraw = guess.homeScore === guess.awayScore;
-  const matchHomeWins = match2.homeScore > match2.awayScore;
-  const matchAwayWins = match2.homeScore < match2.awayScore;
-  const matchDraw = match2.homeScore === match2.awayScore;
-  if (guessHomeWins && matchHomeWins && guess.homeScore - guess.awayScore === match2.homeScore - match2.awayScore || guessAwayWins && matchAwayWins && guess.awayScore - guess.homeScore === match2.awayScore - match2.homeScore || guessDraw && matchDraw) {
-    return scoringSystem.correctDifferenceOrDraw;
-  }
-  if (guessHomeWins && matchHomeWins || guessAwayWins && matchAwayWins || guessDraw && matchDraw) {
-    return scoringSystem.correctWinner;
-  }
-  return 0;
-};
-const getScoringDescription = (points, scoringSystem = SCORING_SYSTEM) => {
-  switch (points) {
-    case scoringSystem.exactScore:
-      return "Placar exato! 🎯";
-    case scoringSystem.correctDifferenceOrDraw:
-      return "Acertou a diferença/empate! 👍";
-    case scoringSystem.correctWinner:
-      return "Acertou o vencedor! 👌";
-    default:
-      return "Sem pontos";
-  }
-};
-const formatKichuteData = (data) => {
-  return (data || []).map((item) => {
-    var _a3, _b3, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
-    const palpiteCasa = item.palpite_casa || 0;
-    const palpiteVisitante = item.palpite_visitante || 0;
-    const placarCasa = (_a3 = item.partida) == null ? void 0 : _a3.placar_casa;
-    const placarVisitante = (_b3 = item.partida) == null ? void 0 : _b3.placar_visitante;
-    let pontos = 0;
-    if (placarCasa !== null && placarVisitante !== null) {
-      pontos = calculatePoints(
-        { homeScore: palpiteCasa, awayScore: palpiteVisitante },
-        { homeScore: placarCasa, awayScore: placarVisitante }
-      );
-    } else if (item.pontos !== null && item.pontos !== void 0) {
-      pontos = Number(item.pontos);
-    }
-    return {
-      id: item.id,
-      rodada: ((_c2 = item.partida) == null ? void 0 : _c2.rodada) ?? 0,
-      partida: {
-        id: item.partida_id,
-        time_casa: {
-          nome: ((_e = (_d = item.partida) == null ? void 0 : _d.time_casa) == null ? void 0 : _e.nome) || "N/A",
-          sigla: ((_g = (_f = item.partida) == null ? void 0 : _f.time_casa) == null ? void 0 : _g.sigla) || "N/A"
-        },
-        time_visitante: {
-          nome: ((_i = (_h = item.partida) == null ? void 0 : _h.time_visitante) == null ? void 0 : _i.nome) || "N/A",
-          sigla: ((_k = (_j = item.partida) == null ? void 0 : _j.time_visitante) == null ? void 0 : _k.sigla) || "N/A"
-        },
-        placar_casa: (_l = item.partida) == null ? void 0 : _l.placar_casa,
-        placar_visitante: (_m = item.partida) == null ? void 0 : _m.placar_visitante
-      },
-      jogador: {
-        id: item.jogador_id,
-        nome: ((_n = item.jogador) == null ? void 0 : _n.nome) || "N/A"
-      },
-      palpite_casa: palpiteCasa,
-      palpite_visitante: palpiteVisitante,
-      pontos
-    };
-  });
-};
-const sortKichutes = (kichutes) => {
-  return [...kichutes].sort((a2, b2) => {
-    if (a2.rodada !== b2.rodada) {
-      return a2.rodada - b2.rodada;
-    }
-    return b2.pontos - a2.pontos;
-  });
-};
-const useKichuteData = (selectedRodada, selectedJogador) => {
-  const [kichutes, setKichutes] = reactExports.useState([]);
-  const [isLoading, setIsLoading] = reactExports.useState(true);
-  const [error, setError] = reactExports.useState(null);
-  const { fetchKichutes } = useKichuteQuery();
-  reactExports.useEffect(() => {
-    const loadKichutes = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const data = await fetchKichutes(selectedRodada, selectedJogador);
-        const formattedData = formatKichuteData(data);
-        const sortedData = sortKichutes(formattedData);
-        setKichutes(sortedData);
-      } catch (err2) {
-        console.error("Erro ao buscar kichutes:", err2);
-        setError("Não foi possível carregar os kichutes");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadKichutes();
-  }, [selectedRodada, selectedJogador, fetchKichutes]);
-  return { kichutes, isLoading, error };
-};
-const usePontuacaoPorJogador = (rodada, jogador) => {
-  const { kichutes, isLoading, error } = useKichuteData(rodada, jogador);
-  const jogadores = Object.entries(
-    kichutes.reduce((acc, k2) => {
-      const nome = k2.jogador.nome;
-      acc[nome] = (acc[nome] || 0) + k2.pontos;
-      return acc;
-    }, {})
-  ).map(([nome, total]) => ({ nome, total })).sort((a2, b2) => b2.total - a2.total);
-  return {
-    jogadores,
-    isLoading,
-    error
-  };
-};
-const Table$1 = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative w-full overflow-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-  "table",
-  {
-    ref,
-    className: cn("w-full caption-bottom text-sm", className),
-    ...props
-  }
-) }));
-Table$1.displayName = "Table";
-const TableHeader = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { ref, className: cn("[&_tr]:border-b", className), ...props }));
-TableHeader.displayName = "TableHeader";
-const TableBody = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  "tbody",
-  {
-    ref,
-    className: cn("[&_tr:last-child]:border-0", className),
-    ...props
-  }
-));
-TableBody.displayName = "TableBody";
-const TableFooter = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  "tfoot",
-  {
-    ref,
-    className: cn(
-      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
-      className
-    ),
-    ...props
-  }
-));
-TableFooter.displayName = "TableFooter";
-const TableRow = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  "tr",
-  {
-    ref,
-    className: cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-      className
-    ),
-    ...props
-  }
-));
-TableRow.displayName = "TableRow";
-const TableHead = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  "th",
-  {
-    ref,
-    className: cn(
-      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
-      className
-    ),
-    ...props
-  }
-));
-TableHead.displayName = "TableHead";
-const TableCell = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  "td",
-  {
-    ref,
-    className: cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className),
-    ...props
-  }
-));
-TableCell.displayName = "TableCell";
-const TableCaption = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  "caption",
-  {
-    ref,
-    className: cn("mt-4 text-sm text-muted-foreground", className),
-    ...props
-  }
-));
-TableCaption.displayName = "TableCaption";
-function StandingsTable({
-  selectedRodada,
-  selectedJogador
-}) {
-  const { jogadores, isLoading, error } = usePontuacaoPorJogador(
-    selectedRodada,
-    selectedJogador
-  );
-  if (isLoading) return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Carregando classificação..." });
-  if (error) return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Erro ao carregar a classificação" });
-  const medalhas = ["🥇", "🥈", "🥉"];
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-4 text-center", children: "#" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: "Jogador" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: "Total" })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: jogadores.map((item, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center font-bold", children: medalhas[index2] || "⭐" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: item.nome }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center font-bold", children: item.total })
-    ] }, item.nome)) })
-  ] }) });
-}
 const supabaseUrl = "https://nabcktytlytgrdwhdanx.supabase.co";
 const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hYmNrdHl0bHl0Z3Jkd2hkYW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1NjU2NjgsImV4cCI6MjA2MDE0MTY2OH0.Pp7I0dVN0-Tp1bXbjwuXUvF78gH-tXey_a9TNO1Au5E";
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -32744,8 +32285,24 @@ const DynamicTableFilters = ({
   selectedAno,
   onRodadaChange,
   onMesChange,
-  onAnoChange
+  onAnoChange,
+  viewMode
 }) => {
+  const todasRodadas = Array.from({ length: 38 }, (_2, i2) => i2 + 1);
+  const meses = [
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" }
+  ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "rodada-select", className: "text-sm font-medium text-gray-700 dark:text-gray-300", children: "Rodada:" }),
@@ -32753,23 +32310,44 @@ const DynamicTableFilters = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "rodada-select", className: "w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Selecionar rodada" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "todas", children: "Todas as rodadas" }),
-          rodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: rodada.toString(), children: [
-            "Rodada ",
-            rodada
-          ] }, `rodada-${rodada}`))
+          todasRodadas.map((rodada) => {
+            const temDados = rodadas.includes(rodada);
+            return /* @__PURE__ */ jsxRuntimeExports.jsx(
+              SelectItem,
+              {
+                value: rodada.toString(),
+                className: temDados ? "font-medium" : "opacity-70",
+                children: temDados ? `Rodada ${rodada} ✓` : `Rodada ${rodada}`
+              },
+              `rodada-${rodada}`
+            );
+          })
         ] })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "mes-select", className: "text-sm font-medium text-gray-700 dark:text-gray-300", children: "Mês:" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: selectedMes, onValueChange: onMesChange, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "mes-select", className: "w-[180px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Selecionar mês" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "todos", children: "Todos os meses" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "4-2025", children: "Abril de 2025" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "5-2025", children: "Maio de 2025" })
-        ] })
-      ] })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
+        {
+          value: selectedMes,
+          onValueChange: onMesChange,
+          disabled: selectedRodada !== "todas" && selectedRodada !== "",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(SelectTrigger, { id: "mes-select", className: "w-[180px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SelectValue, { placeholder: "Selecionar mês" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectContent, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "todos", children: "Todos os meses" }),
+              meses.map((mes) => /* @__PURE__ */ jsxRuntimeExports.jsxs(SelectItem, { value: `${mes.value}-${selectedAno}`, children: [
+                mes.label,
+                " de ",
+                selectedAno
+              ] }, `mes-${mes.value}`)),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "01-07-2025", children: "1º Turno (Jan-Jul)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(SelectItem, { value: "08-12-2025", children: "2º Turno (Ago-Dez)" })
+            ] })
+          ]
+        }
+      )
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "ano-select", className: "text-sm font-medium text-gray-700 dark:text-gray-300", children: "Ano:" }),
@@ -32785,13 +32363,88 @@ const TableLoading = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { class
   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2", children: "Carregando dados..." })
 ] });
 const TableError = ({ message: message2 }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center text-red-500", children: message2 });
+const Table$1 = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative w-full overflow-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+  "table",
+  {
+    ref,
+    className: cn("w-full caption-bottom text-sm", className),
+    ...props
+  }
+) }));
+Table$1.displayName = "Table";
+const TableHeader = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { ref, className: cn("[&_tr]:border-b", className), ...props }));
+TableHeader.displayName = "TableHeader";
+const TableBody = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+  "tbody",
+  {
+    ref,
+    className: cn("[&_tr:last-child]:border-0", className),
+    ...props
+  }
+));
+TableBody.displayName = "TableBody";
+const TableFooter = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+  "tfoot",
+  {
+    ref,
+    className: cn(
+      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+      className
+    ),
+    ...props
+  }
+));
+TableFooter.displayName = "TableFooter";
+const TableRow = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+  "tr",
+  {
+    ref,
+    className: cn(
+      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      className
+    ),
+    ...props
+  }
+));
+TableRow.displayName = "TableRow";
+const TableHead = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+  "th",
+  {
+    ref,
+    className: cn(
+      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      className
+    ),
+    ...props
+  }
+));
+TableHead.displayName = "TableHead";
+const TableCell = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+  "td",
+  {
+    ref,
+    className: cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className),
+    ...props
+  }
+));
+TableCell.displayName = "TableCell";
+const TableCaption = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+  "caption",
+  {
+    ref,
+    className: cn("mt-4 text-sm text-muted-foreground", className),
+    ...props
+  }
+));
+TableCaption.displayName = "TableCaption";
 const SortIcon = ({ field, currentSortField, sortDirection }) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex ml-1 text-muted-foreground", children: currentSortField === field ? sortDirection === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronUp, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4 opacity-30" }) });
 const DynamicTableHeader = ({
   handleSort,
   sortField,
   sortDirection,
   todasRodadas,
-  selectedRodada
+  selectedRodada,
+  viewMode
 }) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted font-poppins", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-10 text-left font-medium text-muted-foreground", children: "#" }),
   /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -32816,7 +32469,7 @@ const DynamicTableHeader = ({
       ]
     }
   ),
-  todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  viewMode === "dynamic" && todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
     TableHead,
     {
       className: `text-center font-medium text-muted-foreground ${selectedRodada === rodada.substring(1) ? "cursor-pointer hover:bg-muted/80" : ""}`,
@@ -32829,6 +32482,149 @@ const DynamicTableHeader = ({
     rodada
   ))
 ] }) });
+const PLAYERS = [
+  {
+    id: "1",
+    name: "Álvaro",
+    paid: true,
+    paidAmount: 40,
+    totalPoints: 28,
+    roundPoints: {
+      1: 11,
+      2: 17
+    }
+  },
+  {
+    id: "2",
+    name: "Bruno",
+    paid: false,
+    paidAmount: 0,
+    totalPoints: 22,
+    roundPoints: {
+      1: 9,
+      2: 13
+    }
+  },
+  {
+    id: "3",
+    name: "Cortez",
+    paid: true,
+    paidAmount: 90,
+    totalPoints: 32,
+    roundPoints: {
+      1: 15,
+      2: 17
+    }
+  },
+  {
+    id: "4",
+    name: "Fugivara",
+    paid: false,
+    paidAmount: 0,
+    totalPoints: 20,
+    roundPoints: {
+      1: 11,
+      2: 9
+    }
+  },
+  {
+    id: "5",
+    name: "Pezão",
+    paid: true,
+    paidAmount: 60,
+    totalPoints: 26,
+    roundPoints: {
+      1: 12,
+      2: 14
+    }
+  },
+  {
+    id: "6",
+    name: "Uemura",
+    paid: true,
+    paidAmount: 30,
+    totalPoints: 24,
+    roundPoints: {
+      1: 13,
+      2: 11
+    }
+  },
+  {
+    id: "7",
+    name: "Ricardo",
+    paid: true,
+    paidAmount: 70,
+    totalPoints: 21,
+    roundPoints: {
+      1: 10,
+      2: 11
+    }
+  }
+];
+const PRIZES = [
+  {
+    id: "1",
+    month: "Janeiro 2023",
+    player: PLAYERS[2],
+    // Cortez
+    amount: 150,
+    paid: true
+  },
+  {
+    id: "2",
+    month: "Fevereiro 2023",
+    player: PLAYERS[0],
+    // Álvaro
+    amount: 150,
+    paid: true
+  },
+  {
+    id: "3",
+    month: "Março 2023",
+    player: PLAYERS[5],
+    // Uemura
+    amount: 150,
+    paid: false
+  }
+];
+const SCORING_SYSTEM = {
+  exactScore: 7,
+  correctDifferenceOrDraw: 4,
+  correctWinner: 2
+};
+const calculatePoints = (guess, match2, scoringSystem = SCORING_SYSTEM) => {
+  if (match2.homeScore === null || match2.awayScore === null || match2.homeScore === void 0 || match2.awayScore === void 0) {
+    return 0;
+  }
+  if (guess.homeScore === match2.homeScore && guess.awayScore === match2.awayScore) {
+    return scoringSystem.exactScore;
+  }
+  const guessHomeWins = guess.homeScore > guess.awayScore;
+  const guessAwayWins = guess.homeScore < guess.awayScore;
+  const guessDraw = guess.homeScore === guess.awayScore;
+  const matchHomeWins = match2.homeScore > match2.awayScore;
+  const matchAwayWins = match2.homeScore < match2.awayScore;
+  const matchDraw = match2.homeScore === match2.awayScore;
+  if (guessHomeWins && matchHomeWins && guess.homeScore - guess.awayScore === match2.homeScore - match2.awayScore || guessAwayWins && matchAwayWins && guess.awayScore - guess.homeScore === match2.awayScore - match2.homeScore || guessDraw && matchDraw) {
+    return scoringSystem.correctDifferenceOrDraw;
+  }
+  if (guessHomeWins && matchHomeWins || guessAwayWins && matchAwayWins || guessDraw && matchDraw) {
+    return scoringSystem.correctWinner;
+  }
+  return 0;
+};
+const getScoringDescription = (points, scoringSystem = SCORING_SYSTEM) => {
+  switch (points) {
+    case scoringSystem.exactScore:
+      return "Placar exato! 🎯";
+    case scoringSystem.correctDifferenceOrDraw:
+      return "Acertou a diferença/empate! 👍";
+    case scoringSystem.correctWinner:
+      return "Acertou o vencedor! 👌";
+    default:
+      return "Sem pontos";
+  }
+};
 const KichutePoints = ({ points, viewType, position: position2 = 0 }) => {
   const getPontosIcon = (points2, viewType2, position22) => {
     if (viewType2 === "annual") {
@@ -32863,7 +32659,7 @@ const KichutePoints = ({ points, viewType, position: position2 = 0 }) => {
     ] })
   ] });
 };
-const DynamicTableRow = ({ jogador, index: index2, todasRodadas }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: index2 % 2 === 0 ? "bg-white dark:bg-gray-950/50" : "bg-gray-50 dark:bg-gray-900/30", children: [
+const DynamicTableRow = ({ jogador, index: index2, todasRodadas, viewMode }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: index2 % 2 === 0 ? "bg-white dark:bg-gray-950/50" : "bg-gray-50 dark:bg-gray-900/30", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: index2 + 1 }),
   /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: jogador.nome }),
   /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -32874,7 +32670,7 @@ const DynamicTableRow = ({ jogador, index: index2, todasRodadas }) => /* @__PURE
       position: index2 <= 2 ? index2 : -1
     }
   ) }),
-  todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+  viewMode === "dynamic" && todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
     KichutePoints,
     {
       points: jogador.rodadas[rodada] || 0,
@@ -32887,14 +32683,15 @@ const DynamicTableFooter = ({
   jogadores,
   todasRodadas,
   totaisPorRodada,
-  totalGeral
+  totalGeral,
+  viewMode
 }) => {
   if (jogadores.length === 0) return null;
   return /* @__PURE__ */ jsxRuntimeExports.jsx(TableFooter, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "border-t-2 border-border bg-muted/30 font-bold", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: "-" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: "Total" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: totalGeral }),
-    todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: totaisPorRodada[rodada] || 0 }, `footer-${rodada}`))
+    viewMode === "dynamic" && todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: totaisPorRodada[rodada] || 0 }, `footer-${rodada}`))
   ] }) });
 };
 const TableEmptyState = ({ colSpan }) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan, className: "text-center py-8 text-gray-500", children: "Nenhum resultado encontrado" }) });
@@ -32906,7 +32703,8 @@ const DynamicTableContent = ({
   handleSort,
   sortField,
   sortDirection,
-  selectedRodada
+  selectedRodada,
+  viewMode
 }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
   /* @__PURE__ */ jsxRuntimeExports.jsx(
     DynamicTableHeader,
@@ -32915,15 +32713,17 @@ const DynamicTableContent = ({
       sortField,
       sortDirection,
       todasRodadas,
-      selectedRodada
+      selectedRodada,
+      viewMode
     }
   ),
-  /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedPlayers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableEmptyState, { colSpan: 3 + todasRodadas.length }) : sortedPlayers.map((jogador, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+  /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedPlayers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableEmptyState, { colSpan: viewMode === "table" ? 3 : 3 + todasRodadas.length }) : sortedPlayers.map((jogador, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
     DynamicTableRow,
     {
       jogador,
       index: index2,
-      todasRodadas
+      todasRodadas,
+      viewMode
     },
     jogador.id
   )) }),
@@ -32933,14 +32733,20 @@ const DynamicTableContent = ({
       jogadores: sortedPlayers,
       todasRodadas,
       totaisPorRodada,
-      totalGeral
+      totalGeral,
+      viewMode
     }
   )
 ] }) });
-const DynamicTable = () => {
-  const [selectedRodada, setSelectedRodada] = reactExports.useState("todas");
+const DynamicTable = ({ viewMode, selectedRodada: initialRodada }) => {
+  const [selectedRodada, setSelectedRodada] = reactExports.useState(initialRodada);
   const [selectedMes, setSelectedMes] = reactExports.useState("todos");
   const [selectedAno, setSelectedAno] = reactExports.useState("2025");
+  reactExports.useEffect(() => {
+    if (initialRodada !== selectedRodada) {
+      setSelectedRodada(initialRodada);
+    }
+  }, [initialRodada]);
   const { jogadores, rodadas, isLoading, error } = useDynamicTableDataReal(
     selectedRodada,
     selectedMes,
@@ -32958,6 +32764,18 @@ const DynamicTable = () => {
     selectedRodada
   );
   const { totaisPorRodada, totalGeral } = useTotalsCalculation(jogadores, todasRodadas);
+  const handleRodadaChange = (value) => {
+    setSelectedRodada(value);
+    if (viewMode === "table") {
+      setSelectedMes("todos");
+    }
+  };
+  const handleMesChange = (value) => {
+    setSelectedMes(value);
+    if (value !== "todos") {
+      setSelectedRodada("todas");
+    }
+  };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       DynamicTableFilters,
@@ -32966,37 +32784,38 @@ const DynamicTable = () => {
         selectedRodada,
         selectedMes,
         selectedAno,
-        onRodadaChange: setSelectedRodada,
-        onMesChange: setSelectedMes,
-        onAnoChange: setSelectedAno
+        onRodadaChange: handleRodadaChange,
+        onMesChange: handleMesChange,
+        onAnoChange: setSelectedAno,
+        viewMode
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableLoading, {}) : error ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableError, { message: error }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
       DynamicTableContent,
       {
         sortedPlayers,
-        todasRodadas,
+        todasRodadas: viewMode === "table" ? [] : todasRodadas,
         totaisPorRodada,
         totalGeral,
         handleSort,
         sortField,
         sortDirection,
-        selectedRodada
+        selectedRodada,
+        viewMode
       }
     ) })
   ] });
 };
 const StandingsContent = ({
   viewMode,
-  sortedPlayers,
   selectedRound,
   isLoaded
 }) => {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`, children: viewMode === "dynamic" ? /* @__PURE__ */ jsxRuntimeExports.jsx(DynamicTable, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(
-    StandingsTable,
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    DynamicTable,
     {
-      selectedRodada: selectedRound ? selectedRound.toString() : "todas",
-      selectedJogador: "todos"
+      viewMode,
+      selectedRodada: selectedRound ? selectedRound.toString() : "todas"
     }
   ) });
 };
@@ -33144,7 +32963,6 @@ const Standings = () => {
   const [selectedMonth, setSelectedMonth] = reactExports.useState("all");
   const [selectedYear, setSelectedYear] = reactExports.useState("2025");
   const [isLoaded, setIsLoaded] = reactExports.useState(false);
-  const [useDynamicTable, setUseDynamicTable] = reactExports.useState(true);
   const [availableRounds, setAvailableRounds] = reactExports.useState([]);
   const { toast: toast2 } = useToast();
   const { currentRound, isLoading: isLoadingCurrentRound } = useCurrentRound();
@@ -33237,16 +33055,13 @@ const Standings = () => {
         allRounds: availableRounds,
         handleRoundChange,
         handleMonthChange,
-        handleYearChange,
-        useDynamicTable,
-        setUseDynamicTable
+        handleYearChange
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
       StandingsContent,
       {
         viewMode,
-        sortedPlayers: [],
         selectedRound,
         isLoaded
       }
@@ -34825,6 +34640,115 @@ const GuessingFormNew = ({ onSubmitSuccess, initialRound = "1" }) => {
       }
     )
   ] }) });
+};
+const useKichuteQuery = () => {
+  const fetchKichutes = reactExports.useCallback(
+    async (selectedRodada, selectedJogador) => {
+      let query = supabase$1.from("kichutes").select(`
+          id,
+          palpite_casa,
+          palpite_visitante,
+          pontos,
+          jogador_id,
+          partida_id,
+          jogador:jogadores(id, nome),
+          partida:partidas(
+            id,
+            rodada,
+            placar_casa,
+            placar_visitante,
+            time_casa:times!time_casa_id(nome, sigla),
+            time_visitante:times!time_visitante_id(nome, sigla)
+          )
+        `);
+      if (selectedRodada !== "todas") {
+        query = query.eq("partida.rodada", parseInt(selectedRodada, 10));
+      }
+      if (selectedJogador !== "todos") {
+        query = query.eq("jogador_id", selectedJogador);
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+    []
+  );
+  return { fetchKichutes };
+};
+const formatKichuteData = (data) => {
+  return (data || []).map((item) => {
+    var _a3, _b3, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
+    const palpiteCasa = item.palpite_casa || 0;
+    const palpiteVisitante = item.palpite_visitante || 0;
+    const placarCasa = (_a3 = item.partida) == null ? void 0 : _a3.placar_casa;
+    const placarVisitante = (_b3 = item.partida) == null ? void 0 : _b3.placar_visitante;
+    let pontos = 0;
+    if (placarCasa !== null && placarVisitante !== null) {
+      pontos = calculatePoints(
+        { homeScore: palpiteCasa, awayScore: palpiteVisitante },
+        { homeScore: placarCasa, awayScore: placarVisitante }
+      );
+    } else if (item.pontos !== null && item.pontos !== void 0) {
+      pontos = Number(item.pontos);
+    }
+    return {
+      id: item.id,
+      rodada: ((_c2 = item.partida) == null ? void 0 : _c2.rodada) ?? 0,
+      partida: {
+        id: item.partida_id,
+        time_casa: {
+          nome: ((_e = (_d = item.partida) == null ? void 0 : _d.time_casa) == null ? void 0 : _e.nome) || "N/A",
+          sigla: ((_g = (_f = item.partida) == null ? void 0 : _f.time_casa) == null ? void 0 : _g.sigla) || "N/A"
+        },
+        time_visitante: {
+          nome: ((_i = (_h = item.partida) == null ? void 0 : _h.time_visitante) == null ? void 0 : _i.nome) || "N/A",
+          sigla: ((_k = (_j = item.partida) == null ? void 0 : _j.time_visitante) == null ? void 0 : _k.sigla) || "N/A"
+        },
+        placar_casa: (_l = item.partida) == null ? void 0 : _l.placar_casa,
+        placar_visitante: (_m = item.partida) == null ? void 0 : _m.placar_visitante
+      },
+      jogador: {
+        id: item.jogador_id,
+        nome: ((_n = item.jogador) == null ? void 0 : _n.nome) || "N/A"
+      },
+      palpite_casa: palpiteCasa,
+      palpite_visitante: palpiteVisitante,
+      pontos
+    };
+  });
+};
+const sortKichutes = (kichutes) => {
+  return [...kichutes].sort((a2, b2) => {
+    if (a2.rodada !== b2.rodada) {
+      return a2.rodada - b2.rodada;
+    }
+    return b2.pontos - a2.pontos;
+  });
+};
+const useKichuteData = (selectedRodada, selectedJogador) => {
+  const [kichutes, setKichutes] = reactExports.useState([]);
+  const [isLoading, setIsLoading] = reactExports.useState(true);
+  const [error, setError] = reactExports.useState(null);
+  const { fetchKichutes } = useKichuteQuery();
+  reactExports.useEffect(() => {
+    const loadKichutes = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await fetchKichutes(selectedRodada, selectedJogador);
+        const formattedData = formatKichuteData(data);
+        const sortedData = sortKichutes(formattedData);
+        setKichutes(sortedData);
+      } catch (err2) {
+        console.error("Erro ao buscar kichutes:", err2);
+        setError("Não foi possível carregar os kichutes");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadKichutes();
+  }, [selectedRodada, selectedJogador, fetchKichutes]);
+  return { kichutes, isLoading, error };
 };
 const KichuteTable = () => {
   const { kichutes, isLoading, error } = useKichuteData("1", "todos");
@@ -52333,7 +52257,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-8xAQC5tN.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-hpyVDD4x.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
