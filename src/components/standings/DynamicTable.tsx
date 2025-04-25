@@ -1,10 +1,13 @@
+
 import { useState } from "react";
-import { RotateCw, ChevronDown, ChevronUp } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
+import { RotateCw } from "lucide-react";
+import { Table, TableBody } from "@/components/ui/table";
 import { TableFilters } from "./TableFilters";
-import { useTableSort, SortField } from "@/hooks/standings/useTableSort";
 import { useDynamicTableDataReal } from "@/hooks/useDynamicTableDataReal";
-import { KichutePoints } from "@/components/kichutes/KichutePoints";
+import { useDynamicTableSort } from "@/hooks/standings/useDynamicTableSort";
+import { DynamicTableHeader } from "./table/DynamicTableHeader";
+import { DynamicTableRow } from "./table/DynamicTableRow";
+import { DynamicTableFooter } from "./table/DynamicTableFooter";
 
 const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = useState<string>("todas");
@@ -17,13 +20,19 @@ const DynamicTable = () => {
     selectedAno
   );
 
-  const { sortField, sortDirection, handleSort, sortPlayers } = useTableSort();
+  const { sortField, sortDirection, handleSort } = useDynamicTableSort();
 
-  const todasRodadas = rodadas;
+  const todasRodadas = Array.from(
+    new Set(jogadores.flatMap(jogador => Object.keys(jogador.rodadas)))
+  ).sort((a, b) => {
+    const numA = parseInt(a.substring(1));
+    const numB = parseInt(b.substring(1));
+    return numA - numB;
+  });
 
   const calcularTotalPorRodada = () => {
     const totais: Record<string, number> = {};
-    todasRodadas.forEach((rodada) => {
+    todasRodadas.forEach(rodada => {
       totais[rodada] = jogadores.reduce((sum, jogador) => {
         return sum + (jogador.rodadas[rodada] || 0);
       }, 0);
@@ -34,55 +43,36 @@ const DynamicTable = () => {
   const totaisPorRodada = calcularTotalPorRodada();
   const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
 
-  const SortIcon = ({ field }: { field: SortField }) => (
-    <span className="inline-flex ml-1 text-muted-foreground">
-      {sortField === field ? (
-        sortDirection === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-      ) : (
-        <ChevronDown className="h-4 w-4 opacity-30" />
-      )}
-    </span>
-  );
-
-  const jogadoresWithId = jogadores.map((jogador, index) => ({
-    ...jogador,
-    id: jogador.id || `player-${index}`
-  }));
-
-  const sortedPlayers = sortPlayers(jogadoresWithId, selectedRodada);
-
-  const months = [
-    { value: "01", label: "Janeiro" },
-    { value: "02", label: "Fevereiro" },
-    { value: "03", label: "Março" },
-    { value: "04", label: "Abril" },
-    { value: "05", label: "Maio" },
-    { value: "06", label: "Junho" },
-    { value: "07", label: "Julho" },
-    { value: "08", label: "Agosto" },
-    { value: "09", label: "Setembro" },
-    { value: "10", label: "Outubro" },
-    { value: "11", label: "Novembro" },
-    { value: "12", label: "Dezembro" },
-  ];
-
-  const getViewType = () => {
-    if (selectedRodada !== "todas") return "round";
-    if (selectedMes !== "todos") return "month";
-    return "annual";
-  };
+  const sortedPlayers = [...jogadores].sort((a, b) => {
+    if (sortField === "nome") {
+      return sortDirection === "asc" 
+        ? a.nome.localeCompare(b.nome) 
+        : b.nome.localeCompare(a.nome);
+    } 
+    if (sortField === "pontos_total") {
+      return sortDirection === "asc" 
+        ? a.pontos_total - b.pontos_total 
+        : b.pontos_total - a.pontos_total;
+    } 
+    if (sortField === "rodada" && selectedRodada !== "todas") {
+      const rodadaKey = `r${selectedRodada}`;
+      const pontosA = a.rodadas[rodadaKey] || 0;
+      const pontosB = b.rodadas[rodadaKey] || 0;
+      return sortDirection === "asc" ? pontosA - pontosB : pontosB - pontosA;
+    }
+    return 0;
+  });
 
   return (
     <div className="space-y-4">
       <TableFilters
-        rodadas={rodadas.map(r => parseInt(r.replace('r', '')))}
+        rodadas={rodadas}
         selectedRodada={selectedRodada}
         selectedMes={selectedMes}
         selectedAno={selectedAno}
         onRodadaChange={setSelectedRodada}
         onMesChange={setSelectedMes}
         onAnoChange={setSelectedAno}
-        months={months}
       />
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
@@ -92,75 +82,41 @@ const DynamicTable = () => {
             <span className="ml-2">Carregando dados...</span>
           </div>
         ) : error ? (
-          <div className="p-4 text-center text-red-500">
-            {error}
-          </div>
+          <div className="p-4 text-center text-red-500">{error}</div>
         ) : (
           <div className="max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle">
             <Table>
-              <TableHeader>
-                <TableRow className="bg-muted font-poppins">
-                  <TableHead className="w-10 text-left font-medium text-muted-foreground">#</TableHead>
-                  <TableHead 
-                    className="text-left font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
-                    onClick={() => handleSort("nome")}
-                  >
-                    Jogador <SortIcon field="nome" />
-                  </TableHead>
-                  <TableHead 
-                    className="text-center font-medium text-muted-foreground cursor-pointer hover:bg-muted/80"
-                    onClick={() => handleSort("pontos_total")}
-                  >
-                    Total <SortIcon field="pontos_total" />
-                  </TableHead>
-                  {todasRodadas.map((rodada) => (
-                    <TableHead 
-                      key={rodada} 
-                      className="text-center font-medium text-muted-foreground"
-                    >
-                      {rodada.toUpperCase()}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
+              <DynamicTableHeader
+                handleSort={handleSort}
+                sortField={sortField}
+                sortDirection={sortDirection}
+                todasRodadas={todasRodadas}
+                selectedRodada={selectedRodada}
+              />
               <TableBody>
-                {sortedPlayers.map((jogador, index) => (
-                  <TableRow key={jogador.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{jogador.nome}</TableCell>
-                    <TableCell className="text-center">
-                      <KichutePoints 
-                        points={jogador.pontos_total}
-                        viewType={getViewType()}
-                        position={index <= 2 ? index : -1}
-                      />
-                    </TableCell>
-                    {todasRodadas.map((rodada) => (
-                      <TableCell key={`${jogador.id}-${rodada}`} className="text-center">
-                        <KichutePoints 
-                          points={jogador.rodadas[rodada] ?? 0}
-                          viewType="round"
-                          position={index === 0 ? 0 : -1}
-                        />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
+                {sortedPlayers.length === 0 ? (
+                  <tr>
+                    <td colSpan={3 + todasRodadas.length} className="text-center py-8 text-gray-500">
+                      Nenhum resultado encontrado
+                    </td>
+                  </tr>
+                ) : (
+                  sortedPlayers.map((jogador, index) => (
+                    <DynamicTableRow
+                      key={jogador.id}
+                      jogador={jogador}
+                      index={index}
+                      todasRodadas={todasRodadas}
+                    />
+                  ))
+                )}
               </TableBody>
-              {jogadores.length > 0 && (
-                <TableFooter>
-                  <TableRow>
-                    <TableCell>-</TableCell>
-                    <TableCell>Total</TableCell>
-                    <TableCell className="text-center">{totalGeral}</TableCell>
-                    {todasRodadas.map((rodada) => (
-                      <TableCell key={`footer-${rodada}`} className="text-center">
-                        {totaisPorRodada[rodada] || 0}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableFooter>
-              )}
+              <DynamicTableFooter
+                jogadores={jogadores}
+                todasRodadas={todasRodadas}
+                totaisPorRodada={totaisPorRodada}
+                totalGeral={totalGeral}
+              />
             </Table>
           </div>
         )}
