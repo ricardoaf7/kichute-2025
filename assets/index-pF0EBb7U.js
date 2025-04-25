@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-C4NmKLMO.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-D3AlXl6H.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -36596,6 +36596,113 @@ const ReportFilters = ({
     ] }) })
   ] });
 };
+const RoundHeader = ({ roundNumber, participantPoints, participants }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted/30", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      TableCell,
+      {
+        colSpan: 2,
+        className: "font-bold py-1 print:py-0",
+        children: [
+          "Rodada ",
+          roundNumber
+        ]
+      }
+    ),
+    participants.map((participant) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      TableCell,
+      {
+        className: "py-1 print:py-0 text-center font-bold",
+        children: [
+          participantPoints[participant.id] || 0,
+          " pts"
+        ]
+      },
+      `total-${roundNumber}-${participant.id}`
+    ))
+  ] });
+};
+const MatchScore = ({ homeScore, awayScore }) => {
+  if (homeScore === void 0 || awayScore === void 0) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground italic", children: "Não jogado" });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold", children: [
+    homeScore,
+    " x ",
+    awayScore
+  ] });
+};
+const PointsDisplay = ({ points }) => {
+  const getPositionIcon = (points2) => {
+    if (points2 === 7) return /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500 inline mr-1" });
+    if (points2 === 4) return /* @__PURE__ */ jsxRuntimeExports.jsx(Medal, { className: "h-4 w-4 text-blue-500 inline mr-1" });
+    if (points2 === 2) return /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "h-4 w-4 text-green-500 inline mr-1" });
+    return null;
+  };
+  const getPointsColorClass = (points2) => {
+    if (points2 === 7) return "text-green-600 font-bold";
+    if (points2 === 4) return "text-blue-600 font-bold";
+    if (points2 === 2) return "text-yellow-600 font-bold";
+    return "text-red-500";
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: cn(getPointsColorClass(points)), children: [
+    getPositionIcon(points),
+    points,
+    "pts"
+  ] });
+};
+const GuessScore = ({ homeGuess, awayGuess, points }) => {
+  if (homeGuess === void 0 || awayGuess === void 0) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground print:text-gray-400", children: "-" });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+      homeGuess,
+      " x ",
+      awayGuess
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(PointsDisplay, { points })
+  ] });
+};
+const MatchRow = ({ match: match2, participants, kichutes }) => {
+  const getKichute = (participantId, matchId) => {
+    return kichutes.find(
+      (k2) => k2.jogador_id === participantId && k2.partida_id === matchId
+    );
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "border-t border-border/30", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "p-2 print:p-1 whitespace-nowrap", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: match2.time_casa.nome }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "x" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: match2.time_visitante.nome })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "p-2 print:p-1 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      MatchScore,
+      {
+        homeScore: match2.placar_casa,
+        awayScore: match2.placar_visitante
+      }
+    ) }),
+    participants.map((participant) => {
+      const kichute = getKichute(participant.id, match2.id);
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+        TableCell,
+        {
+          className: "p-2 print:p-1 text-center",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            GuessScore,
+            {
+              homeGuess: kichute == null ? void 0 : kichute.palpite_casa,
+              awayGuess: kichute == null ? void 0 : kichute.palpite_visitante,
+              points: (kichute == null ? void 0 : kichute.pontos) || 0
+            }
+          )
+        },
+        `${match2.id}-${participant.id}`
+      );
+    })
+  ] });
+};
 const MatchesReportTable = ({
   matches,
   participants,
@@ -36610,14 +36717,13 @@ const MatchesReportTable = ({
   };
   const fontClass = fontSizeClasses[fontSize2] || "text-sm";
   const matchesByRound = reactExports.useMemo(() => {
-    const grouped = matches.reduce((acc, match2) => {
+    return matches.reduce((acc, match2) => {
       if (!acc[match2.rodada]) {
         acc[match2.rodada] = [];
       }
       acc[match2.rodada].push(match2);
       return acc;
     }, {});
-    return grouped;
   }, [matches]);
   const sortedRounds = reactExports.useMemo(() => {
     return Object.keys(matchesByRound).map(Number).sort((a2, b2) => a2 - b2);
@@ -36638,23 +36744,6 @@ const MatchesReportTable = ({
     });
     return totals;
   }, [kichutes, matches]);
-  const getKichute = (participantId, matchId) => {
-    return kichutes.find(
-      (k2) => k2.jogador_id === participantId && k2.partida_id === matchId
-    );
-  };
-  const getPontosIcon = (pontos) => {
-    if (pontos === SCORING_SYSTEM.exactScore) return /* @__PURE__ */ jsxRuntimeExports.jsx(Trophy, { className: "h-4 w-4 text-yellow-500 inline mr-1" });
-    if (pontos === SCORING_SYSTEM.correctDifferenceOrDraw) return /* @__PURE__ */ jsxRuntimeExports.jsx(Medal, { className: "h-4 w-4 text-blue-500 inline mr-1" });
-    if (pontos === SCORING_SYSTEM.correctWinner) return /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "h-4 w-4 text-green-500 inline mr-1" });
-    return null;
-  };
-  const getPontosColorClass = (pontos) => {
-    if (pontos === SCORING_SYSTEM.exactScore) return "text-green-600 font-bold";
-    if (pontos === SCORING_SYSTEM.correctDifferenceOrDraw) return "text-blue-600 font-bold";
-    if (pontos === SCORING_SYSTEM.correctWinner) return "text-yellow-600 font-bold";
-    return "text-red-500";
-  };
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: cn("overflow-x-auto", fontClass), children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { className: "min-w-full", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted/50", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-1/6 p-2 print:p-1", children: "Partida" }),
@@ -36669,67 +36758,23 @@ const MatchesReportTable = ({
       ))
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedRounds.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsxs(React.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "bg-muted/30", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          TableCell,
-          {
-            colSpan: 2,
-            className: "font-bold py-1 print:py-0",
-            children: [
-              "Rodada ",
-              rodada
-            ]
-          }
-        ),
-        participants.map((participant) => {
-          var _a3;
-          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            TableCell,
-            {
-              className: "py-1 print:py-0 text-center font-bold",
-              children: [
-                ((_a3 = totalPointsByRoundAndParticipant[rodada]) == null ? void 0 : _a3[participant.id]) || 0,
-                " pts"
-              ]
-            },
-            `total-${rodada}-${participant.id}`
-          );
-        })
-      ] }),
-      matchesByRound[rodada].map((match2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { className: "border-t border-border/30", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "p-2 print:p-1 whitespace-nowrap", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: match2.time_casa.nome }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "x" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: match2.time_visitante.nome })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "p-2 print:p-1 text-center", children: match2.placar_casa !== void 0 && match2.placar_visitante !== void 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold", children: [
-          match2.placar_casa,
-          " x ",
-          match2.placar_visitante
-        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground italic", children: "Não jogado" }) }),
-        participants.map((participant) => {
-          const kichute = getKichute(participant.id, match2.id);
-          return /* @__PURE__ */ jsxRuntimeExports.jsx(
-            TableCell,
-            {
-              className: "p-2 print:p-1 text-center",
-              children: kichute ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-                  kichute.palpite_casa,
-                  " x ",
-                  kichute.palpite_visitante
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: cn("font-medium", getPontosColorClass(kichute.pontos)), children: [
-                  getPontosIcon(kichute.pontos),
-                  kichute.pontos,
-                  "pts"
-                ] })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground print:text-gray-400", children: "-" })
-            },
-            `${match2.id}-${participant.id}`
-          );
-        })
-      ] }, match2.id))
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        RoundHeader,
+        {
+          roundNumber: rodada,
+          participantPoints: totalPointsByRoundAndParticipant[rodada] || {},
+          participants
+        }
+      ),
+      matchesByRound[rodada].map((match2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        MatchRow,
+        {
+          match: match2,
+          participants,
+          kichutes
+        },
+        match2.id
+      ))
     ] }, `rodada-${rodada}`)) })
   ] }) });
 };
@@ -52161,7 +52206,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-B_gIy2in.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-BMeI91dd.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
