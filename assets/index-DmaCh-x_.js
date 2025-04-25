@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-B5JyUWKg.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-BH4m8Hv8.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -30327,15 +30327,15 @@ class SupabaseClient {
    * @param options.global.fetch A custom fetch implementation.
    * @param options.global.headers Any additional headers to send with each network request.
    */
-  constructor(supabaseUrl, supabaseKey, options) {
+  constructor(supabaseUrl2, supabaseKey, options) {
     var _a3, _b3, _c2;
-    this.supabaseUrl = supabaseUrl;
+    this.supabaseUrl = supabaseUrl2;
     this.supabaseKey = supabaseKey;
-    if (!supabaseUrl)
+    if (!supabaseUrl2)
       throw new Error("supabaseUrl is required.");
     if (!supabaseKey)
       throw new Error("supabaseKey is required.");
-    const _supabaseUrl = stripTrailingSlash(supabaseUrl);
+    const _supabaseUrl = stripTrailingSlash(supabaseUrl2);
     this.realtimeUrl = `${_supabaseUrl}/realtime/v1`.replace(/^http/i, "ws");
     this.authUrl = `${_supabaseUrl}/auth/v1`;
     this.storageUrl = `${_supabaseUrl}/storage/v1`;
@@ -30515,12 +30515,12 @@ class SupabaseClient {
     }
   }
 }
-const createClient = (supabaseUrl, supabaseKey, options) => {
-  return new SupabaseClient(supabaseUrl, supabaseKey, options);
+const createClient = (supabaseUrl2, supabaseKey, options) => {
+  return new SupabaseClient(supabaseUrl2, supabaseKey, options);
 };
 const SUPABASE_URL = "https://nabcktytlytgrdwhdanx.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hYmNrdHl0bHl0Z3Jkd2hkYW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1NjU2NjgsImV4cCI6MjA2MDE0MTY2OH0.Pp7I0dVN0-Tp1bXbjwuXUvF78gH-tXey_a9TNO1Au5E";
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const supabase$1 = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1e6;
 let count = 0;
@@ -30662,7 +30662,7 @@ function RegistrationForm() {
   const handleSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      const { data: existingUser } = await supabase.from("jogadores").select("nome").eq("nome", data.username).single();
+      const { data: existingUser } = await supabase$1.from("jogadores").select("nome").eq("nome", data.username).single();
       if (existingUser) {
         form.setError("username", {
           type: "manual",
@@ -30671,17 +30671,17 @@ function RegistrationForm() {
         return;
       }
       const email = `${data.username}@kichute.app`;
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase$1.auth.signUp({
         email,
         password: data.password
       });
       if (signUpError) throw signUpError;
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase$1.auth.signInWithPassword({
         email,
         password: data.password
       });
       if (signInError) throw signInError;
-      const { error: insertError } = await supabase.from("jogadores").insert({
+      const { error: insertError } = await supabase$1.from("jogadores").insert({
         nome: data.username,
         tipo: "Participante",
         senha: data.password
@@ -30997,7 +30997,7 @@ const StandingsHeader = ({
 const useKichuteQuery = () => {
   const fetchKichutes = reactExports.useCallback(
     async (selectedRodada, selectedJogador) => {
-      let query = supabase.from("kichutes").select(`
+      let query = supabase$1.from("kichutes").select(`
           id,
           palpite_casa,
           palpite_visitante,
@@ -31359,6 +31359,90 @@ function StandingsTable({
     ] }, item.nome)) })
   ] }) });
 }
+const supabaseUrl = "https://nabcktytlytgrdwhdanx.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hYmNrdHl0bHl0Z3Jkd2hkYW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1NjU2NjgsImV4cCI6MjA2MDE0MTY2OH0.Pp7I0dVN0-Tp1bXbjwuXUvF78gH-tXey_a9TNO1Au5E";
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+function useDynamicTableDataReal(selectedRodada, selectedMes, selectedAno) {
+  const [jogadores, setJogadores] = reactExports.useState([]);
+  const [rodadas, setRodadas] = reactExports.useState([]);
+  const [isLoading, setIsLoading] = reactExports.useState(true);
+  const [error, setError] = reactExports.useState(null);
+  reactExports.useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      setError(null);
+      let query = supabase.from("kichutes").select(`
+        jogador_id,
+        jogador_nome,
+        rodada,
+        pontos
+      `);
+      if (selectedRodada !== "todas") {
+        query = query.eq("rodada", selectedRodada);
+      }
+      const { data, error: error2 } = await query;
+      if (error2) {
+        setError("Erro ao carregar dados dos jogadores");
+        setIsLoading(false);
+        return;
+      }
+      const agrupado = {};
+      for (const item of data) {
+        if (!agrupado[item.jogador_id]) {
+          agrupado[item.jogador_id] = {
+            id: item.jogador_id,
+            nome: item.jogador_nome,
+            pontos_total: 0,
+            rodadas: {}
+          };
+        }
+        agrupado[item.jogador_id].pontos_total += item.pontos;
+        agrupado[item.jogador_id].rodadas[`r${item.rodada}`] = item.pontos;
+      }
+      const jogadoresArray = Object.values(agrupado);
+      const uniqueRodadas = [...new Set(data.map((item) => parseInt(item.rodada)))];
+      const sortedRodadas = uniqueRodadas.sort((a2, b2) => a2 - b2);
+      setJogadores(jogadoresArray);
+      setRodadas(sortedRodadas);
+      setIsLoading(false);
+    }
+    fetchData();
+  }, [selectedRodada, selectedMes, selectedAno]);
+  return { jogadores, rodadas, isLoading, error };
+}
+const useSortedPlayers = (jogadores, selectedRodada) => {
+  const [sortField, setSortField] = reactExports.useState("pontos_total");
+  const [sortDirection, setSortDirection] = reactExports.useState("desc");
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+  const sortedPlayers = [...jogadores].sort((a2, b2) => {
+    if (sortField === "nome") {
+      return sortDirection === "asc" ? a2.nome.localeCompare(b2.nome) : b2.nome.localeCompare(a2.nome);
+    }
+    if (sortField === "pontos_total") {
+      return sortDirection === "asc" ? a2.pontos_total - b2.pontos_total : b2.pontos_total - a2.pontos_total;
+    }
+    if (sortField === "rodada" && selectedRodada !== "todas") {
+      const rodadaKey = `r${selectedRodada}`;
+      const pontosA = a2.rodadas[rodadaKey] || 0;
+      const pontosB = b2.rodadas[rodadaKey] || 0;
+      return sortDirection === "asc" ? pontosA - pontosB : pontosB - pontosA;
+    }
+    return 0;
+  });
+  return {
+    sortField,
+    sortDirection,
+    handleSort,
+    sortedPlayers
+  };
+};
 function clamp(value, [min2, max2]) {
   return Math.min(max2, Math.max(min2, value));
 }
@@ -32678,115 +32762,11 @@ const TableFilters = ({
     ] })
   ] });
 };
-const useDynamicTableDataReal = (selectedRodada, selectedMes, selectedAno) => {
-  const [jogadores, setJogadores] = reactExports.useState([]);
-  const [rodadas, setRodadas] = reactExports.useState([]);
-  const [isLoading, setIsLoading] = reactExports.useState(true);
-  const [error, setError] = reactExports.useState(null);
-  reactExports.useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        let partidasQuery = supabase.from("partidas").select(`
-          id,
-          rodada,
-          data,
-          placar_casa,
-          placar_visitante
-        `);
-        if (selectedRodada !== "todas") {
-          partidasQuery = partidasQuery.eq("rodada", parseInt(selectedRodada));
-        }
-        if (selectedMes !== "todos") {
-          const [mesInicio, mesFim] = selectedMes === "01-02" ? ["01", "02"] : [selectedMes, selectedMes];
-          const dataInicio = `${selectedAno}-${mesInicio}-01`;
-          const ultimoDia = mesFim === "02" ? "28" : ["04", "06", "09", "11"].includes(mesFim) ? "30" : "31";
-          const dataFim = `${selectedAno}-${mesFim}-${ultimoDia}`;
-          partidasQuery = partidasQuery.gte("data", dataInicio).lte("data", dataFim);
-        }
-        const { data: partidas, error: partidasError } = await partidasQuery;
-        if (partidasError) throw partidasError;
-        const { data: kichutesData, error: kichutesError } = await supabase.from("kichutes").select(`
-            id,
-            palpite_casa,
-            palpite_visitante,
-            jogador:jogadores(id, nome),
-            partida_id
-          `).in("partida_id", (partidas == null ? void 0 : partidas.map((p2) => p2.id)) || []);
-        if (kichutesError) throw kichutesError;
-        const jogadoresMap = {};
-        kichutesData == null ? void 0 : kichutesData.forEach((kichute) => {
-          if (!kichute.jogador) return;
-          const partida = partidas == null ? void 0 : partidas.find((p2) => p2.id === kichute.partida_id);
-          if (!partida) return;
-          const jogadorId = kichute.jogador.id;
-          const jogadorNome = kichute.jogador.nome;
-          const rodada = `r${partida.rodada}`;
-          if (!jogadoresMap[jogadorId]) {
-            jogadoresMap[jogadorId] = {
-              id: jogadorId,
-              nome: jogadorNome,
-              rodadas: {},
-              pontos_total: 0
-            };
-          }
-          let pontos = 0;
-          if (partida.placar_casa !== null && partida.placar_visitante !== null && kichute.palpite_casa !== null && kichute.palpite_visitante !== null) {
-            pontos = calculatePoints(
-              { homeScore: kichute.palpite_casa, awayScore: kichute.palpite_visitante },
-              { homeScore: partida.placar_casa, awayScore: partida.placar_visitante },
-              SCORING_SYSTEM
-            );
-          }
-          jogadoresMap[jogadorId].rodadas[rodada] = (jogadoresMap[jogadorId].rodadas[rodada] || 0) + pontos;
-          jogadoresMap[jogadorId].pontos_total += pontos;
-          console.log(`[Points Calculation] ${jogadorNome} - Rodada ${rodada}:`, {
-            palpite: `${kichute.palpite_casa}x${kichute.palpite_visitante}`,
-            resultado: `${partida.placar_casa}x${partida.placar_visitante}`,
-            pontos
-          });
-        });
-        const jogadoresArray = Object.values(jogadoresMap);
-        const rodasUnicas = [...new Set(partidas == null ? void 0 : partidas.map((p2) => `r${p2.rodada}`))].sort((a2, b2) => {
-          const numA = parseInt(a2.substring(1));
-          const numB = parseInt(b2.substring(1));
-          return numA - numB;
-        });
-        console.log("Processed data:", {
-          jogadores: jogadoresArray,
-          rodadas: rodasUnicas
-        });
-        setJogadores(jogadoresArray);
-        setRodadas(rodasUnicas);
-      } catch (err2) {
-        console.error("Erro ao buscar dados:", err2);
-        setError("Não foi possível carregar os dados");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [selectedRodada, selectedMes, selectedAno]);
-  return { jogadores, rodadas, isLoading, error };
-};
-const useDynamicTableSort = () => {
-  const [sortField, setSortField] = reactExports.useState("pontos_total");
-  const [sortDirection, setSortDirection] = reactExports.useState("desc");
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("desc");
-    }
-  };
-  return {
-    sortField,
-    sortDirection,
-    handleSort
-  };
-};
+const TableLoading = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-center items-center p-8", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCw, { className: "h-8 w-8 animate-spin text-primary" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2", children: "Carregando dados..." })
+] });
+const TableError = ({ message: message2 }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center text-red-500", children: message2 });
 const SortIcon = ({ field, currentSortField, sortDirection }) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex ml-1 text-muted-foreground", children: currentSortField === field ? sortDirection === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronUp, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "h-4 w-4 opacity-30" }) });
 const DynamicTableHeader = ({
   handleSort,
@@ -32899,11 +32879,46 @@ const DynamicTableFooter = ({
     todasRodadas.map((rodada) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: totaisPorRodada[rodada] || 0 }, `footer-${rodada}`))
   ] }) });
 };
-const TableLoading = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-center items-center p-8", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCw, { className: "h-8 w-8 animate-spin text-primary" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2", children: "Carregando dados..." })
-] });
-const TableError = ({ message: message2 }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center text-red-500", children: message2 });
+const TableEmptyState = ({ colSpan }) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan, className: "text-center py-8 text-gray-500", children: "Nenhum resultado encontrado" }) });
+const DynamicTableContent = ({
+  sortedPlayers,
+  todasRodadas,
+  totaisPorRodada,
+  totalGeral,
+  handleSort,
+  sortField,
+  sortDirection,
+  selectedRodada
+}) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx(
+    DynamicTableHeader,
+    {
+      handleSort,
+      sortField,
+      sortDirection,
+      todasRodadas,
+      selectedRodada
+    }
+  ),
+  /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedPlayers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableEmptyState, { colSpan: 3 + todasRodadas.length }) : sortedPlayers.map((jogador, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+    DynamicTableRow,
+    {
+      jogador,
+      index: index2,
+      todasRodadas
+    },
+    jogador.id
+  )) }),
+  sortedPlayers.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+    DynamicTableFooter,
+    {
+      jogadores: sortedPlayers,
+      todasRodadas,
+      totaisPorRodada,
+      totalGeral
+    }
+  )
+] }) });
 const DynamicTable = () => {
   const [selectedRodada, setSelectedRodada] = reactExports.useState("todas");
   const [selectedMes, setSelectedMes] = reactExports.useState("todos");
@@ -32913,7 +32928,6 @@ const DynamicTable = () => {
     selectedMes,
     selectedAno
   );
-  const { sortField, sortDirection, handleSort } = useDynamicTableSort();
   const todasRodadas = Array.from(
     new Set(jogadores.flatMap((jogador) => Object.keys(jogador.rodadas)))
   ).sort((a2, b2) => {
@@ -32921,6 +32935,10 @@ const DynamicTable = () => {
     const numB = parseInt(b2.substring(1));
     return numA - numB;
   });
+  const { sortField, sortDirection, handleSort, sortedPlayers } = useSortedPlayers(
+    jogadores,
+    selectedRodada
+  );
   const calcularTotalPorRodada = () => {
     const totais = {};
     todasRodadas.forEach((rodada) => {
@@ -32932,21 +32950,6 @@ const DynamicTable = () => {
   };
   const totaisPorRodada = calcularTotalPorRodada();
   const totalGeral = jogadores.reduce((sum, jogador) => sum + jogador.pontos_total, 0);
-  const sortedPlayers = [...jogadores].sort((a2, b2) => {
-    if (sortField === "nome") {
-      return sortDirection === "asc" ? a2.nome.localeCompare(b2.nome) : b2.nome.localeCompare(a2.nome);
-    }
-    if (sortField === "pontos_total") {
-      return sortDirection === "asc" ? a2.pontos_total - b2.pontos_total : b2.pontos_total - a2.pontos_total;
-    }
-    if (sortField === "rodada" && selectedRodada !== "todas") {
-      const rodadaKey = `r${selectedRodada}`;
-      const pontosA = a2.rodadas[rodadaKey] || 0;
-      const pontosB = b2.rodadas[rodadaKey] || 0;
-      return sortDirection === "asc" ? pontosA - pontosB : pontosB - pontosA;
-    }
-    return 0;
-  });
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       TableFilters,
@@ -32960,36 +32963,19 @@ const DynamicTable = () => {
         onAnoChange: setSelectedAno
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableLoading, {}) : error ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableError, { message: error }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[calc(100vh-16rem)] overflow-auto rounded-lg border border-border/50 shadow-subtle", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        DynamicTableHeader,
-        {
-          handleSort,
-          sortField,
-          sortDirection,
-          todasRodadas,
-          selectedRodada
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedPlayers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 3 + todasRodadas.length, className: "text-center py-8 text-gray-500", children: "Nenhum resultado encontrado" }) }) : sortedPlayers.map((jogador, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-        DynamicTableRow,
-        {
-          jogador,
-          index: index2,
-          todasRodadas
-        },
-        jogador.id
-      )) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        DynamicTableFooter,
-        {
-          jogadores,
-          todasRodadas,
-          totaisPorRodada,
-          totalGeral
-        }
-      )
-    ] }) }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableLoading, {}) : error ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableError, { message: error }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DynamicTableContent,
+      {
+        sortedPlayers,
+        todasRodadas,
+        totaisPorRodada,
+        totalGeral,
+        handleSort,
+        sortField,
+        sortDirection,
+        selectedRodada
+      }
+    ) })
   ] });
 };
 const StandingsContent = ({
@@ -33014,7 +33000,7 @@ const usePontuacaoRodada = (selectedRound) => {
     const fetchPontuacao = async () => {
       setIsLoading(true);
       try {
-        let query = supabase.from("pontuacao_rodada").select(`
+        let query = supabase$1.from("pontuacao_rodada").select(`
             id,
             rodada,
             pontos,
@@ -33102,7 +33088,7 @@ const useCurrentRound = () => {
     const fetchCurrentRound = async () => {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase.from("partidas").select("rodada, data").order("data", { ascending: true });
+        const { data, error } = await supabase$1.from("partidas").select("rodada, data").order("data", { ascending: true });
         if (error) throw error;
         if (!data || data.length === 0) {
           setCurrentRound(1);
@@ -33157,7 +33143,7 @@ const Standings = () => {
   reactExports.useEffect(() => {
     const fetchRounds = async () => {
       try {
-        const { data, error } = await supabase.from("partidas").select("rodada").order("rodada");
+        const { data, error } = await supabase$1.from("partidas").select("rodada").order("rodada");
         if (error) throw error;
         const uniqueRounds = [
           ...new Set(data == null ? void 0 : data.map((item) => item.rodada))
@@ -33427,7 +33413,7 @@ const ResultForm = ({ match: match2, onResultSaved }) => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const { error } = await supabase.from("partidas").update({
+      const { error } = await supabase$1.from("partidas").update({
         placar_casa: homeScore,
         placar_visitante: awayScore
       }).eq("id", match2.id);
@@ -33843,7 +33829,7 @@ const MatchesFilters = ({
   reactExports.useEffect(() => {
     const fetchRodadas = async () => {
       try {
-        const { data, error: error2 } = await supabase.from("partidas").select("rodada").order("rodada");
+        const { data, error: error2 } = await supabase$1.from("partidas").select("rodada").order("rodada");
         if (error2) throw error2;
         const uniqueRodadas = [...new Set(data == null ? void 0 : data.map((item) => item.rodada))].filter(Boolean);
         setRodadas(uniqueRodadas);
@@ -33857,7 +33843,7 @@ const MatchesFilters = ({
   reactExports.useEffect(() => {
     const fetchTimes = async () => {
       try {
-        const { data, error: error2 } = await supabase.from("times").select("id, nome").order("nome");
+        const { data, error: error2 } = await supabase$1.from("times").select("id, nome").order("nome");
         if (error2) throw error2;
         setTimes(data || []);
       } catch (err2) {
@@ -33977,7 +33963,7 @@ const useMatches$2 = (selectedRodada, selectedTime) => {
       setIsLoading(true);
       setError(null);
       try {
-        let query = supabase.from("partidas").select(`
+        let query = supabase$1.from("partidas").select(`
             id,
             rodada,
             data,
@@ -34071,7 +34057,7 @@ const Matches = () => {
   const fetchMatches = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.from("partidas").select(`
+      const { data, error } = await supabase$1.from("partidas").select(`
           id,
           rodada,
           data,
@@ -34267,18 +34253,18 @@ const useGuesses = (onSubmitSuccess) => {
       let saveSuccess = true;
       for (const guess of guessesData) {
         console.log(`Processando palpite: Jogador ${guess.jogador_id}, Partida ${guess.partida_id}`);
-        const { data: existingGuess, error: checkError } = await supabase.from("kichutes").select("*").eq("jogador_id", guess.jogador_id).eq("partida_id", guess.partida_id).maybeSingle();
+        const { data: existingGuess, error: checkError } = await supabase$1.from("kichutes").select("*").eq("jogador_id", guess.jogador_id).eq("partida_id", guess.partida_id).maybeSingle();
         console.log("Verificação de palpite existente:", { existingGuess, checkError });
         let result;
         if (existingGuess) {
           console.log(`Atualizando palpite existente: ID ${existingGuess.id}`);
-          result = await supabase.from("kichutes").update({
+          result = await supabase$1.from("kichutes").update({
             palpite_casa: guess.palpite_casa,
             palpite_visitante: guess.palpite_visitante
           }).eq("id", existingGuess.id);
         } else {
           console.log("Inserindo novo palpite");
-          result = await supabase.from("kichutes").insert(guess);
+          result = await supabase$1.from("kichutes").insert(guess);
         }
         console.log("Resultado da operação:", result);
         if (result.error) {
@@ -34322,7 +34308,7 @@ const useMatchesByRound = (selectedRound) => {
     const fetchMatches = async () => {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase.from("partidas").select(`
+        const { data, error } = await supabase$1.from("partidas").select(`
             id,
             rodada,
             data,
@@ -34359,7 +34345,7 @@ const RoundSelector$1 = ({ selectedRound, onRoundChange, isDisabled }) => {
   reactExports.useEffect(() => {
     const fetchRounds = async () => {
       try {
-        const { data, error } = await supabase.from("partidas").select("rodada").order("rodada");
+        const { data, error } = await supabase$1.from("partidas").select("rodada").order("rodada");
         if (error) throw error;
         const uniqueRounds = [...new Set(data == null ? void 0 : data.map((item) => item.rodada))].filter(Boolean);
         setRounds(uniqueRounds);
@@ -34400,7 +34386,7 @@ const useParticipants$1 = () => {
   reactExports.useEffect(() => {
     const fetchParticipants = async () => {
       try {
-        const { data, error } = await supabase.from("jogadores").select("id, nome").order("nome");
+        const { data, error } = await supabase$1.from("jogadores").select("id, nome").order("nome");
         if (error) throw error;
         setParticipants(data || []);
       } catch (err2) {
@@ -34748,9 +34734,9 @@ const GuessingFormNew = ({ onSubmitSuccess, initialRound = "1" }) => {
     const fetchExistingGuesses = async () => {
       if (!selectedParticipant) return;
       try {
-        const { data: matchesData, error: matchesError } = await supabase.from("partidas").select("id").eq("rodada", parseInt(selectedRound));
+        const { data: matchesData, error: matchesError } = await supabase$1.from("partidas").select("id").eq("rodada", parseInt(selectedRound));
         if (matchesError) throw matchesError;
-        const { data: existingGuesses, error: guessesError } = await supabase.from("kichutes").select("*").eq("jogador_id", selectedParticipant).in("partida_id", matchesData.map((m2) => m2.id));
+        const { data: existingGuesses, error: guessesError } = await supabase$1.from("kichutes").select("*").eq("jogador_id", selectedParticipant).in("partida_id", matchesData.map((m2) => m2.id));
         if (guessesError) throw guessesError;
         console.log("Palpites existentes:", existingGuesses);
         const updatedGuesses = matches.map((match2) => {
@@ -35143,7 +35129,7 @@ const PaymentsFilter = ({
     const fetchPlayers = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase.from("jogadores").select("id, nome").order("nome");
+        const { data, error } = await supabase$1.from("jogadores").select("id, nome").order("nome");
         if (error) throw error;
         setPlayers(data || []);
       } catch (error) {
@@ -36167,7 +36153,7 @@ const PaymentsTable = ({
   selectedStatus
 }) => {
   const fetchPayments = async () => {
-    let query = supabase.from("pagamentos").select(`
+    let query = supabase$1.from("pagamentos").select(`
         id, 
         jogador_id,
         valor, 
@@ -36299,7 +36285,7 @@ const useTeams = () => {
     setError(null);
     try {
       console.log("Iniciando busca de times...");
-      const { data, error: error2 } = await supabase.from("times").select("*").order("nome");
+      const { data, error: error2 } = await supabase$1.from("times").select("*").order("nome");
       if (error2) {
         console.error("Erro do Supabase:", error2);
         throw error2;
@@ -36363,7 +36349,7 @@ const MatchesProvider$1 = ({ children }) => {
     const fetchMatches = async () => {
       setIsLoading(true);
       try {
-        const { data: matchesData, error } = await supabase.from("partidas").select(`
+        const { data: matchesData, error } = await supabase$1.from("partidas").select(`
             id,
             rodada,
             data,
@@ -36460,7 +36446,7 @@ const MatchesProvider$1 = ({ children }) => {
   const handleDeleteMatch = async (matchId, roundNumber) => {
     if (confirm("Tem certeza que deseja excluir esta partida?")) {
       try {
-        const { error } = await supabase.from("partidas").delete().eq("id", matchId);
+        const { error } = await supabase$1.from("partidas").delete().eq("id", matchId);
         if (error) throw error;
         setRounds(
           (prev) => prev.map((round2) => {
@@ -36509,21 +36495,21 @@ const MatchesProvider$1 = ({ children }) => {
         local: location2
       };
       if (editingMatch) {
-        const { error } = await supabase.from("partidas").update(matchData).eq("id", editingMatch.id);
+        const { error } = await supabase$1.from("partidas").update(matchData).eq("id", editingMatch.id);
         if (error) throw error;
         toast2({
           title: "Partida atualizada",
           description: "A partida foi atualizada com sucesso."
         });
       } else {
-        const { data, error } = await supabase.from("partidas").insert(matchData).select();
+        const { data, error } = await supabase$1.from("partidas").insert(matchData).select();
         if (error) throw error;
         toast2({
           title: "Partida adicionada",
           description: "A partida foi adicionada com sucesso."
         });
       }
-      const { data: updatedMatches, error: fetchError } = await supabase.from("partidas").select(`
+      const { data: updatedMatches, error: fetchError } = await supabase$1.from("partidas").select(`
           id,
           rodada,
           data,
@@ -36586,7 +36572,7 @@ const MatchesProvider$1 = ({ children }) => {
   };
   const handleUpdateResults = async (match2, homeScore, awayScore) => {
     try {
-      const { error } = await supabase.from("partidas").update({
+      const { error } = await supabase$1.from("partidas").update({
         placar_casa: homeScore,
         placar_visitante: awayScore
       }).eq("id", match2.id);
@@ -52339,7 +52325,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-Ds97QmQK.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-DwKjLc7l.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
@@ -53209,7 +53195,7 @@ const useReportData = (selectedRound, selectedMonth, selectedYear) => {
       setError(null);
       console.log("Buscando dados para", { selectedRound, selectedMonth, selectedYear });
       try {
-        let matchesQuery = supabase.from("partidas").select(`
+        let matchesQuery = supabase$1.from("partidas").select(`
           id, 
           rodada, 
           time_casa:times!time_casa_id(nome, sigla), 
@@ -53238,7 +53224,7 @@ const useReportData = (selectedRound, selectedMonth, selectedYear) => {
         if (matchesData && matchesData.length > 0) {
           setMatches(matchesData);
           const matchIds = matchesData.map((m2) => m2.id);
-          const { data: kichutesData, error: kichutesError } = await supabase.from("kichutes").select(`
+          const { data: kichutesData, error: kichutesError } = await supabase$1.from("kichutes").select(`
               id, 
               palpite_casa, 
               palpite_visitante, 
@@ -55012,7 +54998,7 @@ const useParticipants = () => {
   const { toast: toast2 } = useToast();
   const fetchParticipants = async () => {
     try {
-      const { data, error } = await supabase.from("jogadores").select("*");
+      const { data, error } = await supabase$1.from("jogadores").select("*");
       if (error) {
         console.error("Erro ao buscar participantes:", error);
         toast2({
@@ -55066,14 +55052,14 @@ const useParticipantEdit = (users, setUsers) => {
       };
       if (data.password) {
         const email = `${selectedParticipant.name}@kichute.app`;
-        const { error: authError } = await supabase.auth.admin.updateUserById(
+        const { error: authError } = await supabase$1.auth.admin.updateUserById(
           selectedParticipant.id,
           { password: data.password }
         );
         if (authError) throw authError;
         updateData.senha = data.password;
       }
-      const { error } = await supabase.from("jogadores").update(updateData).eq("id", selectedParticipant.id);
+      const { error } = await supabase$1.from("jogadores").update(updateData).eq("id", selectedParticipant.id);
       if (error) throw error;
       setUsers(
         (prevUsers) => prevUsers.map(
@@ -55124,7 +55110,7 @@ const useParticipantDelete = (users, setUsers) => {
   const confirmDeleteUser = async () => {
     if (!deleteConfirmation.userId) return;
     try {
-      const { error } = await supabase.from("jogadores").delete().eq("id", deleteConfirmation.userId);
+      const { error } = await supabase$1.from("jogadores").delete().eq("id", deleteConfirmation.userId);
       if (error) throw error;
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== deleteConfirmation.userId));
       toast2({
@@ -55179,7 +55165,7 @@ const usePayments = (users, setUsers) => {
       if (!user) return;
       const newPaidAmount = user.paidAmount + amount;
       const newStatus = newPaidAmount >= 10 ? "pago" : "pendente";
-      const { error } = await supabase.from("jogadores").update({
+      const { error } = await supabase$1.from("jogadores").update({
         pagamento_total: newPaidAmount,
         status_pagamento: newStatus
       }).eq("id", paymentDetails.userId);
@@ -55263,7 +55249,7 @@ const AdminUsers = () => {
   };
   const handleSubmitNewUser = async (data) => {
     try {
-      const { data: newUser, error } = await supabase.from("jogadores").insert({
+      const { data: newUser, error } = await supabase$1.from("jogadores").insert({
         nome: data.name,
         senha: data.password,
         tipo: data.tipo,
@@ -55682,7 +55668,7 @@ const useTeamForm = (onSuccess) => {
     setIsSubmitting(true);
     try {
       if (currentTeam) {
-        const { error } = await supabase.from("times").update({
+        const { error } = await supabase$1.from("times").update({
           nome: formData.name,
           sigla: formData.shortName,
           escudo_url: formData.logoUrl,
@@ -55704,7 +55690,7 @@ const useTeamForm = (onSuccess) => {
           description: `${formData.name} foi atualizado com sucesso.`
         });
       } else {
-        const { data, error } = await supabase.from("times").insert({
+        const { data, error } = await supabase$1.from("times").insert({
           nome: formData.name,
           sigla: formData.shortName,
           escudo_url: formData.logoUrl,
@@ -55762,7 +55748,7 @@ const useTeamDelete = (onSuccess) => {
     if (!teamToDelete) return;
     setIsDeleting(true);
     try {
-      const { error } = await supabase.from("times").delete().eq("id", teamToDelete.id);
+      const { error } = await supabase$1.from("times").delete().eq("id", teamToDelete.id);
       if (error) throw error;
       onSuccess(teamToDelete.id);
       toast2({
@@ -55922,7 +55908,7 @@ const TeamsTable = () => {
   reactExports.useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const { data, error } = await supabase.from("times").select("id, nome, sigla, escudo_url").order("nome");
+        const { data, error } = await supabase$1.from("times").select("id, nome, sigla, escudo_url").order("nome");
         if (error) {
           console.error("Error fetching teams:", error.message);
         } else {
@@ -56040,7 +56026,7 @@ const getMatchQueryWithTeams = () => {
 };
 const fetchAllMatches = async () => {
   try {
-    const { data, error } = await supabase.from("partidas").select(getMatchQueryWithTeams()).order("rodada").order("data");
+    const { data, error } = await supabase$1.from("partidas").select(getMatchQueryWithTeams()).order("rodada").order("data");
     if (error) throw error;
     return {
       data: data.map(transformMatchFromSupabase),
@@ -56056,7 +56042,7 @@ const fetchAllMatches = async () => {
 };
 const updateMatchResult = async (matchId, homeScore, awayScore) => {
   try {
-    const { error } = await supabase.from("partidas").update({
+    const { error } = await supabase$1.from("partidas").update({
       placar_casa: homeScore,
       placar_visitante: awayScore
     }).eq("id", matchId);
@@ -56072,7 +56058,7 @@ const updateMatchResult = async (matchId, homeScore, awayScore) => {
 };
 const deleteMatch = async (matchId) => {
   try {
-    const { error } = await supabase.from("partidas").delete().eq("id", matchId);
+    const { error } = await supabase$1.from("partidas").delete().eq("id", matchId);
     if (error) throw error;
     return { success: true, error: null };
   } catch (error) {
@@ -56086,10 +56072,10 @@ const deleteMatch = async (matchId) => {
 const saveMatch = async (matchData, matchId) => {
   try {
     if (matchId) {
-      const { error } = await supabase.from("partidas").update(matchData).eq("id", matchId);
+      const { error } = await supabase$1.from("partidas").update(matchData).eq("id", matchId);
       if (error) throw error;
     } else {
-      const { error } = await supabase.from("partidas").insert(matchData);
+      const { error } = await supabase$1.from("partidas").insert(matchData);
       if (error) throw error;
     }
     return { success: true, error: null };
@@ -60739,7 +60725,7 @@ function ScoreSettingsForm({ initialValues, onSubmit }) {
 }
 const RulesTable = () => {
   const fetchRules = async () => {
-    const { data, error: error2 } = await supabase.from("regras").select("*");
+    const { data, error: error2 } = await supabase$1.from("regras").select("*");
     if (error2) {
       console.error("Erro ao buscar regras:", error2);
       throw new Error("Não foi possível carregar as regras.");
