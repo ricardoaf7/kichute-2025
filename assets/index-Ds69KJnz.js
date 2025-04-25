@@ -26017,7 +26017,7 @@ class RealtimeClient {
       }
     });
     __vitePreload(async () => {
-      const { default: WS } = await import("./browser-BYP3pacm.js").then((n2) => n2.b);
+      const { default: WS } = await import("./browser-D0HSL6C-.js").then((n2) => n2.b);
       return { default: WS };
     }, true ? [] : void 0, import.meta.url).then(({ default: WS }) => {
       this.conn = new WS(this.endpointURL(), void 0, {
@@ -30957,11 +30957,18 @@ function useDynamicTableDataReal(selectedRodada, selectedMes, selectedAno) {
         }
         const jogadoresMap = {};
         kichutesData == null ? void 0 : kichutesData.forEach((kichute) => {
-          if (!kichute.jogador) return;
+          if (!kichute.jogador || Array.isArray(kichute.jogador)) {
+            console.warn("Jogador inválido encontrado:", kichute.jogador);
+            return;
+          }
           const partida = partidas == null ? void 0 : partidas.find((p2) => p2.id === kichute.partida_id);
           if (!partida) return;
           const jogadorId = kichute.jogador.id;
           const jogadorNome = kichute.jogador.nome;
+          if (!jogadorId || !jogadorNome) {
+            console.warn("Dados de jogador incompletos:", kichute.jogador);
+            return;
+          }
           const rodada = `r${partida.rodada}`;
           const pontos = kichute.pontos || 0;
           if (!jogadoresMap[jogadorId]) {
@@ -52310,7 +52317,7 @@ function(t3) {
  */
 function(t3) {
   function e2() {
-    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-BS2D4n7c.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
+    return (n.canvg ? Promise.resolve(n.canvg) : __vitePreload(() => import("./index.es-0C-CgDpz.js"), true ? [] : void 0, import.meta.url)).catch(function(t4) {
       return Promise.reject(new Error("Could not load canvg: " + t4));
     }).then(function(t4) {
       return t4.default ? t4.default : t4;
