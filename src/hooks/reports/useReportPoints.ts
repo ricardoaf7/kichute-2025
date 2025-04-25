@@ -1,5 +1,7 @@
 
 import { useMemo } from "react";
+import { calculatePoints } from "@/utils/scoring";
+import { SCORING_SYSTEM } from "@/utils/mockData";
 
 interface Participant {
   id: string;
@@ -20,6 +22,13 @@ export const useReportPoints = (
   isMonthly: boolean = true
 ) => {
   const pointsByPlayerAndMonth = useMemo(() => {
+    console.log('Processing points calculation with:', {
+      kichutesCount: kichutes.length,
+      participantsCount: participants.length,
+      selectedYear,
+      isMonthly
+    });
+
     const calculatedPoints: CalculatedPoints[] = participants.map(participant => ({
       playerId: participant.id,
       playerName: participant.nome,
@@ -28,18 +37,48 @@ export const useReportPoints = (
     }));
 
     kichutes.forEach(kichute => {
-      const month = new Date(kichute.partida?.data).getMonth() + 1;
-      const year = new Date(kichute.partida?.data).getFullYear().toString();
+      const matchDate = kichute.partida?.data ? new Date(kichute.partida.data) : null;
+      if (!matchDate) return;
+
+      const month = matchDate.getMonth() + 1;
+      const year = matchDate.getFullYear().toString();
       
       if (year === selectedYear && kichute.jogador_id) {
         const playerIndex = calculatedPoints.findIndex(p => p.playerId === kichute.jogador_id);
-        if (playerIndex !== -1) {
-          if (!calculatedPoints[playerIndex].monthlyPoints[month]) {
-            calculatedPoints[playerIndex].monthlyPoints[month] = 0;
-          }
-          calculatedPoints[playerIndex].monthlyPoints[month] += kichute.pontos || 0;
-          calculatedPoints[playerIndex].totalPoints += kichute.pontos || 0;
+        if (playerIndex === -1) return;
+
+        // Recalculate points using the same logic as other views
+        let points = 0;
+        if (kichute.partida?.placar_casa !== null && 
+            kichute.partida?.placar_visitante !== null &&
+            kichute.palpite_casa !== null && 
+            kichute.palpite_visitante !== null) {
+            
+          points = calculatePoints(
+            { 
+              homeScore: kichute.palpite_casa, 
+              awayScore: kichute.palpite_visitante 
+            },
+            { 
+              homeScore: kichute.partida.placar_casa, 
+              awayScore: kichute.partida.placar_visitante 
+            },
+            SCORING_SYSTEM
+          );
         }
+
+        if (!calculatedPoints[playerIndex].monthlyPoints[month]) {
+          calculatedPoints[playerIndex].monthlyPoints[month] = 0;
+        }
+        
+        calculatedPoints[playerIndex].monthlyPoints[month] += points;
+        calculatedPoints[playerIndex].totalPoints += points;
+
+        console.log(`[Monthly Points] ${calculatedPoints[playerIndex].playerName} - Month ${month}:`, {
+          palpite: `${kichute.palpite_casa}x${kichute.palpite_visitante}`,
+          resultado: `${kichute.partida?.placar_casa}x${kichute.partida?.placar_visitante}`,
+          points
+        });
       }
     });
 

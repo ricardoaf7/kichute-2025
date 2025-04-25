@@ -1,4 +1,3 @@
-
 import { useParticipants } from "@/hooks/useParticipants";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Trophy } from "lucide-react";
@@ -71,12 +70,14 @@ const RoundTotalScore = ({ selectedRound }: RoundTotalScoreProps) => {
       {participants.map((participant) => {
         const participantId = String(participant.id);
         const totalPontos = totaisPorJogador[participantId] || 0;
-        const isTopScorer = totalPontos === maxScore && totalPontos > 0;
+        const isTopScorer = totalPontos === maxScore && maxScore > 0;
         
         return (
           <TableCell key={`total-${participantId}`} className="text-center">
             <div className="flex items-center justify-center space-x-1">
-              {isTopScorer && <Trophy className="h-4 w-4 text-yellow-500" />}
+              {isTopScorer && (
+                <Trophy className="h-4 w-4 text-yellow-500" />
+              )}
               <span>{totalPontos}</span>
             </div>
           </TableCell>
